@@ -7,6 +7,7 @@ Development Team: Gottfried Pestal, Charmaine Carr-Harris, Steven Cox-Rogers
 **Important Notes:** 
 
 * This package is under development. Functions may change rapidly and substantially. Do not use these if you are not part of the development team!
+* WARNING: The age comp diagnostics in the data check are not behaving properly. See [this issue](https://github.com/SOLV-Code/RapidRicker/issues/61) for details, and [this wiki page] for context.
 * SR model fits and biological benchmarks are simple deterministic fits based on ```lm(logRpS ~ S)```. These are intended solely as a rapid check for the sensitivity to different ways of subsetting the data.  We envision this as a pre-screening step to plan out more formal model fitting and sensitivity testing (e.g. Bayesian models with time-varying productivity, hierarchical models with shared productivity estimates across stocks).
 
 For now *RapidRicker* includes 3 functions that work on data for a single stock:
@@ -20,6 +21,7 @@ There is also a wrapper function *RapidRicker()* that applies all of these to a 
 
 
 *Update*: Basic Bayesian estimates are being added in the *calcMCMCRickerBM()* function, with the planned option of running them through the R2jags package, the Rstanarm package (with a syntax like R's lm function) or the Rstan package ("traditional" STAN). Depending on speed, these may be incorporated into the overall *RapidRicker()* function call, or stay as a standalone extension.
+
 
 
 To get up and running with some examples, follow the *Quick Start* steps below.
