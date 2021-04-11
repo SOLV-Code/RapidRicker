@@ -7,7 +7,8 @@ Development Team: Gottfried Pestal, Charmaine Carr-Harris, Steven Cox-Rogers
 **Important Notes:** 
 
 * This package is under development. Functions may change rapidly and substantially. Do not use these if you are not part of the development team!
-* WARNING: The age comp diagnostics in the data check are not behaving properly. See [this issue](https://github.com/SOLV-Code/RapidRicker/issues/61) for details, and [this wiki page] for context.
+* WARNING: The age comp diagnostics in the data check were not behaving properly. See [this issue](https://github.com/SOLV-Code/RapidRicker/issues/61) for details, and [this wiki page] for context. Therefore, the
+corresponding steps have been commented out in the *checkSRData() fn, and the associated trigger values have been removed from the *flags_default* object.
 * SR model fits and biological benchmarks are simple deterministic fits based on ```lm(logRpS ~ S)```. These are intended solely as a rapid check for the sensitivity to different ways of subsetting the data.  We envision this as a pre-screening step to plan out more formal model fitting and sensitivity testing (e.g. Bayesian models with time-varying productivity, hierarchical models with shared productivity estimates across stocks).
 
 For now *RapidRicker* includes 3 functions that work on data for a single stock:
