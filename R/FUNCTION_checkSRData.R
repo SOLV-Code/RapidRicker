@@ -169,6 +169,8 @@ if(!("SpnExp" %in% names(sr_obj))){
 # Unstable age comp --------------------------------------------
 # calc: MaxDiffByAge
 
+if(FALSE){ # excluded, until resolve this issue: https://github.com/SOLV-Code/RapidRicker/issues/61
+
 if(trace){print("Starting VarAge")}
 
 flag.label <- "VarAge"
@@ -194,6 +196,8 @@ if(sum(grepl("RecAge",names(sr_obj)))>=2) { # don only of have at least 2 age cl
 if(sum(grepl("RecAge",names(sr_obj)))<2){
   flags[flags$Label == flag.label, "MetricVal"] <- NA
   flags[flags$Label == flag.label, "Flagged"] <- NA
+}
+
 }
 
 
@@ -305,6 +309,9 @@ sr_obj[[paste0(flag.label,"Flag")]] <- NA
 # calc: recAge / Med(RecAge) for main age comp
 #
 
+
+if(FALSE){ # excluded, until resolve this issue: https://github.com/SOLV-Code/RapidRicker/issues/61
+
 if(trace){print("Starting OddAge")}
 
 flag.label <- "OddAge"
@@ -338,6 +345,8 @@ if(sum(grepl("RecAge",names(sr_obj)))<2){
   sr_obj[[paste0(flag.label,"Flag")]] <- NA
 }
 
+
+}
 
 
 #-----------------------------------------
