@@ -17,14 +17,14 @@
 #' @keywords Ricker fit, Bayesian, MCMC, posterior, Smsy, Smax, Seq, Umsy
 #' @export
 #' @examples
-#' ricker.bm <- calcDetRickerBM(SR_Sample[SR_Sample$Stock == "Stock1",],min.obs = 10)
+#' ricker.bm <- calcMCMCRickerBM(SR_Sample[SR_Sample$Stock == "Stock1",],min.obs = 10)
 #' print(ricker.bm)
 
 calcMCMCRickerBM <- function(sr_obj,
-          model.file = "MODEL_Ricker_BUGS.txt",
+          model.file = "BUILT_IN_MODEL_Ricker_BUGS.txt",
           min.obs=15,
 					mcmc.settings = list(n.chains=2, n.burnin=20000, n.thin=60,n.samples=50000),
-					mcmc.inits = list(list(tau_R=3, C=1),list(tau_R=7, C=2)),
+					mcmc.inits = list(list(tau_R=3, S.max=1),list(tau_R=7, S.max=2)),
 					mcmc.priors = list(p.alpha = 0,tau_alpha = 0.0001, p.beta = 1, tau_beta = 0.1,max.scalar = 3),
 					output = "short",
 					out.path = "MCMC_Out",
@@ -62,14 +62,27 @@ mcmc.data <- c(list(S = sr.use$Spn, R_Obs = sr.use$Rec, N = dim(sr.use)[1]),
 
 print(mcmc.data)
 
-# Define the model
+# Get the model file
+
+models.list <- c("BUILT_IN_MODEL_Ricker_BUGS.txt")
+
+if(model.file %in% models.list){
+# this extracts the full path to the file in the local installing
+# as per https://stat.ethz.ch/pipermail/r-help/2010-August/249288.html
+model.use <- system.file( model.file, package="RapidRicker")
+}
+
+if(!(model.file %in% models.list)){
+# This passes the user-specified path/file into the JAGS call
+model.use <- model.file
+}
 
 
 
 # Do the MCMC
 
 tmp.out <- doRJAGS(data.obj = mcmc.data,
-                    model.fn = paste0("/",model.file), # for details see ?ricker.BUGS
+                    model.fn = model.use, # for details see ?ricker.BUGS
                     inits = mcmc.inits,
                     settings = mcmc.settings ,
                     pars.track = pars.track.in,

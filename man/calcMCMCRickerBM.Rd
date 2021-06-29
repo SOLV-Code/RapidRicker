@@ -6,10 +6,12 @@
 \usage{
 calcMCMCRickerBM(
   sr_obj,
+  model.file = "BUILT_IN_MODEL_Ricker_BUGS.txt",
   min.obs = 15,
   mcmc.settings = list(n.chains = 2, n.burnin = 20000, n.thin = 60, n.samples = 50000),
   mcmc.inits = list(list(tau_R = 3, C = 1), list(tau_R = 7, C = 2)),
-  mcmc.priors = list(p.alpha = 0, tau_alpha = 1e-04, p.beta = 1, tau_beta = 0.1),
+  mcmc.priors = list(p.alpha = 0, tau_alpha = 1e-04, p.beta = 1, tau_beta = 0.1,
+    max.scalar = 3),
   output = "short",
   out.path = "MCMC_Out",
   out.label = "MCMC",
@@ -20,13 +22,15 @@ calcMCMCRickerBM(
 \arguments{
 \item{sr_obj}{a data frame with Spn and Rec (Data for 1 Stock!). Other variables can be there but are not used (RpS, Qual, ExpF etc)}
 
+\item{model.file}{a txt file with JAGS code (default is "MODEL_Ricker_BUGS.txt" )}
+
 \item{min.obs}{min number of S-R pairs needed to fit a model}
 
 \item{mcmc.settings}{a list with n.chains (2), n.burnin (20000), n.thin (60), and n.samples (50000). Default values in brackets.}
 
 \item{mcmc.inits}{a list of lists with inits for each chain. Default is "list(list(tau_R=3, C=1),list(tau_R=7, C=2))"}
 
-\item{mcmc.priors}{a list with p.alpha, p.beta, tau_alpha,tau_beta}
+\item{mcmc.priors}{a list with p.alpha, p.beta, tau_alpha,tau_beta (if model.file = "MODEL_Ricker_BUGS.txt" )}
 
 \item{output}{one of "short" (only return summary stats for key parameters in a list object), "post" (also save posterior distribution samples to folder), or "all" (also produce pdf files with standard diagnostic plots)}
 
