@@ -24,18 +24,19 @@ ricker.lna.c <- ricker.lna + (ricker.sigma^2  / 2)
 ricker.a <- exp(ricker.lna.c)
 ricker.b <- - ricker.fit$coefficients[2]
 
-S.max <- 1 / ricker.b 
+S.max <- 1 / ricker.b
 S.eq <- ricker.lna  * S.max
 S.eq.c <- ricker.lna.c  * S.max
 
 # hilborn proxy
 U.msy.h <- ricker.lna.c * (0.5-0.07*ricker.lna.c)
-S.msy.h <- S.eq.c *(0.5-0.07*ricker.lna.c)  
-  
+S.msy.h <- S.eq.c *(0.5-0.07*ricker.lna.c)
+
 # peterman correction
+S.eq.c2 <- S.eq.c # same in det case, but included for comparison to MCMC step which has a tweak here
 peterman.approx.c <- (0.5 - 0.65 * ricker.lna.c^1.27 / (8.7 + ricker.lna.c^1.27))
-U.msy.p <- ricker.lna.c * peterman.approx.c 
-S.msy.p <- U.msy.p / ricker.b  
+U.msy.p <- ricker.lna.c * peterman.approx.c
+S.msy.p <- U.msy.p / ricker.b
 
 
 
@@ -51,6 +52,7 @@ out.vec <-  c(
 			Seq.c = round(as.vector(S.eq.c)),
 			Smsy_h = round(as.vector(S.msy.h)),
 			Umsy_h = round(as.vector(U.msy.h),2),
+			Seq.c2 = round(as.vector(S.eq.c2)),
 			Smsy_p = round(as.vector(S.msy.p)),
 			Umsy_p = round(as.vector(U.msy.p),2)
 			)
@@ -71,6 +73,7 @@ out.vec <-  c(n_obs = dim(sr.use)[1],
 			Seq.c = NA,
 			Smsy_h = NA,
 			Umsy_h = NA,
+			Seq.c2 = NA,
 			Smsy_p = NA,
 			Umsy_p = NA
 			)
@@ -78,7 +81,7 @@ out.vec <-  c(n_obs = dim(sr.use)[1],
 }
 
 return(out.vec)
-  
+
 }
 
 
