@@ -4,10 +4,11 @@
 #' Also calculates standard biological benchmarks (Smsy, Seq, Smax, Umsy). Benchmark calculations were adapted from BUGS code used in Miller & Pestal (2020), available \href{https://www.dfo-mpo.gc.ca/csas-sccs/Publications/ResDocs-DocRech/2020/2020_035-eng.pdf}{here}.
 #' Two versions for some BM are produced: "_h" = Hilborn Proxy (\href{https://cdnsciencepub.com/doi/pdf/10.1139/f85-230}{Hilborn 1985}) and "_p" = Peterman Proxy" (\href{https://cdnsciencepub.com/doi/pdf/10.1139/f99-204}{Peterman et al. 2000}). Note: This requires installing JAGS from \href{https://sourceforge.net/projects/mcmc-jags/files/latest/download}{here}.
 #' @param sr_obj a data frame with Spn and Rec (Data for 1 Stock!). Other variables can be there but are not used (RpS, Qual, ExpF etc)
+#' @param model.file a txt file with JAGS code (default is "MODEL_Ricker_BUGS.txt" )
 #' @param min.obs min number of S-R pairs needed to fit a model
 #' @param mcmc.settings a list with n.chains (2), n.burnin (20000), n.thin (60), and n.samples (50000). Default values in brackets.
 #' @param mcmc.inits a list of lists with inits for each chain. Default is "list(list(tau_R=3, C=1),list(tau_R=7, C=2))"
-#' @param mcmc.priors a list with p.alpha, p.beta, tau_alpha,tau_beta
+#' @param mcmc.priors a list with p.alpha, p.beta, tau_alpha,tau_beta (if model.file = "MODEL_Ricker_BUGS.txt" )
 #' @param output one of "short" (only return summary stats for key parameters in a list object), "post" (also save posterior distribution samples to folder), or "all" (also produce pdf files with standard diagnostic plots)
 #' @param out.path text string specifying  folder. if output is "post" or "all", the generated files will be stored to this folder
 #' @param out.label label use in the output files if output is "post" or "all"
@@ -19,10 +20,12 @@
 #' ricker.bm <- calcDetRickerBM(SR_Sample[SR_Sample$Stock == "Stock1",],min.obs = 10)
 #' print(ricker.bm)
 
-calcMCMCRickerBM <- function(sr_obj,min.obs=15, 
+calcMCMCRickerBM <- function(sr_obj,
+          model.file = "MODEL_Ricker_BUGS.txt",
+          min.obs=15,
 					mcmc.settings = list(n.chains=2, n.burnin=20000, n.thin=60,n.samples=50000),
 					mcmc.inits = list(list(tau_R=3, C=1),list(tau_R=7, C=2)),
-					mcmc.priors = list(p.alpha = 0,tau_alpha = 0.0001, p.beta = 1, tau_beta = 0.1),
+					mcmc.priors = list(p.alpha = 0,tau_alpha = 0.0001, p.beta = 1, tau_beta = 0.1,max.scalar = 3),
 					output = "short",
 					out.path = "MCMC_Out",
 					out.label = "MCMC",
@@ -63,20 +66,17 @@ print(mcmc.data)
 
 
 
-
-
-
 # Do the MCMC
 
-tmp.out <- doRJAGS(data.obj = mcmc.data, 
-                    model.fn = ricker.BUGS, # for details see ?ricker.BUGS
-                    inits = mcmc.inits, 
+tmp.out <- doRJAGS(data.obj = mcmc.data,
+                    model.fn = paste0("/",model.file), # for details see ?ricker.BUGS
+                    inits = mcmc.inits,
                     settings = mcmc.settings ,
-                    pars.track = pars.track.in, 
+                    pars.track = pars.track.in,
                     out.label= out.label,
 					out.path= out.path,
 					output=output,
-                    mcmc.seed = mcmc.seed,	
+                    mcmc.seed = mcmc.seed,
 					tracing = tracing
 					)
 
@@ -135,8 +135,8 @@ out.vec <-  c(n_obs = dim(sr.use)[1],
 			Smsy_p = NA,
 			Umsy_p = NA
 			)
-		
-perc.vec <- seq(5,95,by=5)		
+
+perc.vec <- seq(5,95,by=5)
 perc.df <- as.data.frame(matrix(NA,ncol= length(pars.labels),nrow = length(perc.vec),dimnames = list(
 					paste0("p",perc.vec),  pars.labels ))) %>% rownames_to_column()
 names(perc.df)[1] <- "Percentile"
@@ -147,7 +147,7 @@ tmp.out <- NA
 }
 
 return(list(Medians = out.vec, Percentiles = perc.df, PercDiff = perc.diff.df,MCMC = tmp.out))
-  
+
 }
 
 
