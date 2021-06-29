@@ -9,7 +9,7 @@ calcMCMCRickerBM(
   model.file = "BUILT_IN_MODEL_Ricker_BUGS.txt",
   min.obs = 15,
   mcmc.settings = list(n.chains = 2, n.burnin = 20000, n.thin = 60, n.samples = 50000),
-  mcmc.inits = list(list(tau_R = 3, C = 1), list(tau_R = 7, C = 2)),
+  mcmc.inits = list(list(tau_R = 3, S.max = 1), list(tau_R = 7, S.max = 2)),
   mcmc.priors = list(p.alpha = 0, tau_alpha = 1e-04, p.beta = 1, tau_beta = 0.1,
     max.scalar = 3),
   output = "short",
@@ -48,7 +48,7 @@ Also calculates standard biological benchmarks (Smsy, Seq, Smax, Umsy). Benchmar
 Two versions for some BM are produced: "_h" = Hilborn Proxy (\href{https://cdnsciencepub.com/doi/pdf/10.1139/f85-230}{Hilborn 1985}) and "_p" = Peterman Proxy" (\href{https://cdnsciencepub.com/doi/pdf/10.1139/f99-204}{Peterman et al. 2000}). Note: This requires installing JAGS from \href{https://sourceforge.net/projects/mcmc-jags/files/latest/download}{here}.
 }
 \examples{
-ricker.bm <- calcDetRickerBM(SR_Sample[SR_Sample$Stock == "Stock1",],min.obs = 10)
+ricker.bm <- calcMCMCRickerBM(SR_Sample[SR_Sample$Stock == "Stock1",],min.obs = 10)
 print(ricker.bm)
 }
 \keyword{Bayesian,}

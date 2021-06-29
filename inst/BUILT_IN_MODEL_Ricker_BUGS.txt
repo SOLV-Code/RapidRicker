@@ -1,6 +1,6 @@
 model{
 	# adapted from code originally developed by Catherine Michielsens, Sue Grant, and Bronwyn MacDonald.
-	# modified to incorporate Smax upper constraint (and replace C with Smax
+	# modified to incorporate Smax upper constraint (and replaced C with Smax)
 
 
     for (i in 1:N) {                       #loop over N sample points
@@ -18,6 +18,7 @@ model{
 	# and max.scalar at 3, so that the Smax prior is bounded by 3 times the largest observed Spn
     S.max ~ dlnorm(p.beta, tau_beta) T(0,Smax.limit)
 	Smax.limit <- max.scalar * exp(p.beta)
+	
     tau_R ~ dgamma(0.001,0.001)                    #prior for precision parameter
     sigma <- 1/sqrt(tau_R) 			# changed based on Fleishman and Evenson
 
