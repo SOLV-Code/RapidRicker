@@ -65,7 +65,7 @@ print(mcmc.data)
 
 # Get the model file
 
-models.list <- c("BUILT_IN_MODEL_Ricker_BUGS.txt")
+models.list <- c("BUILT_IN_MODEL_Ricker_BUGS.txt","BUILT_IN_MODEL_RickerKalman_BUGS.txt")
 
 if(model.file %in% models.list){
 # this extracts the full path to the file in the local installing

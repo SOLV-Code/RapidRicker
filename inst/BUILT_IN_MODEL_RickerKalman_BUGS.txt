@@ -1,0 +1,56 @@
+model{
+	# adapted from code by Ann-Marie Huang, which was originally contributed by Catherine Michielsens
+
+
+    for (i in 1:N) {                       #loop over N sample points
+      R_Obs[i] ~ dlnorm(logR[i],tau_R)          #likelihood -> predicted value for NA in data set
+      logR[i] <- RS[i] +log(S[i])               # calc log(R) - fitted values
+      RS[i] <- ln.alpha[i] - beta * S[i]           # ricker model
+	  year[i]<-i
+	}
+
+    for (i in 2:N){
+          ln.alpha[i] <- ln.alpha[i-1] + w[i]
+          w[i]~ dnorm(0,tauw)
+    }
+
+
+
+    ln.alpha[1] ~ dnorm(p.alpha,tau_alpha)        #prior for alpha (actually ln.alpha!)
+    beta <-1/ S.max					   # prior for beta
+
+	# new constraint June 2021
+	# typical default is to  set p.beta set at log(max obs Spn)
+	# and max.scalar at 3, so that the Smax prior is bounded by 3 times the largest observed Spn
+    S.max ~ dlnorm(p.beta, tau_beta)I(0,Smax.limit)
+	Smax.limit <- max.scalar * exp(p.beta)
+	
+    tau_R ~ dgamma(0.001,0.001)                    #prior for precision parameter
+    sigma <- 1/sqrt(tau_R) 			# changed based on Fleishman and Evenson
+
+	tauw~ dgamma(0.01,0.001)
+    varw<- 1/tauw
+	sigw<- 1/sqrt(tauw)
+
+	ln.alpha.c <- ln.alpha + (sigma * sigma / 2) # bias correction for lognormal skewness
+
+    #BIOLOGICAL BENCHMARKS
+    # adapted from code in Miller & Pestal 2020 Taku Sockeye Res Doc
+
+    alpha.c <- min(exp(ln.alpha.c),1.0E4)
+    S.eq.c <- ln.alpha.c * S.max
+
+	# Hilborn Proxy ("_h" in the output from calcDetRickerBM)
+    U.msy.c <- ln.alpha.c * (0.5-0.07*ln.alpha.c)
+    S.msy.c <- S.eq.c *(0.5-0.07*ln.alpha.c)
+
+	# Peterman Approximation ("_p" in the output from calcDetRickerBM)
+    positive.lna.c <- step(ln.alpha.c)
+    ln.alpha.c.nonneg <- ln.alpha.c * positive.lna.c
+    S.eq.c2 <- ln.alpha.c.nonneg * S.max
+    peterman.approx.c <- (0.5 - 0.65*pow(ln.alpha.c.nonneg,1.27) / (8.7 +pow(ln.alpha.c.nonneg,1.27)))
+    U.msy.c2 <- ln.alpha.c.nonneg * peterman.approx.c
+    S.msy.c2 <- U.msy.c2 / beta
+    U.max.c2 <- 1 - 1 / exp(ln.alpha.c.nonneg)
+
+}
