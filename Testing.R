@@ -16,9 +16,16 @@ max.spn
 p.beta.in <- log(max.spn)
 p.beta.in
 
-tau_beta.in <- 0.01
+tau_beta.in <- 2
+# check corresponding SD
+# as per https://journal.r-project.org/archive/2013/RJ-2013-020/RJ-2013-020.pdf
+1/sqrt(tau_beta.in)
+paste("Capacity prior is a lognormal distribution with mean = ",p.beta.in, "and sd = ",1/sqrt(tau_beta.in) )
 
-
+hist(rlnorm(10000,p.beta.in,1/sqrt(tau_beta.in)),breaks=1000)
+# PriorPicker, set up as per https://deanattali.com/2015/04/21/r-package-shiny-app/
+# inspired by https://daattali.com/shiny/colourInput/
+# use app.R format: https://shiny.rstudio.com/articles/app-formats.html
 
 ricker.test <- calcMCMCRickerBM(
   sr_obj = sr.use, sr.scale = sr.scale.use  ,
@@ -81,4 +88,25 @@ rickerKF.test$Percentiles
 rickerKF.test$PercDiff
 
 
+temp.test <- readRDS("tmpout.RDS")
+names(temp.test)
+dimnames(temp.test$MCMC.Percentiles)
 
+
+tmp.cols <- c("ln.alpha","ln.alpha.c","beta","sigma","deviance", "S.max",
+              "S.eq.c","S.msy.c", "U.msy.c",
+              "S.eq.c2","S.msy.c2", "U.msy.c2")
+
+paste(tmp.cols,collapse="|")
+
+
+out.df <- temp.test$MCMC.Percentiles %>%
+  as.data.frame() %>%
+  select(matches(paste(tmp.cols,collapse="|"))) %>%
+  rownames_to_column()
+head(out.df)
+
+tmp.rescale <- c("S.max", "S.eq.c","S.msy.c","S.eq.c2","S.msy.c2")
+paste(tmp.rescale,collapse="|")
+out.df[, grepl(paste(tmp.rescale,collapse="|"), names(out.df)) ] <- out.df[, grepl(paste(tmp.rescale,collapse="|"), names(out.df)) ] * sr.scale.use
+out.df[,1:10]

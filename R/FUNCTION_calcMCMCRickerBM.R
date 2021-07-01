@@ -98,14 +98,25 @@ tmp.out <- doRJAGS(data.obj = mcmc.data,
 #print(pars.labels)
 #print(head(tmp.out$MCMC.Percentiles))
 
-perc.df <- as.data.frame(tmp.out$MCMC.Percentiles[,pars.track.in]) %>% rownames_to_column() # rearrange the columns and convert to data frame
+# extract, rearrange the columns and convert to data frame
+perc.df <-  tmp.out$MCMC.Percentiles %>%
+  as.data.frame() %>%
+  select(matches(paste(pars.track.in,collapse="|")))  %>%
+  t() %>%   rownames_to_column() %>% rename(Variable = rowname)
 
 
 # rescale the BM measures and relabel the Vars
-perc.df[,pars.rescale] <- perc.df[,pars.rescale] * sr.scale
-names(perc.df) <- c("Percentile", pars.labels)
+perc.df[grepl(paste(pars.rescale,collapse="|"), names(perc.df)) ] <- perc.df[, grepl(paste(pars.rescale,collapse="|"), names(perc.df))  ] * sr.scale
+# OLD: perc.df[,pars.rescale] <- perc.df[,pars.rescale] * sr.scale
 
-#print(perc.df)
+
+
+for(i in 1:length(pars.track.in)){
+  names(perc.df) <- gsub(pars.track.in[i],pars.labels[i],names(perc.df))
+}
+
+
+print(head((perc.df)))
 
 #extract the results
 
