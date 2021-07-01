@@ -4,7 +4,7 @@
 library(tidyverse)
 library(RapidRicker)
 
-sr.use <- SR_Sample[SR_Sample$Stock == "Stock1",] %>% select(Year, Spn, Rec,logRpS)
+sr.use <- SR_Sample[SR_Sample$Stock == "Stock2",] %>% select(Year, Spn, Rec,logRpS)
 sr.use
 
 sr.scale.use <- 10^6
