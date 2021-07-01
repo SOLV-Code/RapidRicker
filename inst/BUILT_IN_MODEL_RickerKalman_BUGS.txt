@@ -32,25 +32,28 @@ model{
     varw<- 1/tauw
 	sigw<- 1/sqrt(tauw)
 
-	ln.alpha.c <- ln.alpha + (sigma * sigma / 2) # bias correction for lognormal skewness
-
     #BIOLOGICAL BENCHMARKS
     # adapted from code in Miller & Pestal 2020 Taku Sockeye Res Doc
 
-    alpha.c <- min(exp(ln.alpha.c),1.0E4)
-    S.eq.c <- ln.alpha.c * S.max
+    for (i in 1:N) {  
+
+	ln.alpha.c[i] <- ln.alpha[i] + (sigma * sigma / 2) # bias correction for lognormal skewness
+
+    alpha.c[i] <- min(exp(ln.alpha.c[i]),1.0E4)
+    S.eq.c[i] <- ln.alpha.c[i] * S.max
 
 	# Hilborn Proxy ("_h" in the output from calcDetRickerBM)
-    U.msy.c <- ln.alpha.c * (0.5-0.07*ln.alpha.c)
-    S.msy.c <- S.eq.c *(0.5-0.07*ln.alpha.c)
+    U.msy.c[i] <- ln.alpha.c[i] * (0.5-0.07*ln.alpha.c[i])
+    S.msy.c[i] <- S.eq.c[i] *(0.5-0.07*ln.alpha.c[i])
 
 	# Peterman Approximation ("_p" in the output from calcDetRickerBM)
-    positive.lna.c <- step(ln.alpha.c)
-    ln.alpha.c.nonneg <- ln.alpha.c * positive.lna.c
-    S.eq.c2 <- ln.alpha.c.nonneg * S.max
-    peterman.approx.c <- (0.5 - 0.65*pow(ln.alpha.c.nonneg,1.27) / (8.7 +pow(ln.alpha.c.nonneg,1.27)))
-    U.msy.c2 <- ln.alpha.c.nonneg * peterman.approx.c
-    S.msy.c2 <- U.msy.c2 / beta
-    U.max.c2 <- 1 - 1 / exp(ln.alpha.c.nonneg)
-
+    positive.lna.c[i] <- step(ln.alpha.c[i])
+    ln.alpha.c.nonneg[i] <- ln.alpha.c[i] * positive.lna.c[i]
+    S.eq.c2[i] <- ln.alpha.c.nonneg[i] * S.max
+    peterman.approx.c[i] <- (0.5 - 0.65*pow(ln.alpha.c.nonneg[i],1.27) / (8.7 +pow(ln.alpha.c.nonneg[i],1.27)))
+    U.msy.c2[i] <- ln.alpha.c.nonneg[i] * peterman.approx.c[i]
+    S.msy.c2[i] <- U.msy.c2[i] / beta
+    U.max.c2[i] <- 1 - 1 / exp(ln.alpha.c.nonneg[i])
+	}
+	
 }
