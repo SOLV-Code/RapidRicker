@@ -16,9 +16,16 @@ max.spn
 p.beta.in <- log(max.spn)
 p.beta.in
 
-tau_beta.in <- 0.01
+tau_beta.in <- 2
+# check corresponding SD
+# as per https://journal.r-project.org/archive/2013/RJ-2013-020/RJ-2013-020.pdf
+1/sqrt(tau_beta.in)
+paste("Capacity prior is a lognormal distribution with mean = ",p.beta.in, "and sd = ",1/sqrt(tau_beta.in) )
 
-
+hist(rlnorm(10000,p.beta.in,1/sqrt(tau_beta.in)),breaks=1000)
+# PriorPicker, set up as per https://deanattali.com/2015/04/21/r-package-shiny-app/
+# inspired by https://daattali.com/shiny/colourInput/
+# use app.R format: https://shiny.rstudio.com/articles/app-formats.html
 
 ricker.test <- calcMCMCRickerBM(
   sr_obj = sr.use, sr.scale = sr.scale.use  ,
@@ -35,9 +42,9 @@ ricker.test <- calcMCMCRickerBM(
   tracing = FALSE
 )
 
-
+ricker.test$Medians
 ricker.test$Percentiles
-ricker.test$PercDiff
+
 
 
 det.test <- calcDetRickerBM(sr_obj = sr.use %>% mutate(Spn = Spn,Rec = Rec), min.obs = 15)
@@ -76,9 +83,13 @@ rickerKF.test <- calcMCMCRickerBM(
   tracing = FALSE
 )
 
-
+rickerKF.test$Medians
 rickerKF.test$Percentiles
-rickerKF.test$PercDiff
 
 
 
+temp.test <- readRDS("tmpout.RDS")
+names(temp.test)
+head(temp.test)
+temp.test
+temp.test %>% dplyr::filter(VarType == "")
