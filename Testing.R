@@ -42,9 +42,9 @@ ricker.test <- calcMCMCRickerBM(
   tracing = FALSE
 )
 
-
+ricker.test$Medians
 ricker.test$Percentiles
-ricker.test$PercDiff
+
 
 
 det.test <- calcDetRickerBM(sr_obj = sr.use %>% mutate(Spn = Spn,Rec = Rec), min.obs = 15)
@@ -83,30 +83,13 @@ rickerKF.test <- calcMCMCRickerBM(
   tracing = FALSE
 )
 
-
+rickerKF.test$Medians
 rickerKF.test$Percentiles
-rickerKF.test$PercDiff
+
 
 
 temp.test <- readRDS("tmpout.RDS")
 names(temp.test)
-dimnames(temp.test$MCMC.Percentiles)
-
-
-tmp.cols <- c("ln.alpha","ln.alpha.c","beta","sigma","deviance", "S.max",
-              "S.eq.c","S.msy.c", "U.msy.c",
-              "S.eq.c2","S.msy.c2", "U.msy.c2")
-
-paste(tmp.cols,collapse="|")
-
-
-out.df <- temp.test$MCMC.Percentiles %>%
-  as.data.frame() %>%
-  select(matches(paste(tmp.cols,collapse="|"))) %>%
-  rownames_to_column()
-head(out.df)
-
-tmp.rescale <- c("S.max", "S.eq.c","S.msy.c","S.eq.c2","S.msy.c2")
-paste(tmp.rescale,collapse="|")
-out.df[, grepl(paste(tmp.rescale,collapse="|"), names(out.df)) ] <- out.df[, grepl(paste(tmp.rescale,collapse="|"), names(out.df)) ] * sr.scale.use
-out.df[,1:10]
+head(temp.test)
+temp.test
+temp.test %>% dplyr::filter(VarType == "")

@@ -38,8 +38,14 @@ calcMCMCRickerBM <- function(sr_obj, sr.scale = 10^6,
 
 require(tidyverse)
 
-# Prep the data
+# NEED MISSING YEAR HANDLING FOR KF MODEL HERE
+
+  # Prep the data
 sr.use  <- sr_obj %>% dplyr::filter(!is.na(Rec),!is.na(Spn)) # drop incomplete records
+
+yr.match <- data.frame(YrIdx = 1 : sum(!is.na(sr.use$Rec)), Yr = sr.use$Year)
+print(yr.match)
+
 
 # pars.track.in <- c("ln.alpha.c","beta","sigma","deviance","S.max","S.msy.c2")}
 pars.track.in <- c("ln.alpha","ln.alpha.c","beta","sigma","deviance", "S.max",
@@ -102,45 +108,51 @@ tmp.out <- doRJAGS(data.obj = mcmc.data,
 perc.df <-  tmp.out$MCMC.Percentiles %>%
   as.data.frame() %>%
   select(matches(paste(pars.track.in,collapse="|")))  %>%
-  t() %>%   rownames_to_column() %>% rename(Variable = rowname)
+  t() %>%  as.data.frame() %>% rownames_to_column() %>% rename(Variable = rowname)
 
 
 # rescale the BM measures and relabel the Vars
-perc.df[grepl(paste(pars.rescale,collapse="|"), names(perc.df)) ] <- perc.df[, grepl(paste(pars.rescale,collapse="|"), names(perc.df))  ] * sr.scale
-# OLD: perc.df[,pars.rescale] <- perc.df[,pars.rescale] * sr.scale
+perc.df[grepl(paste(pars.rescale,collapse="|"), perc.df$Variable),  2:dim(perc.df)[2] ] <-
+              perc.df[grepl(paste(pars.rescale,collapse="|"), perc.df$Variable),  2:dim(perc.df)[2] ] * sr.scale
 
 
 
-for(i in 1:length(pars.track.in)){
-  names(perc.df) <- gsub(pars.track.in[i],pars.labels[i],names(perc.df))
-}
+for(i in 1:length(pars.track.in)){  perc.df$Variable <- gsub(pars.track.in[i],pars.labels[i],perc.df$Variable) }
 
 
-print(head((perc.df)))
-
-#extract the results
-
-out.vec <-  c(
-			n_obs = dim(sr.use)[1] ,
-			perc.df %>% dplyr::filter(Percentile == "p50") %>% select(-Percentile) %>% unlist()
+medians.df <-  c(
+			perc.df %>% select(Variable,p50) %>% as.data.frame() %>%
+			      mutate(VarType = substr(Variable, 1, regexpr("\\[",Variable)-1)) %>%
+			      mutate(YrIdx = as.numeric(substr(Variable, regexpr("\\[",Variable)+1, regexpr("\\]",Variable)-1 )))  %>%
+			      left_join(yr.match,by="YrIdx")
 			)
+
+medians.df$VarType[medians.df$VarType==""] <- medians.df$Variable[medians.df$VarType==""]
 
 
 # calculate perc diff from det estimate
 det.ricker.bm <- calcDetRickerBM(sr.use, min.obs = min.obs) # generates a vector with par and BM est
 
+
+medians.df <- left_join(as.data.frame(medians.df),  data.frame(VarType = names(det.ricker.bm),Det = det.ricker.bm), by = "VarType") %>%
+                    mutate(Diff = p50 - Det) %>% mutate(PercDiff = round(Diff/Det *100,1)) %>%
+                      select(VarType,Variable,YrIdx,Yr,everything())
+
+
+#extract the results
+
 # replaced by pars.compare above
 #common.vals <- intersect(names(det.ricker.bm),pars.rescale )
 #print(common.vals)
 
-det.mat <- matrix(det.ricker.bm[pars.compare],
-             nrow= dim(perc.df)[1],
-             ncol = length(pars.compare),
-             byrow=TRUE)
+#det.mat <- matrix(det.ricker.bm[pars.compare],
+#             nrow= dim(perc.df)[1],
+#             ncol = length(pars.compare),
+#             byrow=TRUE)
 
-perc.diff.df <- cbind(Percentile = perc.df[,1],
-      data.frame(round( (perc.df[,pars.compare] - det.mat) / det.mat *100,2 ))
-	  )
+#perc.diff.df <- cbind(Percentile = perc.df[,1],
+#      data.frame(round( (perc.df[,pars.compare] - det.mat) / det.mat *100,2 ))
+#	  )
 
 
 
@@ -178,7 +190,7 @@ tmp.out <- NA
 
 }
 
-return(list(Medians = out.vec, Percentiles = perc.df, PercDiff = perc.diff.df,MCMC = tmp.out, sr.scale = sr.scale))
+return(list(Medians = medians.df, Percentiles = perc.df, MCMC = tmp.out, sr.scale = sr.scale))
 
 }
 
