@@ -10,6 +10,12 @@ sr.use
 sr.scale.use <- 10^6
 
 
+tmp.df <- sr.use %>% dplyr::filter(!is.na(Rec),!is.na(Spn))
+length(setdiff(min(tmp.df$Year):max(tmp.df$Year),tmp.df$Year)) > 0
+
+
+
+
 max.spn <- max(sr.use$Spn/sr.scale.use, na.rm = TRUE)
 max.spn
 
@@ -29,12 +35,13 @@ hist(rlnorm(10000,p.beta.in,1/sqrt(tau_beta.in)),breaks=1000)
 
 ricker.test <- calcMCMCRickerBM(
   sr_obj = sr.use, sr.scale = sr.scale.use  ,
+  model.type = "Basic",
   model.file = "BUILT_IN_MODEL_Ricker_BUGS.txt",
   min.obs = 15,
   mcmc.settings = list(n.chains = 2, n.burnin = 20000, n.thin = 60, n.samples = 50000),
   mcmc.inits = list(list(tau_R = 3, S.max = max.spn /2), list(tau_R = 7, S.max = max.spn * 2 )),
   mcmc.priors = list(p.alpha = 0, tau_alpha = 1e-04, p.beta = p.beta.in, tau_beta = tau_beta.in,
-                     max.scalar = 2, p.tau_R = 0.001,tau_tau_R=0.01),
+                     max.scalar = 2, shape.tau_R = 0.001,lambda_tau_R=0.01),
   output = "short",
   out.path = "MCMC_Out",
   out.label = "MCMC",
@@ -49,16 +56,13 @@ ricker.test$Percentiles
 
 det.test <- calcDetRickerBM(sr_obj = sr.use %>% mutate(Spn = Spn,Rec = Rec), min.obs = 15)
 
-print(paste("Smsy =", round(ricker.test$Medians["Smsy_p"])))
-print(paste("Smsy Det=", round(det.test["Smsy_p"])))
-print(paste("Smax =", round(ricker.test$Medians["Smax"])))
-print(paste("Smax Det =", round(det.test["Smax"])))
-print(paste("Max Obs Spn =", round(max.spn*sr.scale.use)))
-print(paste("Mean Obs Spn=", round(mean(sr.use$Spn, na.rm = TRUE))))
-
-
-
-
+# Need to fixfor new output strcture
+#print(paste("Smsy =", round(ricker.test$Medians["p50"]   )))
+#print(paste("Smsy Det=", round(det.test["Smsy_p"])))
+#print(paste("Smax =", round(ricker.test$Medians["Smax"])))
+#print(paste("Smax Det =", round(det.test["Smax"])))
+#print(paste("Max Obs Spn =", round(max.spn*sr.scale.use)))
+#print(paste("Mean Obs Spn=", round(mean(sr.use$Spn, na.rm = TRUE))))
 
 
 
@@ -70,12 +74,13 @@ print(paste("Mean Obs Spn=", round(mean(sr.use$Spn, na.rm = TRUE))))
 
 rickerKF.test <- calcMCMCRickerBM(
   sr_obj = sr.use, sr.scale = sr.scale.use  ,
+  model.type = "Kalman",
   model.file = "BUILT_IN_MODEL_RickerKalman_BUGS.txt",
   min.obs = 15,
   mcmc.settings = list(n.chains = 2, n.burnin = 20000, n.thin = 60, n.samples = 50000),
   mcmc.inits = list(list(tau_R = 3, S.max = max.spn /2), list(tau_R = 7, S.max = max.spn * 2 )),
   mcmc.priors = list(p.alpha = 0, tau_alpha = 1e-04, p.beta = p.beta.in, tau_beta = tau_beta.in,
-                     max.scalar = 2,p.tau_R = 0.001,tau_tau_R=0.01,p.tauw = 0.01,tau_tauw=0.001),
+                     max.scalar = 2,shape.tau_R = 0.001,lambda_tau_R=0.01,shape.tauw = 0.01,lambda_tauw=0.001),
   output = "short",
   out.path = "MCMC_Out",
   out.label = "MCMC",

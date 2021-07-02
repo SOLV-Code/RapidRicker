@@ -44,7 +44,9 @@ require(tidyverse)
 
   # Prep the data
 sr.use  <- sr_obj %>% dplyr::filter(!is.na(Rec),!is.na(Spn)) # drop incomplete records
-# NEED MISSING YEAR HANDLING FOR KF and AR1 MODEL HERE
+missing.yrs <- length(setdiff(min(tmp.df$Year):max(tmp.df$Year),tmp.df$Year)) > 0 # T/F check if there are missing years. If so, can't do AR1 or KF model
+
+if(missing.yrs & model.type %in% c("Kalman","AR1")){warning("Gaps in the time series. Can't do Kalman Filter or AR 1 model, Returning NAs")}
 
 yr.match <- data.frame(YrIdx = 1 : sum(!is.na(sr.use$Rec)), Yr = sr.use$Year)
 print(yr.match)
@@ -64,7 +66,7 @@ pars.labels <- c("ln_a","ln_a_c","b","sd","deviance", "Smax",
 pars.compare <- c("Smax","Seq.c","Smsy_h", "Umsy_h","Seq.c2","Smsy_p", "Umsy_p")
 
 
-if(dim(sr.use)[1] >= min.obs){
+if(dim(sr.use)[1] >= min.obs & (!missing.yrs  | model.type == "Basic")  ){
 
 
 mcmc.data <- c(list(S = sr.use$Spn / sr.scale, R_Obs = sr.use$Rec / sr.scale, N = dim(sr.use)[1]),
@@ -86,6 +88,11 @@ if(!(model.file %in% models.list)){
 # This passes the user-specified path/file into the JAGS call
 model.use <- model.file
 }
+
+
+
+# calculate default priors and inits, unless user specifies custom values
+
 
 
 
@@ -124,7 +131,7 @@ for(i in length(pars.track.in):1){  perc.df$Variable <- gsub(pars.track.in[i],pa
 
 
 medians.df <-  c(
-			perc.df %>% select(Variable,p50) %>% as.data.frame() %>%
+			perc.df %>% select(Variable,p10,p25,p50,p75,p90) %>% as.data.frame() %>%
 			      mutate(VarType = substr(Variable, 1, regexpr("\\[",Variable)-1)) %>%
 			      mutate(YrIdx = as.numeric(substr(Variable, regexpr("\\[",Variable)+1, regexpr("\\]",Variable)-1 )))  %>%
 			      left_join(yr.match,by="YrIdx")
@@ -142,29 +149,16 @@ medians.df <- left_join(as.data.frame(medians.df),  data.frame(VarType = names(d
                       select(VarType,Variable,YrIdx,Yr,everything())
 
 
-#extract the results
-
-# replaced by pars.compare above
-#common.vals <- intersect(names(det.ricker.bm),pars.rescale )
-#print(common.vals)
-
-#det.mat <- matrix(det.ricker.bm[pars.compare],
-#             nrow= dim(perc.df)[1],
-#             ncol = length(pars.compare),
-#             byrow=TRUE)
-
-#perc.diff.df <- cbind(Percentile = perc.df[,1],
-#      data.frame(round( (perc.df[,pars.compare] - det.mat) / det.mat *100,2 ))
-#	  )
 
 
+} # if n >= min.obs (and if no gaps if AR1 or KF)
 
 
+if(dim(sr.use)[1] < min.obs |  missing.yrs){
 
-} # if n >= min.obs
+if(dim(sr.use)[1] < min.obs){warning("Not enough data to fit a model (num obs < user-specified min.obs)")}
 
 
-if(dim(sr.use)[1] < min.obs){
 
 out.vec <-  c(n_obs = dim(sr.use)[1],
 			ln_a = NA,
@@ -185,10 +179,12 @@ out.vec <-  c(n_obs = dim(sr.use)[1],
 
 perc.vec <- seq(5,95,by=5)
 perc.df <- as.data.frame(matrix(NA,ncol= length(pars.labels),nrow = length(perc.vec),dimnames = list(
-					paste0("p",perc.vec),  pars.labels ))) %>% rownames_to_column()
-names(perc.df)[1] <- "Percentile"
+					paste0("p",perc.vec),  pars.labels ))) %>%
+          t() %>%  as.data.frame() %>% rownames_to_column() %>% rename(Variable = rowname)
 
-perc.diff.df <- perc.df
+
+medians.df <- data.frame(VarType = perc.df$Variable,Variable = perc.df$Variable,
+                         YrIdx = NA, Yr  = NA, p10 = NA, p25 = NA, p50 = NA, p75 = NA, p90 = NA, Det = NA, Diff = NA, PercDiff = NA)
 tmp.out <- NA
 
 }
