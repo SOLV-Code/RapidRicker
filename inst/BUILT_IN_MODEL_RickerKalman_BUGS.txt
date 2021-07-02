@@ -25,10 +25,10 @@ model{
     S.max ~ dlnorm(p.beta, tau_beta)I(0,Smax.limit)
 	Smax.limit <- max.scalar * exp(p.beta)
 	
-    tau_R ~ dgamma(0.001,0.001)                    #prior for precision parameter
+    tau_R ~ dgamma(p.tau_R,tau_tau_R)                    #prior for precision parameter
     sigma <- 1/sqrt(tau_R) 			# changed based on Fleishman and Evenson
 
-	tauw~ dgamma(0.01,0.001)
+	tauw~ dgamma(p.tauw,tau_tauw)
     varw<- 1/tauw
 	sigw<- 1/sqrt(tauw)
 

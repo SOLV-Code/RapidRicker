@@ -34,7 +34,7 @@ ricker.test <- calcMCMCRickerBM(
   mcmc.settings = list(n.chains = 2, n.burnin = 20000, n.thin = 60, n.samples = 50000),
   mcmc.inits = list(list(tau_R = 3, S.max = max.spn /2), list(tau_R = 7, S.max = max.spn * 2 )),
   mcmc.priors = list(p.alpha = 0, tau_alpha = 1e-04, p.beta = p.beta.in, tau_beta = tau_beta.in,
-                     max.scalar = 2),
+                     max.scalar = 2, p.tau_R = 0.001,tau_tau_R=0.01),
   output = "short",
   out.path = "MCMC_Out",
   out.label = "MCMC",
@@ -75,7 +75,7 @@ rickerKF.test <- calcMCMCRickerBM(
   mcmc.settings = list(n.chains = 2, n.burnin = 20000, n.thin = 60, n.samples = 50000),
   mcmc.inits = list(list(tau_R = 3, S.max = max.spn /2), list(tau_R = 7, S.max = max.spn * 2 )),
   mcmc.priors = list(p.alpha = 0, tau_alpha = 1e-04, p.beta = p.beta.in, tau_beta = tau_beta.in,
-                     max.scalar = 2),
+                     max.scalar = 2,p.tau_R = 0.001,tau_tau_R=0.01,p.tauw = 0.01,tau_tauw=0.001),
   output = "short",
   out.path = "MCMC_Out",
   out.label = "MCMC",
@@ -86,10 +86,4 @@ rickerKF.test <- calcMCMCRickerBM(
 rickerKF.test$Medians
 rickerKF.test$Percentiles
 
-
-
-temp.test <- readRDS("tmpout.RDS")
-names(temp.test)
-head(temp.test)
-temp.test
-temp.test %>% dplyr::filter(VarType == "")
+sort(unique(rickerKF.test$Medians$VarType))

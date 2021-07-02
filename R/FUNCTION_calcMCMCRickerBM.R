@@ -6,6 +6,7 @@
 #' @param sr_obj a data frame with Spn,Rec (actual numbers, not thousands or  millions) for the MCMC and logRpS for the deterministic fit (Data for 1 Stock!). Other variables can be there but are not used (RpS, Qual, ExpF etc)
 #' @param sr.scale an integer value used to rescale the Spn and Rec variables in sr_obj, prior to the MCMC fit, default = 10^6 (i.e. convert to millions). NOTE: If sr.scale is different from 1, then
 #' the benchmark estimates are scaled back, but the MCMC estimates of alpha and beta will be in different units then the alpha and beta estimates from the deterministic fit.
+#' @param model.type one of "Basic", "Kalman", or "AR1". This needs to match the model structure in the model.file argument. If Kalman or AR1, it will check for gaps in the time series, and return NA results if there are any.
 #' @param model.file a txt file with JAGS code (default is "MODEL_Ricker_BUGS.txt" )
 #' @param min.obs min number of S-R pairs needed to fit a model
 #' @param mcmc.settings a list with n.chains (2), n.burnin (20000), n.thin (60), and n.samples (50000). Default values in brackets.
@@ -23,6 +24,7 @@
 #' print(ricker.bm)
 
 calcMCMCRickerBM <- function(sr_obj, sr.scale = 10^6,
+          model.type = "Basic",
           model.file = "BUILT_IN_MODEL_Ricker_BUGS.txt",
           min.obs=15,
 					mcmc.settings = list(n.chains=2, n.burnin=20000, n.thin=60,n.samples=50000),
@@ -38,10 +40,11 @@ calcMCMCRickerBM <- function(sr_obj, sr.scale = 10^6,
 
 require(tidyverse)
 
-# NEED MISSING YEAR HANDLING FOR KF MODEL HERE
+
 
   # Prep the data
 sr.use  <- sr_obj %>% dplyr::filter(!is.na(Rec),!is.na(Spn)) # drop incomplete records
+# NEED MISSING YEAR HANDLING FOR KF and AR1 MODEL HERE
 
 yr.match <- data.frame(YrIdx = 1 : sum(!is.na(sr.use$Rec)), Yr = sr.use$Year)
 print(yr.match)
@@ -116,8 +119,8 @@ perc.df[grepl(paste(pars.rescale,collapse="|"), perc.df$Variable),  2:dim(perc.d
               perc.df[grepl(paste(pars.rescale,collapse="|"), perc.df$Variable),  2:dim(perc.df)[2] ] * sr.scale
 
 
-
-for(i in 1:length(pars.track.in)){  perc.df$Variable <- gsub(pars.track.in[i],pars.labels[i],perc.df$Variable) }
+# KLUDGE WARNING: do in reverse order, so the .c2 are done before .c
+for(i in length(pars.track.in):1){  perc.df$Variable <- gsub(pars.track.in[i],pars.labels[i],perc.df$Variable) }
 
 
 medians.df <-  c(
