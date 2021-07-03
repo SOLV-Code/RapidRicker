@@ -6,6 +6,7 @@
 #' @param sr_obj a data frame with Spn,Rec (actual numbers, not thousands or  millions) for the MCMC and logRpS for the deterministic fit (Data for 1 Stock!). Other variables can be there but are not used (RpS, Qual, ExpF etc)
 #' @param sr.scale an integer value used to rescale the Spn and Rec variables in sr_obj, prior to the MCMC fit, default = 10^6 (i.e. convert to millions). NOTE: If sr.scale is different from 1, then
 #' the benchmark estimates are scaled back, but the MCMC estimates of alpha and beta will be in different units then the alpha and beta estimates from the deterministic fit.
+#' @param model.type one of "Basic", "Kalman", or "AR1". This needs to match the model structure in the model.file argument. If Kalman or AR1, it will check for gaps in the time series, and return NA results if there are any.
 #' @param model.file a txt file with JAGS code (default is "MODEL_Ricker_BUGS.txt" )
 #' @param min.obs min number of S-R pairs needed to fit a model
 #' @param mcmc.settings a list with n.chains (2), n.burnin (20000), n.thin (60), and n.samples (50000). Default values in brackets.
@@ -23,11 +24,13 @@
 #' print(ricker.bm)
 
 calcMCMCRickerBM <- function(sr_obj, sr.scale = 10^6,
+          model.type = "Basic",
           model.file = "BUILT_IN_MODEL_Ricker_BUGS.txt",
           min.obs=15,
 					mcmc.settings = list(n.chains=2, n.burnin=20000, n.thin=60,n.samples=50000),
-					mcmc.inits = list(list(tau_R=3, S.max=1),list(tau_R=7, S.max=2)),
-					mcmc.priors = list(p.alpha = 0,tau_alpha = 0.0001, p.beta = 1, tau_beta = 0.1,max.scalar = 3),
+					mcmc.inits = "default",
+					mcmc.priors = list(p.alpha = 0,tau_alpha = 0.0001, p.beta = 1 , tau_beta = 0.1,max.scalar = 3,
+					                   shape.tau_R = 0.001,lambda_tau_R=0.01,shape.tauw = 0.01,lambda_tauw=0.001),
 					output = "short",
 					out.path = "MCMC_Out",
 					out.label = "MCMC",
@@ -38,10 +41,13 @@ calcMCMCRickerBM <- function(sr_obj, sr.scale = 10^6,
 
 require(tidyverse)
 
-# NEED MISSING YEAR HANDLING FOR KF MODEL HERE
+
 
   # Prep the data
 sr.use  <- sr_obj %>% dplyr::filter(!is.na(Rec),!is.na(Spn)) # drop incomplete records
+missing.yrs <- length(setdiff(min(tmp.df$Year):max(tmp.df$Year),tmp.df$Year)) > 0 # T/F check if there are missing years. If so, can't do AR1 or KF model
+
+if(missing.yrs & model.type %in% c("Kalman","AR1")){warning("Gaps in the time series. Can't do Kalman Filter or AR 1 model, Returning NAs")}
 
 yr.match <- data.frame(YrIdx = 1 : sum(!is.na(sr.use$Rec)), Yr = sr.use$Year)
 print(yr.match)
@@ -61,7 +67,7 @@ pars.labels <- c("ln_a","ln_a_c","b","sd","deviance", "Smax",
 pars.compare <- c("Smax","Seq.c","Smsy_h", "Umsy_h","Seq.c2","Smsy_p", "Umsy_p")
 
 
-if(dim(sr.use)[1] >= min.obs){
+if(dim(sr.use)[1] >= min.obs & (!missing.yrs  | model.type == "Basic")  ){
 
 
 mcmc.data <- c(list(S = sr.use$Spn / sr.scale, R_Obs = sr.use$Rec / sr.scale, N = dim(sr.use)[1]),
@@ -83,6 +89,59 @@ if(!(model.file %in% models.list)){
 # This passes the user-specified path/file into the JAGS call
 model.use <- model.file
 }
+
+
+
+# calculate default priors and inits, unless user specifies custom values
+# NOTE: there is a difference in the distr functions between BUGS/JAGS and R
+# See REF
+
+if(tolower(mcmc.priors$p.beta) == "default"){
+  #default mean for the lognormal beta is the natural log of the largest observed Spn
+  mcmc.priors$p.beta <- max(sr_obj$Spn/sr.scale, na.rm = TRUE)
+  }
+
+if(tolower(mcmc.priors$tau_beta) == "default"){
+  #default precision for the lognormal beta is a very low precision (large uncertainty)
+  # set at a CV of 10, then calculated as
+  #  sd = CV * p.beta
+  #  tau = (1/sd)^2
+  mcmc.priors$tau_beta <- (1 / (10 * mcmc.priors$p.beta ))^2
+}
+
+if(tolower(mcmc.inits) == "default"){
+# random sample from the distributions defined by the mean and precision (or shape)
+mcmc.inits <- list(
+                #KLUDGE for tau_R inits, see https://github.com/SOLV-Code/RapidRicker/issues/71
+                list(tau_R= 3, #rgamma(1,shape = runif(1,1,10) ,rate = mcmc.priors$shape.tau_R),
+                     S.max= 0.2 #, rlnorm(1,meanlog = mcmc.priors$p.beta, sdlog = 1/sqrt(mcmc.priors$tau_beta))
+                    )
+
+                )
+
+
+if(mcmc.settings$n.chains>1){
+
+for(i in 2:mcmc.settings$n.chains){
+
+mcmc.inits <- c(mcmc.inits,
+         list(list(tau_R= 7, #rgamma(1,shape = runif(1,1,10) ,rate = mcmc.priors$shape.tau_R),
+         S.max= 0.1 #rlnorm(1,meanlog = mcmc.priors$p.beta, sdlog = 1/sqrt(mcmc.priors$tau_beta))
+         ) ))
+}
+}
+
+print("inits --------------------------")
+print(mcmc.inits)
+
+
+print("priors --------------------------")
+print(mcmc.priors)
+
+
+}
+
+
 
 
 
@@ -116,12 +175,12 @@ perc.df[grepl(paste(pars.rescale,collapse="|"), perc.df$Variable),  2:dim(perc.d
               perc.df[grepl(paste(pars.rescale,collapse="|"), perc.df$Variable),  2:dim(perc.df)[2] ] * sr.scale
 
 
-
-for(i in 1:length(pars.track.in)){  perc.df$Variable <- gsub(pars.track.in[i],pars.labels[i],perc.df$Variable) }
+# KLUDGE WARNING: do in reverse order, so the .c2 are done before .c
+for(i in length(pars.track.in):1){  perc.df$Variable <- gsub(pars.track.in[i],pars.labels[i],perc.df$Variable) }
 
 
 medians.df <-  c(
-			perc.df %>% select(Variable,p50) %>% as.data.frame() %>%
+			perc.df %>% select(Variable,p10,p25,p50,p75,p90) %>% as.data.frame() %>%
 			      mutate(VarType = substr(Variable, 1, regexpr("\\[",Variable)-1)) %>%
 			      mutate(YrIdx = as.numeric(substr(Variable, regexpr("\\[",Variable)+1, regexpr("\\]",Variable)-1 )))  %>%
 			      left_join(yr.match,by="YrIdx")
@@ -139,29 +198,16 @@ medians.df <- left_join(as.data.frame(medians.df),  data.frame(VarType = names(d
                       select(VarType,Variable,YrIdx,Yr,everything())
 
 
-#extract the results
-
-# replaced by pars.compare above
-#common.vals <- intersect(names(det.ricker.bm),pars.rescale )
-#print(common.vals)
-
-#det.mat <- matrix(det.ricker.bm[pars.compare],
-#             nrow= dim(perc.df)[1],
-#             ncol = length(pars.compare),
-#             byrow=TRUE)
-
-#perc.diff.df <- cbind(Percentile = perc.df[,1],
-#      data.frame(round( (perc.df[,pars.compare] - det.mat) / det.mat *100,2 ))
-#	  )
 
 
+} # if n >= min.obs (and if no gaps if AR1 or KF)
 
 
+if(dim(sr.use)[1] < min.obs |  missing.yrs){
 
-} # if n >= min.obs
+if(dim(sr.use)[1] < min.obs){warning("Not enough data to fit a model (num obs < user-specified min.obs)")}
 
 
-if(dim(sr.use)[1] < min.obs){
 
 out.vec <-  c(n_obs = dim(sr.use)[1],
 			ln_a = NA,
@@ -182,15 +228,19 @@ out.vec <-  c(n_obs = dim(sr.use)[1],
 
 perc.vec <- seq(5,95,by=5)
 perc.df <- as.data.frame(matrix(NA,ncol= length(pars.labels),nrow = length(perc.vec),dimnames = list(
-					paste0("p",perc.vec),  pars.labels ))) %>% rownames_to_column()
-names(perc.df)[1] <- "Percentile"
+					paste0("p",perc.vec),  pars.labels ))) %>%
+          t() %>%  as.data.frame() %>% rownames_to_column() %>% rename(Variable = rowname)
 
-perc.diff.df <- perc.df
+
+medians.df <- data.frame(VarType = perc.df$Variable,Variable = perc.df$Variable,
+                         YrIdx = NA, Yr  = NA, p10 = NA, p25 = NA, p50 = NA, p75 = NA, p90 = NA, Det = NA, Diff = NA, PercDiff = NA)
 tmp.out <- NA
 
 }
 
-return(list(Medians = medians.df, Percentiles = perc.df, MCMC = tmp.out, sr.scale = sr.scale))
+return(list(Medians = medians.df, Percentiles = perc.df,
+            MCMC = tmp.out, sr.scale = sr.scale,
+            priors.used = mcmc.priors, inits.used = mcmc.inits))
 
 }
 
