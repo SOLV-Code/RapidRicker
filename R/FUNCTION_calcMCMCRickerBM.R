@@ -28,8 +28,9 @@ calcMCMCRickerBM <- function(sr_obj, sr.scale = 10^6,
           model.file = "BUILT_IN_MODEL_Ricker_BUGS.txt",
           min.obs=15,
 					mcmc.settings = list(n.chains=2, n.burnin=20000, n.thin=60,n.samples=50000),
-					mcmc.inits = list(list(tau_R=3, S.max=1),list(tau_R=7, S.max=2)),
-					mcmc.priors = list(p.alpha = 0,tau_alpha = 0.0001, p.beta = 1, tau_beta = 0.1,max.scalar = 3),
+					mcmc.inits = "default",
+					mcmc.priors = list(p.alpha = 0,tau_alpha = 0.0001, p.beta = 1 , tau_beta = 0.1,max.scalar = 3,
+					                   shape.tau_R = 0.001,lambda_tau_R=0.01,shape.tauw = 0.01,lambda_tauw=0.001),
 					output = "short",
 					out.path = "MCMC_Out",
 					out.label = "MCMC",
@@ -92,6 +93,54 @@ model.use <- model.file
 
 
 # calculate default priors and inits, unless user specifies custom values
+# NOTE: there is a difference in the distr functions between BUGS/JAGS and R
+# See REF
+
+if(tolower(mcmc.priors$p.beta) == "default"){
+  #default mean for the lognormal beta is the natural log of the largest observed Spn
+  mcmc.priors$p.beta <- max(sr_obj$Spn/sr.scale, na.rm = TRUE)
+  }
+
+if(tolower(mcmc.priors$tau_beta) == "default"){
+  #default precision for the lognormal beta is a very low precision (large uncertainty)
+  # set at a CV of 10, then calculated as
+  #  sd = CV * p.beta
+  #  tau = (1/sd)^2
+  mcmc.priors$tau_beta <- (1 / (10 * mcmc.priors$p.beta ))^2
+}
+
+if(tolower(mcmc.inits) == "default"){
+# random sample from the distributions defined by the mean and precision (or shape)
+mcmc.inits <- list(
+                #KLUDGE for tau_R inits, see https://github.com/SOLV-Code/RapidRicker/issues/71
+                list(tau_R= 3, #rgamma(1,shape = runif(1,1,10) ,rate = mcmc.priors$shape.tau_R),
+                     S.max= 0.2 #, rlnorm(1,meanlog = mcmc.priors$p.beta, sdlog = 1/sqrt(mcmc.priors$tau_beta))
+                    )
+
+                )
+
+
+if(mcmc.settings$n.chains>1){
+
+for(i in 2:mcmc.settings$n.chains){
+
+mcmc.inits <- c(mcmc.inits,
+         list(list(tau_R= 7, #rgamma(1,shape = runif(1,1,10) ,rate = mcmc.priors$shape.tau_R),
+         S.max= 0.1 #rlnorm(1,meanlog = mcmc.priors$p.beta, sdlog = 1/sqrt(mcmc.priors$tau_beta))
+         ) ))
+}
+}
+
+print("inits --------------------------")
+print(mcmc.inits)
+
+
+print("priors --------------------------")
+print(mcmc.priors)
+
+
+}
+
 
 
 
@@ -189,7 +238,9 @@ tmp.out <- NA
 
 }
 
-return(list(Medians = medians.df, Percentiles = perc.df, MCMC = tmp.out, sr.scale = sr.scale))
+return(list(Medians = medians.df, Percentiles = perc.df,
+            MCMC = tmp.out, sr.scale = sr.scale,
+            priors.used = mcmc.priors, inits.used = mcmc.inits))
 
 }
 

@@ -39,8 +39,8 @@ ricker.test <- calcMCMCRickerBM(
   model.file = "BUILT_IN_MODEL_Ricker_BUGS.txt",
   min.obs = 15,
   mcmc.settings = list(n.chains = 2, n.burnin = 20000, n.thin = 60, n.samples = 50000),
-  mcmc.inits = list(list(tau_R = 3, S.max = max.spn /2), list(tau_R = 7, S.max = max.spn * 2 )),
-  mcmc.priors = list(p.alpha = 0, tau_alpha = 1e-04, p.beta = p.beta.in, tau_beta = tau_beta.in,
+  mcmc.inits = "default",
+  mcmc.priors = list(p.alpha = 0, tau_alpha = 1e-04, p.beta = max.spn, tau_beta = (1 / (10 * max.spn ))^2, #max.spn
                      max.scalar = 2, shape.tau_R = 0.001,lambda_tau_R=0.01),
   output = "short",
   out.path = "MCMC_Out",
@@ -51,8 +51,8 @@ ricker.test <- calcMCMCRickerBM(
 
 ricker.test$Medians
 ricker.test$Percentiles
-
-
+ricker.test$priors.used
+ricker.test$inits.used
 
 det.test <- calcDetRickerBM(sr_obj = sr.use %>% mutate(Spn = Spn,Rec = Rec), min.obs = 15)
 
@@ -78,8 +78,8 @@ rickerKF.test <- calcMCMCRickerBM(
   model.file = "BUILT_IN_MODEL_RickerKalman_BUGS.txt",
   min.obs = 15,
   mcmc.settings = list(n.chains = 2, n.burnin = 20000, n.thin = 60, n.samples = 50000),
-  mcmc.inits = list(list(tau_R = 3, S.max = max.spn /2), list(tau_R = 7, S.max = max.spn * 2 )),
-  mcmc.priors = list(p.alpha = 0, tau_alpha = 1e-04, p.beta = p.beta.in, tau_beta = tau_beta.in,
+  mcmc.inits = "default",
+  mcmc.priors = list(p.alpha = 0, tau_alpha = 1e-04, p.beta = max.spn, tau_beta = (1 / (10 * max.spn ))^2,
                      max.scalar = 2,shape.tau_R = 0.001,lambda_tau_R=0.01,shape.tauw = 0.01,lambda_tauw=0.001),
   output = "short",
   out.path = "MCMC_Out",
