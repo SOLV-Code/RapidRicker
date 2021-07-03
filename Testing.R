@@ -44,9 +44,7 @@ hist(rlnorm(10000,p.beta.in,1/sqrt(tau_beta.in)),breaks=1000)
 
 
 
-generatePriors <- function(sr_obj,sr.scale=10^6,model_type = "Basic", custom.list = NULL){
-
-
+generatePriors <- function(sr_obj,sr.scale=10^6,model_type = "Basic", custom.list = NULL,filename = NULL){
 
 
 # priors for all the Ricker model form
@@ -94,12 +92,33 @@ if(is.na(prior.list$max.scalar) ){
 }
 
 
+if(is.na(prior.list$shape.tau_R) ){
+  # shape for the gamma distribution of the  precision terms for the lognormal distribution of R_Obs
+  prior.list$shape.tau_R <- 0.001 # just using established default for now, should work regardless of Spn/Rec scale
+}
+
+if(is.na(prior.list$lambda_tau_R) ){
+  # lambda for the gamma distribution of the  precision terms for the lognormal distribution of R_Obs
+  prior.list$lambda_tau_R <- 0.01 # just using established default for now, should work regardless of Spn/Rec scale
+}
+
+
+
+if(!is.null(filename)){
+  sink(file = filename)
+  print("NOTES -----------------------------------")
+  print("For all tau priors: smaller number = smaller precision = wider distribution")
+  print("PRIORS ----------------------------------")
+  print(prior.list)
+  sink()
+}
+
 return(prior.list)
 }
 
 
 
-generatePriors(sr_obj = sr.use ,model_type = "Basic", custom.list = NULL)
+generatePriors(sr_obj = sr.use ,model_type = "Basic", custom.list = NULL,filename = "Priors.txt")
 generatePriors(sr_obj = sr.use ,model_type = "Basic", custom.list = list(p.beta = 0.3))
 generatePriors(sr_obj = sr.use ,model_type = "Kalman", custom.list = NULL)
 
