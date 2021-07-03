@@ -33,6 +33,119 @@ hist(rlnorm(10000,p.beta.in,1/sqrt(tau_beta.in)),breaks=1000)
 # inspired by https://daattali.com/shiny/colourInput/
 # use app.R format: https://shiny.rstudio.com/articles/app-formats.html
 
+
+
+
+
+
+
+
+
+
+
+
+generatePriors <- function(sr_obj,sr.scale=10^6,model_type = "Basic", custom.list = NULL){
+
+
+
+
+# priors for all the Ricker model form
+prior.list <- list(p.alpha = NA,tau_alpha = NA, p.beta = NA , tau_beta = NA,max.scalar = NA,
+                   shape.tau_R = NA, lambda_tau_R=NA)
+
+if(model_type == "Kalman"){ prior.list = c(prior.list, shape.tauw = NA,lambda_tauw=NA) }
+if(model_type == "AR1"){  warning("AR1 not yet implemented"); stop() }
+
+#print(prior.list)
+#print(is.na(prior.list$p.beta))
+
+
+if(is.na(prior.list$p.alpha) ){
+  #default mean for the normal (log) alpha parameter is 0, as per previous implementations
+  prior.list$p.alpha <- 0
+}
+
+if(is.na(prior.list$tau_alpha) ){
+  #default precision for the normal (log) alpha  is a very low precision (large uncertainty)
+  # set at    (so if Spn and Rec are converted into millions,
+  #then tau_alpha will be 0.001, which matches previous implementation)
+  prior.list$tau_alpha <- 100 / sr.scale
+}
+
+
+
+if(is.na(prior.list$p.beta) ){
+    #default mean for the lognormal capacity is the natural log of the largest observed Spn
+    prior.list$p.beta <- max(sr_obj$Spn/sr.scale, na.rm = TRUE)
+  }
+
+if(is.na(prior.list$tau_beta) ){
+    #default precision for the lognormal beta is a very low precision (large uncertainty)
+    # set at a CV of 10, then calculated as
+    #  sd = CV * p.beta
+    #  tau = (1/sd)^2
+  prior.list$tau_beta <- (1 / (10 * prior.list$p.beta ))^2
+  }
+
+
+if(is.na(prior.list$max.scalar) ){
+  # upper limit on Smax, expressed as a multiple of p.beta
+  prior.list$max.scalar <- 3
+}
+
+
+return(prior.list)
+}
+
+
+
+generatePriors(sr_obj = sr.use ,model_type = "Basic", custom.list = NULL)
+generatePriors(sr_obj = sr.use ,model_type = "Basic", custom.list = list(p.beta = 0.3))
+generatePriors(sr_obj = sr.use ,model_type = "Kalman", custom.list = NULL)
+
+
+
+
+
+if(FALSE){
+if(tolower(mcmc.inits) == "default"){
+  # random sample from the distributions defined by the mean and precision (or shape)
+  mcmc.inits <- list(
+    #KLUDGE for tau_R inits, see https://github.com/SOLV-Code/RapidRicker/issues/71
+    list(tau_R= 3, #rgamma(1,shape = runif(1,1,10) ,rate = mcmc.priors$shape.tau_R),
+         S.max= 0.2 #, rlnorm(1,meanlog = mcmc.priors$p.beta, sdlog = 1/sqrt(mcmc.priors$tau_beta))
+    )
+
+  )
+
+
+  if(mcmc.settings$n.chains>1){
+
+    for(i in 2:mcmc.settings$n.chains){
+
+      mcmc.inits <- c(mcmc.inits,
+                      list(list(tau_R= 7, #rgamma(1,shape = runif(1,1,10) ,rate = mcmc.priors$shape.tau_R),
+                                S.max= 0.1 #rlnorm(1,meanlog = mcmc.priors$p.beta, sdlog = 1/sqrt(mcmc.priors$tau_beta))
+                      ) ))
+    }
+  }
+
+  print("inits --------------------------")
+  print(mcmc.inits)
+
+} }
+
+
+
+
+
+
+
+
+
+
+
+
 ricker.test <- calcMCMCRickerBM(
   sr_obj = sr.use, sr.scale = sr.scale.use  ,
   model.type = "Basic",
