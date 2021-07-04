@@ -17,7 +17,7 @@ model{
 	# typical default is to  set p.beta set at log(max obs Spn)
 	# and max.scalar at 3, so that the Smax prior is bounded by 3 times the largest observed Spn
     S.max ~ dlnorm(p.beta, tau_beta) T(0,Smax.limit)
-	Smax.limit <- max.scalar * exp(p.beta)
+	Smax.limit <- max.scalar * p.beta
 	
     tau_R ~ dgamma(shape.tau_R,lambda_tau_R)             #prior for precision parameter
     sigma <- 1/sqrt(tau_R) 			# changed based on Fleishman and Evenson

@@ -92,55 +92,6 @@ model.use <- model.file
 
 
 
-# calculate default priors and inits, unless user specifies custom values
-# NOTE: there is a difference in the distr functions between BUGS/JAGS and R
-# See REF
-
-if(tolower(mcmc.priors$p.beta) == "default"){
-  #default mean for the lognormal beta is the natural log of the largest observed Spn
-  mcmc.priors$p.beta <- max(sr_obj$Spn/sr.scale, na.rm = TRUE)
-  }
-
-if(tolower(mcmc.priors$tau_beta) == "default"){
-  #default precision for the lognormal beta is a very low precision (large uncertainty)
-  # set at a CV of 10, then calculated as
-  #  sd = CV * p.beta
-  #  tau = (1/sd)^2
-  mcmc.priors$tau_beta <- (1 / (10 * mcmc.priors$p.beta ))^2
-}
-
-if(tolower(mcmc.inits) == "default"){
-# random sample from the distributions defined by the mean and precision (or shape)
-mcmc.inits <- list(
-                #KLUDGE for tau_R inits, see https://github.com/SOLV-Code/RapidRicker/issues/71
-                list(tau_R= 3, #rgamma(1,shape = runif(1,1,10) ,rate = mcmc.priors$shape.tau_R),
-                     S.max= 0.2 #, rlnorm(1,meanlog = mcmc.priors$p.beta, sdlog = 1/sqrt(mcmc.priors$tau_beta))
-                    )
-
-                )
-
-
-if(mcmc.settings$n.chains>1){
-
-for(i in 2:mcmc.settings$n.chains){
-
-mcmc.inits <- c(mcmc.inits,
-         list(list(tau_R= 7, #rgamma(1,shape = runif(1,1,10) ,rate = mcmc.priors$shape.tau_R),
-         S.max= 0.1 #rlnorm(1,meanlog = mcmc.priors$p.beta, sdlog = 1/sqrt(mcmc.priors$tau_beta))
-         ) ))
-}
-}
-
-print("inits --------------------------")
-print(mcmc.inits)
-
-
-print("priors --------------------------")
-print(mcmc.priors)
-
-
-}
-
 
 
 
