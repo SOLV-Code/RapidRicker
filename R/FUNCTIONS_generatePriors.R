@@ -1,11 +1,10 @@
-#' plotRanking
+#' generatePriors
 #'
 #' This function generates priors for the alternative Ricker model forms. User-specified values can be fed in for one or more variable to replace the defaults. Defaults are under development. Follow the discussion at \href{https://github.com/SOLV-Code/RapidRicker/issues/71}{this thread}.
-#' @param sr_obj  a data frame where each column is a set of values. Column labels become plot labels
 #' @param sr_obj a data frame with Spn,Rec (actual numbers, not thousands or  millions) for the MCMC and logRpS for the deterministic fit (Data for 1 Stock!). Other variables can be there but are not used (RpS, Qual, ExpF etc)
 #' @param sr.scale an integer value used to rescale the Spn and Rec variables in sr_obj, prior to the MCMC fit, default = 10^6 (i.e. convert to millions). NOTE: If sr.scale is different from 1, then
 #' the benchmark estimates are scaled back, but the MCMC estimates of alpha and beta will be in different units then the alpha and beta estimates from the deterministic fit.
-#' @param model.type one of "Basic", "Kalman", or "AR1".  For details, see \href{https://github.com/SOLV-Code/RapidRicker/wiki/3:--Ricker-Model-Forms-in-BUGS-JAGS}{this wiki}.
+#' @param model_type one of "Basic", "Kalman", or "AR1".  For details, see \href{https://github.com/SOLV-Code/RapidRicker/wiki/3:--Ricker-Model-Forms-in-BUGS-JAGS}{this wiki}.
 #' @param custom.list a list with elements to replace the default values (e.g. "list(p.beta = 0.1)")
 #' @param filename either NULL, or a file/path for an output file to save the generated priors (e.g. "OUTPUT/Priors.txt")
 #' @keywords priors
@@ -20,14 +19,11 @@ generatePriors <- function(sr_obj,sr.scale=10^6,model_type = "Basic", custom.lis
 prior.list <- list(p.alpha = NA,tau_alpha = NA, p.beta = NA , tau_beta = NA,max.scalar = NA,
                    shape.tau_R = NA, lambda_tau_R=NA)
 
-
-
-
 if(model_type == "Kalman"){ prior.list = c(prior.list, shape.tauw = NA,lambda_tauw=NA) }
 if(model_type == "AR1"){  warning("AR1 not yet implemented"); stop() }
 
 custom.match <- intersect(names(prior.list),names(custom.list))
-print(custom.match)
+#print(custom.match)
 
 if(length(custom.match)>0){
 

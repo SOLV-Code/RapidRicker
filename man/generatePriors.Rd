@@ -2,7 +2,7 @@
 % Please edit documentation in R/FUNCTIONS_generatePriors.R
 \name{generatePriors}
 \alias{generatePriors}
-\title{plotRanking}
+\title{generatePriors}
 \usage{
 generatePriors(
   sr_obj,
@@ -18,11 +18,11 @@ generatePriors(
 \item{sr.scale}{an integer value used to rescale the Spn and Rec variables in sr_obj, prior to the MCMC fit, default = 10^6 (i.e. convert to millions). NOTE: If sr.scale is different from 1, then
 the benchmark estimates are scaled back, but the MCMC estimates of alpha and beta will be in different units then the alpha and beta estimates from the deterministic fit.}
 
+\item{model_type}{one of "Basic", "Kalman", or "AR1".  For details, see \href{https://github.com/SOLV-Code/RapidRicker/wiki/3:--Ricker-Model-Forms-in-BUGS-JAGS}{this wiki}.}
+
 \item{custom.list}{a list with elements to replace the default values (e.g. "list(p.beta = 0.1)")}
 
 \item{filename}{either NULL, or a file/path for an output file to save the generated priors (e.g. "OUTPUT/Priors.txt")}
-
-\item{model.type}{one of "Basic", "Kalman", or "AR1".  For details, see \href{https://github.com/SOLV-Code/RapidRicker/wiki/3:--Ricker-Model-Forms-in-BUGS-JAGS}{this wiki}.}
 }
 \description{
 This function generates priors for the alternative Ricker model forms. User-specified values can be fed in for one or more variable to replace the defaults. Defaults are under development. Follow the discussion at \href{https://github.com/SOLV-Code/RapidRicker/issues/71}{this thread}.
