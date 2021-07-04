@@ -6,12 +6,15 @@
 \usage{
 calcMCMCRickerBM(
   sr_obj,
+  sr.scale = 10^6,
+  model.type = "Basic",
   model.file = "BUILT_IN_MODEL_Ricker_BUGS.txt",
   min.obs = 15,
   mcmc.settings = list(n.chains = 2, n.burnin = 20000, n.thin = 60, n.samples = 50000),
-  mcmc.inits = list(list(tau_R = 3, S.max = 1), list(tau_R = 7, S.max = 2)),
+  mcmc.inits = "default",
   mcmc.priors = list(p.alpha = 0, tau_alpha = 1e-04, p.beta = 1, tau_beta = 0.1,
-    max.scalar = 3),
+    max.scalar = 3, shape.tau_R = 0.001, lambda_tau_R = 0.01, shape.tauw = 0.01,
+    lambda_tauw = 0.001),
   output = "short",
   out.path = "MCMC_Out",
   out.label = "MCMC",
@@ -20,7 +23,12 @@ calcMCMCRickerBM(
 )
 }
 \arguments{
-\item{sr_obj}{a data frame with Spn and Rec (Data for 1 Stock!). Other variables can be there but are not used (RpS, Qual, ExpF etc)}
+\item{sr_obj}{a data frame with Spn,Rec (actual numbers, not thousands or  millions) for the MCMC and logRpS for the deterministic fit (Data for 1 Stock!). Other variables can be there but are not used (RpS, Qual, ExpF etc)}
+
+\item{sr.scale}{an integer value used to rescale the Spn and Rec variables in sr_obj, prior to the MCMC fit, default = 10^6 (i.e. convert to millions). NOTE: If sr.scale is different from 1, then
+the benchmark estimates are scaled back, but the MCMC estimates of alpha and beta will be in different units then the alpha and beta estimates from the deterministic fit.}
+
+\item{model.type}{one of "Basic", "Kalman", or "AR1". This needs to match the model structure in the model.file argument. If Kalman or AR1, it will check for gaps in the time series, and return NA results if there are any.}
 
 \item{model.file}{a txt file with JAGS code (default is "MODEL_Ricker_BUGS.txt" )}
 
@@ -28,7 +36,7 @@ calcMCMCRickerBM(
 
 \item{mcmc.settings}{a list with n.chains (2), n.burnin (20000), n.thin (60), and n.samples (50000). Default values in brackets.}
 
-\item{mcmc.inits}{a list of lists with inits for each chain. Default is "list(list(tau_R=3, C=1),list(tau_R=7, C=2))"}
+\item{mcmc.inits}{a list of lists with inits for each chain. Default is "list(list(tau_R=3, S.max=1),list(tau_R=7, S.max=2))"}
 
 \item{mcmc.priors}{a list with p.alpha, p.beta, tau_alpha,tau_beta (if model.file = "MODEL_Ricker_BUGS.txt" )}
 

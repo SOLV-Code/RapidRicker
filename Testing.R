@@ -34,92 +34,8 @@ hist(rlnorm(10000,p.beta.in,1/sqrt(tau_beta.in)),breaks=1000)
 # use app.R format: https://shiny.rstudio.com/articles/app-formats.html
 
 
-
-
-
-
-
-
-
-
-
-
-generatePriors <- function(sr_obj,sr.scale=10^6,model_type = "Basic", custom.list = NULL,filename = NULL){
-
-
-# priors for all the Ricker model form
-prior.list <- list(p.alpha = NA,tau_alpha = NA, p.beta = NA , tau_beta = NA,max.scalar = NA,
-                   shape.tau_R = NA, lambda_tau_R=NA)
-
-if(model_type == "Kalman"){ prior.list = c(prior.list, shape.tauw = NA,lambda_tauw=NA) }
-if(model_type == "AR1"){  warning("AR1 not yet implemented"); stop() }
-
-#print(prior.list)
-#print(is.na(prior.list$p.beta))
-
-
-if(is.na(prior.list$p.alpha) ){
-  #default mean for the normal (log) alpha parameter is 0, as per previous implementations
-  prior.list$p.alpha <- 0
-}
-
-if(is.na(prior.list$tau_alpha) ){
-  #default precision for the normal (log) alpha  is a very low precision (large uncertainty)
-  # set at    (so if Spn and Rec are converted into millions,
-  #then tau_alpha will be 0.001, which matches previous implementation)
-  prior.list$tau_alpha <- 100 / sr.scale
-}
-
-
-
-if(is.na(prior.list$p.beta) ){
-    #default mean for the lognormal capacity is the natural log of the largest observed Spn
-    prior.list$p.beta <- max(sr_obj$Spn/sr.scale, na.rm = TRUE)
-  }
-
-if(is.na(prior.list$tau_beta) ){
-    #default precision for the lognormal beta is a very low precision (large uncertainty)
-    # set at a CV of 10, then calculated as
-    #  sd = CV * p.beta
-    #  tau = (1/sd)^2
-  prior.list$tau_beta <- (1 / (10 * prior.list$p.beta ))^2
-  }
-
-
-if(is.na(prior.list$max.scalar) ){
-  # upper limit on Smax, expressed as a multiple of p.beta
-  prior.list$max.scalar <- 3
-}
-
-
-if(is.na(prior.list$shape.tau_R) ){
-  # shape for the gamma distribution of the  precision terms for the lognormal distribution of R_Obs
-  prior.list$shape.tau_R <- 0.001 # just using established default for now, should work regardless of Spn/Rec scale
-}
-
-if(is.na(prior.list$lambda_tau_R) ){
-  # lambda for the gamma distribution of the  precision terms for the lognormal distribution of R_Obs
-  prior.list$lambda_tau_R <- 0.01 # just using established default for now, should work regardless of Spn/Rec scale
-}
-
-
-
-if(!is.null(filename)){
-  sink(file = filename)
-  print("NOTES -----------------------------------")
-  print("For all tau priors: smaller number = smaller precision = wider distribution")
-  print("PRIORS ----------------------------------")
-  print(prior.list)
-  sink()
-}
-
-return(prior.list)
-}
-
-
-
 generatePriors(sr_obj = sr.use ,model_type = "Basic", custom.list = NULL,filename = "Priors.txt")
-generatePriors(sr_obj = sr.use ,model_type = "Basic", custom.list = list(p.beta = 0.3))
+generatePriors(sr_obj = sr.use ,model_type = "Basic", custom.list = list(p.beta = 0.3,tau_beta = 0.1))
 generatePriors(sr_obj = sr.use ,model_type = "Kalman", custom.list = NULL)
 
 
@@ -158,8 +74,8 @@ if(tolower(mcmc.inits) == "default"){
 
 
 
-
-
+priors.ricker <- generatePriors(sr_obj = sr.use ,model_type = "Basic")
+inits.ricker <- generateInits(priors.ricker)
 
 
 
@@ -171,9 +87,8 @@ ricker.test <- calcMCMCRickerBM(
   model.file = "BUILT_IN_MODEL_Ricker_BUGS.txt",
   min.obs = 15,
   mcmc.settings = list(n.chains = 2, n.burnin = 20000, n.thin = 60, n.samples = 50000),
-  mcmc.inits = "default",
-  mcmc.priors = list(p.alpha = 0, tau_alpha = 1e-04, p.beta = max.spn, tau_beta = (1 / (10 * max.spn ))^2, #max.spn
-                     max.scalar = 2, shape.tau_R = 0.001,lambda_tau_R=0.01),
+  mcmc.inits = inits.ricker,
+  mcmc.priors = priors.ricker,
   output = "short",
   out.path = "MCMC_Out",
   out.label = "MCMC",
