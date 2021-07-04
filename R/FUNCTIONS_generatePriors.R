@@ -1,7 +1,6 @@
 #' plotRanking
 #'
 #' This function generates priors for the alternative Ricker model forms. User-specified values can be fed in for one or more variable to replace the defaults. Defaults are under development. Follow the discussion at \href{https://github.com/SOLV-Code/RapidRicker/issues/71}{this thread}.
-#' @param sr_obj  a data frame where each column is a set of values. Column labels become plot labels
 #' @param sr_obj a data frame with Spn,Rec (actual numbers, not thousands or  millions) for the MCMC and logRpS for the deterministic fit (Data for 1 Stock!). Other variables can be there but are not used (RpS, Qual, ExpF etc)
 #' @param sr.scale an integer value used to rescale the Spn and Rec variables in sr_obj, prior to the MCMC fit, default = 10^6 (i.e. convert to millions). NOTE: If sr.scale is different from 1, then
 #' the benchmark estimates are scaled back, but the MCMC estimates of alpha and beta will be in different units then the alpha and beta estimates from the deterministic fit.
@@ -27,7 +26,7 @@ if(model_type == "Kalman"){ prior.list = c(prior.list, shape.tauw = NA,lambda_ta
 if(model_type == "AR1"){  warning("AR1 not yet implemented"); stop() }
 
 custom.match <- intersect(names(prior.list),names(custom.list))
-print(custom.match)
+#print(custom.match)
 
 if(length(custom.match)>0){
 

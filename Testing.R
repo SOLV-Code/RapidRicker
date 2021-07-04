@@ -34,16 +34,29 @@ hist(rlnorm(10000,p.beta.in,1/sqrt(tau_beta.in)),breaks=1000)
 # use app.R format: https://shiny.rstudio.com/articles/app-formats.html
 
 
-generatePriors(sr_obj = sr.use ,model_type = "Basic", custom.list = NULL,filename = "Priors.txt")
-generatePriors(sr_obj = sr.use ,model_type = "Basic", custom.list = list(p.beta = 0.3,tau_beta = 0.1))
-generatePriors(sr_obj = sr.use ,model_type = "Kalman", custom.list = NULL)
+generatePriors(sr_obj = sr.use ,sr.scale=10^6,model_type = "Basic", custom.list = NULL,filename = "Priors.txt")
+generatePriors(sr_obj = sr.use ,sr.scale=10^6,model_type = "Basic", custom.list = list(p.beta = 0.3,tau_beta = 0.1))
+generatePriors(sr_obj = sr.use ,sr.scale=10^6,model_type = "Kalman", custom.list = NULL)
 
 
 
 
 
-if(FALSE){
-if(tolower(mcmc.inits) == "default"){
+
+
+
+
+
+
+
+
+priors.ricker <- generatePriors(sr_obj = sr.use , sr.scale=10^6, model_type = "Basic")
+
+
+generateInits(priors, model_type = "Basic",n.chains = 2){
+
+if(tolower(model_type) %in% c("basic","kalman")){
+
   # random sample from the distributions defined by the mean and precision (or shape)
   mcmc.inits <- list(
     #KLUDGE for tau_R inits, see https://github.com/SOLV-Code/RapidRicker/issues/71
@@ -65,20 +78,24 @@ if(tolower(mcmc.inits) == "default"){
     }
   }
 
+
+
+
+
+} # end if Basic, kalman
+
   print("inits --------------------------")
   print(mcmc.inits)
 
-} }
+  return(inits)
+
+} # end generate inits
 
 
 
 
 
-priors.ricker <- generatePriors(sr_obj = sr.use ,model_type = "Basic")
 inits.ricker <- generateInits(priors.ricker)
-
-
-
 
 
 ricker.test <- calcMCMCRickerBM(
