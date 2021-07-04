@@ -10,8 +10,8 @@ sr.use
 sr.scale.use <- 10^6
 
 
-tmp.df <- sr.use %>% dplyr::filter(!is.na(Rec),!is.na(Spn))
-length(setdiff(min(tmp.df$Year):max(tmp.df$Year),tmp.df$Year)) > 0
+#tmp.df <- sr.use %>% dplyr::filter(!is.na(Rec),!is.na(Spn))
+#length(setdiff(min(tmp.df$Year):max(tmp.df$Year),tmp.df$Year)) > 0
 
 
 

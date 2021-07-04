@@ -45,12 +45,12 @@ require(tidyverse)
 
   # Prep the data
 sr.use  <- sr_obj %>% dplyr::filter(!is.na(Rec),!is.na(Spn)) # drop incomplete records
-missing.yrs <- length(setdiff(min(tmp.df$Year):max(tmp.df$Year),tmp.df$Year)) > 0 # T/F check if there are missing years. If so, can't do AR1 or KF model
+missing.yrs <- length(setdiff(min(sr.use$Year):max(sr.use$Year),sr.use$Year)) > 0 # T/F check if there are missing years. If so, can't do AR1 or KF model
 
 if(missing.yrs & model.type %in% c("Kalman","AR1")){warning("Gaps in the time series. Can't do Kalman Filter or AR 1 model, Returning NAs")}
 
 yr.match <- data.frame(YrIdx = 1 : sum(!is.na(sr.use$Rec)), Yr = sr.use$Year)
-print(yr.match)
+#print(yr.match)
 
 
 # pars.track.in <- c("ln.alpha.c","beta","sigma","deviance","S.max","S.msy.c2")}
