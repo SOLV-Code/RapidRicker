@@ -56,13 +56,13 @@ yr.match <- data.frame(YrIdx = 1 : sum(!is.na(sr.use$Rec)), Yr = sr.use$Year)
 # pars.track.in <- c("ln.alpha.c","beta","sigma","deviance","S.max","S.msy.c2")}
 pars.track.in <- c("ln.alpha","ln.alpha.c","beta","sigma","deviance", "S.max",
 						"S.eq.c","S.msy.c", "U.msy.c",
-						"S.eq.c2","S.msy.c2", "U.msy.c2")
+						"S.eq.c2","S.msy.c2", "U.msy.c2","RS")
 
 pars.rescale <- c("S.max", "S.eq.c","S.msy.c","S.eq.c2","S.msy.c2")
 
 pars.labels <- c("ln_a","ln_a_c","b","sd","deviance", "Smax",
 						"Seq.c","Smsy_h", "Umsy_h",
-						"Seq.c2","Smsy_p", "Umsy_p")
+						"Seq.c2","Smsy_p", "Umsy_p","logRpS")
 
 pars.compare <- c("Smax","Seq.c","Smsy_h", "Umsy_h","Seq.c2","Smsy_p", "Umsy_p")
 
