@@ -7,6 +7,9 @@ model{
       R_Obs[i] ~ dlnorm(logR[i],tau_R)          #likelihood -> predicted value for NA in data set
       logR[i] <- RS[i] +log(S[i])               # calc log(R) - fitted values
       RS[i] <- ln.alpha - beta * S[i]           # ricker model
+	  
+	  log.resid[i] <-  log(R_Obs[i]) - logR[i] 
+	  
    }
 
 

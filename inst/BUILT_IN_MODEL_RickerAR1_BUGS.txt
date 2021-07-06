@@ -1,0 +1,71 @@
+model{
+
+# This is a BUGS version of the Ricker model fit with lag-1 autoregression correction (AR1) and associated benchmarks. 
+# The code is modified from code by Catherine Michielsens and expanded for AR1 based on Eq21 and 22 of 
+# Fleischman and Evenson (2010; ADFG FMS10-04). 
+
+
+# do first year    
+R_Obs[1] ~ dlnorm(logR[1],tau_R)    
+logR[1] <- log(S[1]) + RS[1]    
+RS[1] <- ln.alpha - beta * S[1] + phi * log.resid.0    
+
+# do second year    
+R_Obs[2] ~ dlnorm(logR[2],tau_R)    
+logR[2] <- log(S[2]) + RS[2]     
+RS[2] <- ln.alpha - beta * S[2] + phi * log.resid[1]    
+log.resid[1] <-  log(R_Obs[1]) - logR[1]    
+
+#loop over rext of N sample points (starting with the third)    
+
+for (i in 2:N) { 
+log.resid[i] <-  log(R_Obs[i]) - logR[i] 
+}
+
+
+for (i in 3:N) {       
+R_Obs[i] ~ dlnorm(logR[i],tau_R)  # likelihood 
+logR[i] <- log(S[i]) + RS[i]      
+RS[i] <- ln.alpha - beta * S[i] + phi * log.resid[i-1] 
+} 
+
+ln.alpha ~ dnorm(p.alpha,tau_alpha)            #prior for ln.alpha     
+beta <-1/S.max    # prior for beta     
+
+S.max ~ dlnorm(p.beta, tau_beta)T(0,Smax.limit) 
+Smax.limit <- max.scalar * p.beta 
+
+tau_R ~ dgamma(shape.tau_R,lambda_tau_R)    #prior for precision parameter     
+sigma <- 1/sqrt(tau_R)   # based on Fleishman and Evenson (2010; ADFG FMS10-04)
+
+# OLD phi ~ dnorm(0,0.0001) #T(-1,1) # AR1 priors as per Fleishman and Evenson AppA2  
+# crashed with "Error in node phi. Slicer stuck at value with infinite density "
+# Seems to be if node gets stuck on 0? (see: https://stackoverflow.com/questions/47135726/error-slicer-stuck-at-value-with-infinite-density-running-binomial-beta-model)
+# works if bounds are commented out... -> need to investigate
+
+phi ~ dnorm(0.5,0.0001) #T(0.0001,0.9999)
+log.resid.0 ~ dnorm(0,tau.red) #T(-3,3)  
+tau.red <- tau.white * (1-phi*phi)     
+tau.white ~ dgamma(shape.tauw,lambda_tauw)    
+       
+	ln.alpha.c <- ln.alpha + (sigma * sigma / 2) # bias correction for lognormal skewness
+
+
+    #BIOLOGICAL BENCHMARKS
+    alpha.c <- min(exp(ln.alpha.c),1.0E4)
+    S.eq.c <- ln.alpha.c * S.max 
+	
+	# Hilborn Proxy ("_h" in the output from calcDetRickerBM)
+    U.msy.c <- ln.alpha.c * (0.5-0.07*ln.alpha.c)
+    S.msy.c <- S.eq.c *(0.5-0.07*ln.alpha.c)  
+    
+	# Peterman Approximation ("_p" in the output from calcDetRickerBM)
+    positive.lna.c <- step(ln.alpha.c)
+    ln.alpha.c.nonneg <- ln.alpha.c * positive.lna.c
+    S.eq.c2 <- ln.alpha.c.nonneg * S.max 
+    peterman.approx.c <- (0.5 - 0.65*pow(ln.alpha.c.nonneg,1.27) / (8.7 +pow(ln.alpha.c.nonneg,1.27)))
+    U.msy.c2 <- ln.alpha.c.nonneg * peterman.approx.c 
+    S.msy.c2 <- U.msy.c2 / beta  
+    U.max.c2 <- 1 - 1 / exp(ln.alpha.c.nonneg) 
+
+}

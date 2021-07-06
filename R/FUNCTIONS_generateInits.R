@@ -17,7 +17,7 @@ generateInits <- function(priors, model_type = "Basic",n.chains = 2,filename = N
 # loops through to get nested list correponding to number of chains
 # Issues and current approach discussed at https://github.com/SOLV-Code/RapidRicker/issues/71
 
-if(tolower(model_type) %in% c("basic","kalman")){
+if(tolower(model_type) %in% c("basic","kalman","ar1")){
 
 # inits for first chain
 mcmc.inits <- list(list(tau_R= runif(1,1,10), #rgamma(1,shape = runif(1,1,2) ,rate = priors.ricker$shape.tau_R*10)
