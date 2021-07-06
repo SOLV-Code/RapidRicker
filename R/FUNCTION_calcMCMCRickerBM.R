@@ -53,17 +53,22 @@ yr.match <- data.frame(YrIdx = 1 : sum(!is.na(sr.use$Rec)), Yr = sr.use$Year)
 #print(yr.match)
 
 
-# pars.track.in <- c("ln.alpha.c","beta","sigma","deviance","S.max","S.msy.c2")}
+
+
 pars.track.in <- c("ln.alpha","ln.alpha.c","beta","sigma","deviance", "S.max",
 						"S.eq.c","S.msy.c", "U.msy.c",
 						"S.eq.c2","S.msy.c2", "U.msy.c2","log.resid")
-
-pars.rescale <- c("S.max", "S.eq.c","S.msy.c","S.eq.c2","S.msy.c2")
-
 pars.labels <- c("ln_a","ln_a_c","b","sd","deviance", "Smax",
 						"Seq.c","Smsy_h", "Umsy_h",
 						"Seq.c2","Smsy_p", "Umsy_p","log.resid")
 
+if(tolower(model.type) == "ar1"){
+  pars.track.in <- c(pars.track.in,"phi")
+  pars.labels <- c(pars.labels,"phi")
+}
+
+
+pars.rescale <- c("S.max", "S.eq.c","S.msy.c","S.eq.c2","S.msy.c2")
 pars.compare <- c("Smax","Seq.c","Smsy_h", "Umsy_h","Seq.c2","Smsy_p", "Umsy_p")
 
 
@@ -172,6 +177,11 @@ out.vec <-  c(n_obs = dim(sr.use)[1],
 			Umsy_p = NA,
 			log.resid = NA
 			)
+
+if(tolower(model.type) == "ar1"){
+  out.vec  <- c(out.vec, phi = NA)
+}
+
 
 perc.vec <- seq(5,95,by=5)
 perc.df <- as.data.frame(matrix(NA,ncol= length(pars.labels),nrow = length(perc.vec),dimnames = list(

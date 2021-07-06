@@ -38,12 +38,13 @@ Smax.limit <- max.scalar * p.beta
 tau_R ~ dgamma(shape.tau_R,lambda_tau_R)    #prior for precision parameter     
 sigma <- 1/sqrt(tau_R)   # based on Fleishman and Evenson (2010; ADFG FMS10-04)
 
-# OLD phi ~ dnorm(0,0.0001) T(-1,1) # AR1 priors as per Fleishman and Evenson AppA2  
+# OLD phi ~ dnorm(0,0.0001) #T(-1,1) # AR1 priors as per Fleishman and Evenson AppA2  
 # crashed with "Error in node phi. Slicer stuck at value with infinite density "
-# Seems to be if node gets stuck on 0 (see: https://stackoverflow.com/questions/47135726/error-slicer-stuck-at-value-with-infinite-density-running-binomial-beta-model)
-phi ~ dnorm(0.5,0.0001) T(0.0001,0.9999)
+# Seems to be if node gets stuck on 0? (see: https://stackoverflow.com/questions/47135726/error-slicer-stuck-at-value-with-infinite-density-running-binomial-beta-model)
+# works if bounds are commented out... -> need to investigate
 
-log.resid.0 ~ dnorm(0,tau.red) T(-3,3)  
+phi ~ dnorm(0.5,0.0001) #T(0.0001,0.9999)
+log.resid.0 ~ dnorm(0,tau.red) #T(-3,3)  
 tau.red <- tau.white * (1-phi*phi)     
 tau.white ~ dgamma(shape.tauw,lambda_tauw)    
        
