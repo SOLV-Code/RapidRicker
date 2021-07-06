@@ -19,8 +19,7 @@ generatePriors <- function(sr_obj,sr.scale=10^6,model_type = "Basic", custom.lis
 prior.list <- list(p.alpha = NA,tau_alpha = NA, p.beta = NA , tau_beta = NA,max.scalar = NA,
                    shape.tau_R = NA, lambda_tau_R=NA)
 
-if(model_type == "Kalman"){ prior.list = c(prior.list, shape.tauw = NA,lambda_tauw=NA) }
-if(model_type == "AR1"){  warning("AR1 not yet implemented"); stop() }
+if(model_type %in% c("Kalman","AR1")){ prior.list = c(prior.list, shape.tauw = NA,lambda_tauw=NA) }
 
 custom.match <- intersect(names(prior.list),names(custom.list))
 #print(custom.match)
@@ -83,7 +82,7 @@ if(is.na(prior.list$lambda_tau_R) ){
 }
 
 
-if(model_type == "Kalman"){
+if(model_type %in% c("Kalman","AR1")){
 
 if(is.na(prior.list$shape.tauw) ){
   # shape for the gamma distribution of the  precision terms for the normal distribution of w (the annual step in prod)

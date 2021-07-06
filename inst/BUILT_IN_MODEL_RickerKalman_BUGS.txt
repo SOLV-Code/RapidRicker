@@ -7,6 +7,7 @@ model{
       logR[i] <- RS[i] +log(S[i])               # calc log(R) - fitted values
       RS[i] <- ln.alpha[i] - beta * S[i]           # ricker model
 	  year[i]<-i
+	  log.resid[i] <-  log(R_Obs[i]) - logR[i]  
 	}
 
     for (i in 2:N){
@@ -18,19 +19,19 @@ model{
 
     ln.alpha[1] ~ dnorm(p.alpha,tau_alpha)        #prior for alpha (actually ln.alpha!)
     beta <-1/ S.max					   # prior for beta
-
-	# new constraint June 2021
-	# typical default is to  set p.beta set at log(max obs Spn)
-	# and max.scalar at 3, so that the Smax prior is bounded by 3 times the largest observed Spn
-    S.max ~ dlnorm(p.beta, tau_beta)I(0,Smax.limit)
+	
+    S.max ~ dlnorm(p.beta, tau_beta)T(0,Smax.limit)
 	Smax.limit <- max.scalar * p.beta
 	
     tau_R ~ dgamma(shape.tau_R,lambda_tau_R)                    #prior for precision parameter
-    sigma <- 1/sqrt(tau_R) 			# changed based on Fleishman and Evenson
+    sigma <- 1/sqrt(tau_R) 			# based on Fleishman and Evenson
 
 	tauw~ dgamma(shape.tauw,lambda_tauw)
     varw<- 1/tauw
 	sigw<- 1/sqrt(tauw)
+
+
+
 
     #BIOLOGICAL BENCHMARKS
     # adapted from code in Miller & Pestal 2020 Taku Sockeye Res Doc

@@ -71,6 +71,10 @@ ricker.test$inits.used
 
 det.test <- calcDetRickerBM(sr_obj = sr.use %>% mutate(Spn = Spn,Rec = Rec), min.obs = 15)
 
+det.test.resid <- calcDetRickerBM(sr_obj = sr.use %>% mutate(Spn = Spn,Rec = Rec),
+                                  min.obs = 15,resids =TRUE)
+det.test.resid
+
 
 print(paste("Smsy =", round(ricker.test$Medians %>% dplyr::filter(VarType == "Smsy_p") %>% select(p50))))
 print(paste("Smsy Det=", round(det.test["Smsy_p"])))
@@ -112,3 +116,47 @@ rickerKF.test$Medians
 rickerKF.test$Percentiles
 
 sort(unique(rickerKF.test$Medians$VarType))
+
+
+
+
+
+
+
+
+#####
+# Ricker AR1 Test
+
+
+priors.AR1 <- generatePriors(sr_obj = sr.use , sr.scale=10^6, model_type = "AR1")
+priors.AR1
+
+inits.AR1 <- generateInits(priors.AR1)
+inits.AR1
+
+rickerAR1.test <- calcMCMCRickerBM(
+  sr_obj = sr.use, sr.scale = sr.scale.use  ,
+  model.type = "AR1",
+  model.file = "BUILT_IN_MODEL_RickerAR1_BUGS.txt",
+  min.obs = 15,
+  mcmc.settings = list(n.chains = 2, n.burnin = 20000, n.thin = 60, n.samples = 50000),
+  mcmc.inits = inits.AR1,
+  mcmc.priors = priors.AR1,
+  output = "short",
+  out.path = "MCMC_Out",
+  out.label = "MCMC",
+  mcmc.seed = "default",
+  tracing = FALSE
+)
+
+rickerAR1.test$Medians
+rickerAR1.test$Percentiles
+
+sort(unique(rickerAR1.test$Medians$VarType))
+
+
+
+
+
+
+

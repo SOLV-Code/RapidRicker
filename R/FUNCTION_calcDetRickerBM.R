@@ -5,13 +5,14 @@
 #' Two versions for some BM are produced: "_h" = Hilborn Proxy (\href{https://cdnsciencepub.com/doi/pdf/10.1139/f85-230}{Hilborn 1985}) and "_p" = Peterman Proxy" (\href{https://cdnsciencepub.com/doi/pdf/10.1139/f99-204}{Peterman et al. 2000}).
 #' @param sr_obj a data frame with Year and Spn, logRpS (Data for 1 Stock!). Other variables can be there but are not used (RpS, Qual, ExpF etc)
 #' @param min.obs min number of S-R pairs needed to fit a model
+#' @param resids if TRUE, add the residuals to the output
 #' @keywords Ricker fit, Smsy, Smax, Seq, Umsy
 #' @export
 #' @examples
 #' ricker.bm <- calcDetRickerBM(SR_Sample[SR_Sample$Stock == "Stock1",],min.obs = 10)
 #' print(ricker.bm)
 
-calcDetRickerBM <- function(sr_obj,min.obs=15){
+calcDetRickerBM <- function(sr_obj,min.obs=15,resids = FALSE){
 
 sr.use  <- sr_obj %>% dplyr::filter(!is.na(logRpS),!is.na(Spn))
 
@@ -27,6 +28,12 @@ ricker.b <- - ricker.fit$coefficients[2]
 S.max <- 1 / ricker.b
 S.eq <- ricker.lna  * S.max
 S.eq.c <- ricker.lna.c  * S.max
+
+if(resids){
+  R.fitted <-  exp( (ricker.lna - ricker.b * sr.use$Spn) + log(sr.use$Spn) )
+  R.resids <- R.fitted - sr.use$Rec
+}
+
 
 # hilborn proxy
 U.msy.h <- ricker.lna.c * (0.5-0.07*ricker.lna.c)
@@ -80,7 +87,8 @@ out.vec <-  c(n_obs = dim(sr.use)[1],
 
 }
 
-return(out.vec)
+if(!resids) {  return(out.vec) }
+if(resids) { return(list(out.vec = out.vec, resids = R.resids ))  }
 
 }
 

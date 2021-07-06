@@ -56,13 +56,13 @@ yr.match <- data.frame(YrIdx = 1 : sum(!is.na(sr.use$Rec)), Yr = sr.use$Year)
 # pars.track.in <- c("ln.alpha.c","beta","sigma","deviance","S.max","S.msy.c2")}
 pars.track.in <- c("ln.alpha","ln.alpha.c","beta","sigma","deviance", "S.max",
 						"S.eq.c","S.msy.c", "U.msy.c",
-						"S.eq.c2","S.msy.c2", "U.msy.c2","RS")
+						"S.eq.c2","S.msy.c2", "U.msy.c2","log.resid")
 
 pars.rescale <- c("S.max", "S.eq.c","S.msy.c","S.eq.c2","S.msy.c2")
 
 pars.labels <- c("ln_a","ln_a_c","b","sd","deviance", "Smax",
 						"Seq.c","Smsy_h", "Umsy_h",
-						"Seq.c2","Smsy_p", "Umsy_p","logRpS")
+						"Seq.c2","Smsy_p", "Umsy_p","log.resid")
 
 pars.compare <- c("Smax","Seq.c","Smsy_h", "Umsy_h","Seq.c2","Smsy_p", "Umsy_p")
 
@@ -77,7 +77,7 @@ print(mcmc.data)
 
 # Get the model file
 
-models.list <- c("BUILT_IN_MODEL_Ricker_BUGS.txt","BUILT_IN_MODEL_RickerKalman_BUGS.txt")
+models.list <- c("BUILT_IN_MODEL_Ricker_BUGS.txt","BUILT_IN_MODEL_RickerKalman_BUGS.txt","BUILT_IN_MODEL_RickerAR1_BUGS.txt")
 
 if(model.file %in% models.list){
 # this extracts the full path to the file in the local installing
@@ -89,11 +89,6 @@ if(!(model.file %in% models.list)){
 # This passes the user-specified path/file into the JAGS call
 model.use <- model.file
 }
-
-
-
-
-
 
 
 # Do the MCMC
@@ -174,7 +169,8 @@ out.vec <-  c(n_obs = dim(sr.use)[1],
 			Umsy_h = NA,
 			Seq.c2 = NA,
 			Smsy_p = NA,
-			Umsy_p = NA
+			Umsy_p = NA,
+			log.resid = NA
 			)
 
 perc.vec <- seq(5,95,by=5)
@@ -184,7 +180,8 @@ perc.df <- as.data.frame(matrix(NA,ncol= length(pars.labels),nrow = length(perc.
 
 
 medians.df <- data.frame(VarType = perc.df$Variable,Variable = perc.df$Variable,
-                         YrIdx = NA, Yr  = NA, p10 = NA, p25 = NA, p50 = NA, p75 = NA, p90 = NA, Det = NA, Diff = NA, PercDiff = NA)
+                         YrIdx = NA, Yr  = NA, p10 = NA, p25 = NA, p50 = NA,
+                         p75 = NA, p90 = NA, Det = NA, Diff = NA, PercDiff = NA)
 tmp.out <- NA
 
 }
