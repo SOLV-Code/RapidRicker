@@ -4,12 +4,14 @@
 \alias{calcDetRickerBM}
 \title{calcDetRickerBM}
 \usage{
-calcDetRickerBM(sr_obj, min.obs = 15)
+calcDetRickerBM(sr_obj, min.obs = 15, resids = FALSE)
 }
 \arguments{
 \item{sr_obj}{a data frame with Year and Spn, logRpS (Data for 1 Stock!). Other variables can be there but are not used (RpS, Qual, ExpF etc)}
 
 \item{min.obs}{min number of S-R pairs needed to fit a model}
+
+\item{resids}{if TRUE, add the residuals to the output}
 }
 \description{
 This function calculates Ricker Model parameters for spawner-recruit data using a simple linear regression of log(R/S) ~ S.  Note that these are simple deterministic model fits intended for rapid testing of input data!

@@ -57,7 +57,7 @@ ricker.test <- calcMCMCRickerBM(
   mcmc.settings = list(n.chains = 2, n.burnin = 20000, n.thin = 60, n.samples = 50000),
   mcmc.inits = inits.ricker,
   mcmc.priors = priors.ricker,
-  output = "short",
+  output = "post",
   out.path = "MCMC_Out",
   out.label = "MCMC",
   mcmc.seed = "default",
@@ -82,6 +82,30 @@ print(paste("Smax =", round(ricker.test$Medians %>% dplyr::filter(VarType == "Sm
 print(paste("Smax Det =", round(det.test["Smax"])))
 print(paste("Max Obs Spn =", round(max.spn*sr.scale.use)))
 print(paste("Mean Obs Spn=", round(mean(sr.use$Spn, na.rm = TRUE))))
+
+
+
+
+calcRickerSgen(a = 1.2, b = 12)
+mapply(calcRickerSgen,c(1.2,1.5),c(10,12))
+
+
+sgen.test <- mapply(calcRickerSgen,
+                     ricker.test$MCMC$MCMC.samples[,"ln.alpha"],
+                     ricker.test$MCMC$MCMC.samples[,"beta"]
+                      )
+plot(sort(sgen.test))
+min(sgen.test)
+
+
+
+warnings()
+names(ricker.test)
+dimnames()
+
+
+
+
 
 
 
@@ -153,10 +177,6 @@ rickerAR1.test$Medians
 rickerAR1.test$Percentiles
 
 sort(unique(rickerAR1.test$Medians$VarType))
-
-
-
-
 
 
 
