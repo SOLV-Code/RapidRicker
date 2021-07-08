@@ -156,6 +156,8 @@ sort(unique(rickerAR1.test$Medians$VarType))
 
 
 
+calcRickerSgen(a = 1.2, b = 12)
+
 
 
 
