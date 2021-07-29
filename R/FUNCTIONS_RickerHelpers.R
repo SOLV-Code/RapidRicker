@@ -36,10 +36,10 @@ ricker.array <- function(a.vec,b.vec,spn.vec){
 #' @export
 
 
-calcRickerSgen <- function(a,b){
+calcRickerSgen <- function(a,b,sig=1){
 # this is just a wrapper for functions from Holt & Ogden 2013
 
-sgen.est <- Sgen.solver(a,b,sig=1)
+sgen.est <- Sgen.solver(a,b,sig=sig)
 
 return(sgen.est$SRfit)
 
