@@ -47,9 +47,12 @@ return(sgen.est$SRfit)
 }
 
 
+
+
+
 # functions below are from Holt & Ogden 2013
 
-Sgen.model<-function(S,a,b,sig){
+Sgen.model<-function(S,a,b,sig,trace = FALSE){
 	PR<-a*S*exp(-b*S)
 	SMSY<-(log(a)/b)*(0.5-0.07*log(a))
 	epsilon.wna=log(SMSY)-log(PR)	#residuals
@@ -66,3 +69,11 @@ Sgen.solver <- function(a,b,sig) {
 	SRfit=optimize(f=Sgen.fn,interval=c(0, SMSY), a=a, b=b, sig=sig)	 # nb: not optim() !!
 	return(list(SRfit=SRfit$minimum))  # returns the minimum S
 }
+
+
+
+
+
+
+ricker.rec  <- function(S,ricker.lna,ricker.b) {exp( (ricker.lna - ricker.b * S) + log(S) )}
+
