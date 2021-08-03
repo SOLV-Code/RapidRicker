@@ -4,7 +4,7 @@
 \alias{calcRickerSgen}
 \title{calcRickerSgen}
 \usage{
-calcRickerSgen(a, b)
+calcRickerSgen(a, b, sig = 1)
 }
 \arguments{
 \item{a}{value of "a" parameter}
@@ -12,6 +12,6 @@ calcRickerSgen(a, b)
 \item{b}{value of b parameter}
 }
 \description{
-This function calculates Sgen a set of Ricker a,b parameters using a solver function extracted from Holt and Ogden (2013) INCLUDE LINK. This function is part of the WSPMetrics Package, but is recreated here to avoid compilcations with github-based package dependencies.
+This function calculates Sgen a set of Ricker a,b parameters using a solver function extracted from Holt and Ogden (2013) INCLUDE LINK. This function is part of the WSPMetrics Package INCLUDE LINK, but is recreated here to avoid complications with github-based package dependencies.
 }
 \keyword{Sgen}
