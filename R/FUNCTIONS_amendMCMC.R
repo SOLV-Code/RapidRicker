@@ -23,7 +23,7 @@ if(!kalman.check){ alphas.idx <-  match("ln.alpha", dimnames(mcmc.obj[[1]]$MCMC$
 alphas <- mcmc.obj[[1]]$MCMC$MCMC.samples[,alphas.idx,drop=FALSE]
 #alphas[alphas<0] <- NA # NEED TO DISCUSS -> now handling inside of calcRickerProxy()
 num.alphas <- dim(alphas)[2]
-
+num.mcmc <- dim(alphas)[1]
 
 # percentiles to use for summaries
 probs.use <- seq(5,95,by=5) /100
