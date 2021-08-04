@@ -17,8 +17,8 @@ calcRickerProxy <- function(a,b, sd = NULL, spn.vals = NULL, sr.scale = 10^6, ou
 # if have sd, apply the bias correction
 if(!is.null(sd)){ a <- a+ (sd^2/2) }
 
-print(str(a))
-print(head(a))
+#print(str(a))
+#print(head(a))
 
 # only do BM calcs if a > 1 (stock replaces at least replaces itself at very low Spn) -> ln.a > ln(1) 
 if(a > 0){  
