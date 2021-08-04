@@ -11,7 +11,11 @@
 #' @export
 
 
-calcRickerProxy <- function(a,b, spn.vals = NULL, sr.scale = 10^6, out.type = "sgen"){
+calcRickerProxy <- function(a,b, sd = NULL, spn.vals = NULL, sr.scale = 10^6, out.type = "sgen"){
+# Uses the Hilborn(1985) proxies 
+
+# if have sd, apply the bias correction
+if(!is.null(sd)){ a <- a+ (sd^2/2) }
 
 
 # only do BM calcs if a > 1 (stock replaces at least replaces itself at very low Spn) -> ln.a > ln(1) 
