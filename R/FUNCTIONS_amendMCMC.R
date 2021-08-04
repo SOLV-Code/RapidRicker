@@ -16,11 +16,11 @@ amendMCMC <- function(mcmc.obj,sr.scale =10^6){
 mcmc.obj.out <- mcmc.obj  
   
 # Extract the parameters
-betas <- mcmc.obj.use[[1]]$MCMC$MCMC.samples[,"beta"]
-kalman.check <- sum(grepl("ln.alpha\\[", dimnames(mcmc.obj.use[[1]]$MCMC$MCMC.samples)[[2]])) > 0
-if(kalman.check){ alphas.idx <-  grepl("ln.alpha\\[", dimnames(mcmc.obj.use[[1]]$MCMC$MCMC.samples)[[2]]) }
-if(!kalman.check){ alphas.idx <-  match("ln.alpha", dimnames(mcmc.obj.use[[1]]$MCMC$MCMC.samples)[[2]]) }
-alphas <- mcmc.obj.use[[1]]$MCMC$MCMC.samples[,alphas.idx,drop=FALSE]
+betas <- mcmc.obj[[1]]$MCMC$MCMC.samples[,"beta"]
+kalman.check <- sum(grepl("ln.alpha\\[", dimnames(mcmc.obj[[1]]$MCMC$MCMC.samples)[[2]])) > 0
+if(kalman.check){ alphas.idx <-  grepl("ln.alpha\\[", dimnames(mcmc.obj[[1]]$MCMC$MCMC.samples)[[2]]) }
+if(!kalman.check){ alphas.idx <-  match("ln.alpha", dimnames(mcmc.obj[[1]]$MCMC$MCMC.samples)[[2]]) }
+alphas <- mcmc.obj[[1]]$MCMC$MCMC.samples[,alphas.idx,drop=FALSE]
 #alphas[alphas<0] <- NA # NEED TO DISCUSS -> now handling inside of calcRickerProxy()
 num.alphas <- dim(alphas)[2]
 
