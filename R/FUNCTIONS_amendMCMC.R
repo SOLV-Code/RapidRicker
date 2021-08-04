@@ -17,6 +17,7 @@ mcmc.obj.out <- mcmc.obj
   
 # Extract the parameters
 betas <- mcmc.obj[[1]]$MCMC$MCMC.samples[,"beta"]
+sigmas <- mcmc.obj[[1]]$MCMC$MCMC.samples[,"sd"]
 kalman.check <- sum(grepl("ln.alpha\\[", dimnames(mcmc.obj[[1]]$MCMC$MCMC.samples)[[2]])) > 0
 if(kalman.check){ alphas.idx <-  grepl("ln.alpha\\[", dimnames(mcmc.obj[[1]]$MCMC$MCMC.samples)[[2]]) }
 if(!kalman.check){ alphas.idx <-  match("ln.alpha", dimnames(mcmc.obj[[1]]$MCMC$MCMC.samples)[[2]]) }
@@ -47,7 +48,7 @@ for(i in 1:num.alphas){
   
   print(paste("alpha index:",i))
 
-  vals.tmp <- mapply(calcRickerProxy, alphas[,i], betas) * sr.scale  
+  vals.tmp <- mapply(calcRickerProxy, alphas[,i], betas,sigmas) * sr.scale  
   check.df <- data.frame(alphas[,i], betas,vals.tmp)
   quants.tmp <- quantile(vals.tmp,probs.use,na.rm=TRUE)
   sgen.quants[,i] <- quants.tmp
@@ -63,7 +64,8 @@ mcmc.obj.out[[1]]$Percentiles <- mcmc.obj.out[[1]]$Percentiles  %>%
 # append Sgen to $Medians object
 det.a <- mcmc.obj[[1]]$Medians[mcmc.obj[[1]]$Medians$VarType == "ln_a","Det"]
 det.b <- mcmc.obj[[1]]$Medians[mcmc.obj[[1]]$Medians$VarType == "b","Det"]
-det.sgen <- mapply(calcRickerProxy, det.a, rep(det.b,length(det.a)))  
+det.sd <- mcmc.obj[[1]]$Medians[mcmc.obj[[1]]$Medians$VarType == "sd","Det"]
+det.sgen <- mapply(calcRickerProxy, a = det.a, b = rep(det.b,length(det.a)),sd =rep(det.sd,length(det.a)))  
 
 mcmc.obj.out[[1]]$Medians <- mcmc.obj.out[[1]]$Medians %>%
   bind_rows(
@@ -100,7 +102,7 @@ rec.quants <- array(data = NA,dim = c(length(spn.vals.use),length(probs.use),dim
 for(i in 1:num.alphas){	
 print(paste("alpha index:",i))
   
-exp.rec.tmp <- mapply(calcRickerProxy, a = alphas[,i], b =betas,
+exp.rec.tmp <- mapply(calcRickerProxy, a = alphas[,i], b =betas, sd = sigmas,
           MoreArgs = list(spn.vals = spn.vals.use, sr.scale = sr.scale,out.type = "rec")) %>% round()
 rec.quants[,,i] <-  apply(exp.rec.tmp,MARGIN = 1,quantile, probs=probs.use,na.rm=TRUE ) %>% t()
 }
