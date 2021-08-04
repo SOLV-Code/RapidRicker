@@ -58,7 +58,7 @@ if(a <= 0){
 }  
     
   
-if(out.type == "sgen") {out.obj <- s.gen}
+if(out.type == "sgen") {out.obj <- s.gen *sr.scale}
   
 if(out.type %in% c("bm", "all")) {out.obj <- list(sgen = s.gen *sr.scale ,smsy = s.msy*sr.scale, 
                                                smax = s.max*sr.scale, seq = s.eq*sr.scale) }
