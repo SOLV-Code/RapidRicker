@@ -91,7 +91,7 @@ mcmc.obj.out[[1]]$MCMC$MCMC.samples <- cbind(mcmc.obj.out[[1]]$MCMC$MCMC.samples
 
 print("Starting fitted curve calcs")
 
-spn.vals.use <- calcRickerProxy(a=det.a[1], b =det.b*sr.scale,  # b/c det fit currently done in fish mot scaled values 
+spn.vals.use <- calcRickerProxy(a=det.a[1], b =det.b,  
                                 spn.vals = NULL, sr.scale = sr.scale,out.type = "curve")[["spn"]]
 
 rec.quants <- array(data = NA,dim = c(length(spn.vals.use),length(probs.use),dim(alphas)[[2]]),
