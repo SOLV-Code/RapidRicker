@@ -141,7 +141,7 @@ medians.df$VarType[medians.df$VarType==""] <- medians.df$Variable[medians.df$Var
 
 
 # calculate perc diff from det estimate
-det.ricker.bm <- calcDetRickerBM(sr.use, min.obs = min.obs) # generates a vector with par and BM est
+det.ricker.bm <- calcDetRickerBM(sr.use ,sr.scale = sr.scale, min.obs = min.obs) # generates a vector with par and BM est
 
 
 medians.df <- left_join(as.data.frame(medians.df),  data.frame(VarType = names(det.ricker.bm),Det = det.ricker.bm), by = "VarType") %>%
