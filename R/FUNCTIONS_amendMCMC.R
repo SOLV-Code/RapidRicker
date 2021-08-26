@@ -94,7 +94,7 @@ print("Starting fitted curve calcs")
 spn.vals.use <- calcRickerProxy(a=det.a[1], b =det.b,  
                                 spn.vals = NULL, sr.scale = sr.scale,out.type = "curve")[["spn"]]
 
-print(tail(spn.vals.use))
+#print(tail(spn.vals.use))
 
 rec.quants <- array(data = NA,dim = c(length(spn.vals.use),length(probs.use),dim(alphas)[[2]]),
                         dimnames = list(paste0("Spn",1:length(spn.vals.use)),
@@ -107,7 +107,7 @@ print(paste("alpha index:",i))
 exp.rec.tmp <- mapply(calcRickerProxy, a = alphas[,i], b =betas, sd = sigmas,
           MoreArgs = list(spn.vals = spn.vals.use, sr.scale = sr.scale,out.type = "rec")) %>% round()
 		  
-print(tail(exp.rec.tmp))		  
+#print(tail(exp.rec.tmp))		  
 rec.quants[,,i] <-  apply(exp.rec.tmp,MARGIN = 1,quantile, probs=probs.use,na.rm=TRUE ) %>% t()
 }
 

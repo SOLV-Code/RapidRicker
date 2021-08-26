@@ -47,7 +47,21 @@ require(tidyverse)
 sr.use  <- sr_obj %>% dplyr::filter(!is.na(Rec),!is.na(Spn)) # drop incomplete records
 missing.yrs <- length(setdiff(min(sr.use$Year):max(sr.use$Year),sr.use$Year)) > 0 # T/F check if there are missing years. If so, can't do AR1 or KF model
 
-if(missing.yrs & model.type %in% c("Kalman","AR1")){warning("Gaps in the time series. Can't do Kalman Filter or AR 1 model, Returning NAs")}
+
+# if have enough data, do the MCMC
+if(dim(sr.use)[1] >= min.obs){   skip.mcmc <- FALSE  }
+
+# unless have missing years and a time varying model
+if(missing.yrs & model.type %in% c("Kalman","AR1")){
+  skip.mcmc <- TRUE
+  warning("Gaps in the time series. Can't do Kalman Filter or AR 1 model, Returning NAs")
+  }
+
+
+
+
+
+
 
 yr.match <- data.frame(YrIdx = 1 : sum(!is.na(sr.use$Rec)), Yr = sr.use$Year)
 #print(yr.match)
@@ -72,7 +86,7 @@ pars.rescale <- c("S.max", "S.eq.c","S.msy.c","S.eq.c2","S.msy.c2")
 pars.compare <- c("Smax","Seq.c","Smsy_h", "Umsy_h","Seq.c2","Smsy_p", "Umsy_p")
 
 
-if(dim(sr.use)[1] >= min.obs & (!missing.yrs  | model.type == "Basic")  ){
+if(!skip.mcmc){
 
 
 mcmc.data <- c(list(S = sr.use$Spn / sr.scale, R_Obs = sr.use$Rec / sr.scale, N = dim(sr.use)[1]),
@@ -151,13 +165,14 @@ medians.df <- left_join(as.data.frame(medians.df),  data.frame(VarType = names(d
 
 
 
-} # if n >= min.obs (and if no gaps if AR1 or KF)
+} # if !skip.mcmc
 
 
-if(dim(sr.use)[1] < min.obs |  missing.yrs){
 
-if(dim(sr.use)[1] < min.obs){warning("Not enough data to fit a model (num obs < user-specified min.obs)")}
+if(skip.mcmc){
 
+
+warning("Not enough data to fit a model (num obs < user-specified min.obs)")
 
 
 out.vec <-  c(n_obs = dim(sr.use)[1],
