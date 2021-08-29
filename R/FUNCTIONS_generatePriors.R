@@ -35,13 +35,14 @@ prior.list[custom.match] <- custom.list[custom.match]
 #print(prior.list)
 #print(is.na(prior.list$p.beta))
 
-
+if(!is.na(prior.list$p.alpha) ){prior.list$p.alpha <- as.numeric(prior.list$p.alpha)} # because it might be text of the spec file has "default" for some entries
 if(is.na(prior.list$p.alpha) ){
   #default mean for the normal (log) alpha parameter is 0, as per previous implementations
   # for the Kalman filter model, this is the mean of the first alpha, alpha[2] to alpha[N] are based on the previous alpha plus a step w[i]
   prior.list$p.alpha <- 0
 }
 
+if(!is.na(prior.list$tau_alpha) ){ prior.list$tau_alpha <- as.numeric(prior.list$tau_alpha)}
 if(is.na(prior.list$tau_alpha) ){
   #default precision for the normal (log) alpha  is a very low precision (large uncertainty)
   # set at    (so if Spn and Rec are converted into millions,
@@ -50,12 +51,13 @@ if(is.na(prior.list$tau_alpha) ){
 }
 
 
-
+if(!is.na(prior.list$p.beta) ){prior.list$p.beta <- as.numeric(prior.list$p.beta)}
 if(is.na(prior.list$p.beta) ){
     #default mean for the lognormal capacity is the natural log of the largest observed Spn
     prior.list$p.beta <- max(sr_obj$Spn/sr.scale, na.rm = TRUE)
   }
 
+if(!is.na(prior.list$tau_beta) ){ prior.list$tau_beta <- as.numeric(prior.list$tau_beta)}
 if(is.na(prior.list$tau_beta) ){
     #default precision for the lognormal beta is a very low precision (large uncertainty)
     # set at a CV of 10, then calculated as
@@ -65,17 +67,19 @@ if(is.na(prior.list$tau_beta) ){
   }
 
 
+if(!is.na(prior.list$max.scalar) ){prior.list$max.scalar <- as.numeric(prior.list$max.scalar)}
 if(is.na(prior.list$max.scalar) ){
   # upper limit on Smax, expressed as a multiple of p.beta
   prior.list$max.scalar <- 3
 }
 
-
+if(!is.na(prior.list$shape.tau_R) ){prior.list$shape.tau_R <- as.numeric(prior.list$shape.tau_R)}
 if(is.na(prior.list$shape.tau_R) ){
   # shape for the gamma distribution of the  precision terms for the lognormal distribution of R_Obs
   prior.list$shape.tau_R <- 0.001 # just using established default for now, should work regardless of Spn,Rec scale?
 }
 
+if(!is.na(prior.list$lambda_tau_R) ){prior.list$lambda_tau_R <- as.numeric(prior.list$lambda_tau_R)}
 if(is.na(prior.list$lambda_tau_R) ){
   # lambda for the gamma distribution of the  precision terms for the lognormal distribution of R_Obs
   prior.list$lambda_tau_R <- 0.01 # just using established default for now, should work regardless of Spn,Rec scale?
@@ -84,11 +88,13 @@ if(is.na(prior.list$lambda_tau_R) ){
 
 if(model_type %in% c("Kalman","AR1")){
 
+if(!is.na(prior.list$shape.tauw) ){prior.list$shape.tauw <- as.numeric(prior.list$shape.tauw)}
 if(is.na(prior.list$shape.tauw) ){
   # shape for the gamma distribution of the  precision terms for the normal distribution of w (the annual step in prod)
   prior.list$shape.tauw <- 0.01 # just using established default for now, should work regardless of Spn,Rec scale?
 }
 
+if(!is.na(prior.list$lambda_tauw) ){prior.list$lambda_tauw <- as.numeric(prior.list$lambda_tauw)}
 if(is.na(prior.list$lambda_tauw) ){
   # lambda for the gamma distribution of the  precision terms for the normal distribution of w (the annual step in prod)
   prior.list$lambda_tauw <- 0.001 # just using established default for now, should work regardless of Spn,Rec scale?
