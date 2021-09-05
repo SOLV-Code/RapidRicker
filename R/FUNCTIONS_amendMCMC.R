@@ -1,5 +1,5 @@
 #' amendMCMC
-#' 
+#'
 #'  Wrapper function that applies the calcRickerProxy() function to each MCMC sample in the calcMCMCRickerBM() output,
 #'  calculates corresponding Sgen and fitted SR curves, and amends the output with summaries.
 #' @param mcmc.obj output from a call to calcMCMCRickerBM() with output = "all"
@@ -13,8 +13,8 @@ amendMCMC <- function(mcmc.obj,sr.scale =10^6){
 ############################
 
 # set up the output object
-mcmc.obj.out <- mcmc.obj  
-  
+mcmc.obj.out <- mcmc.obj
+
 # Extract the parameters
 betas <- mcmc.obj[[1]]$MCMC$MCMC.samples[,"beta"]
 sigmas <- mcmc.obj[[1]]$MCMC$MCMC.samples[,"sd"]
@@ -44,16 +44,16 @@ sgen.sample <- matrix(NA,nrow=num.mcmc,ncol = num.alphas, dimnames =list(1:num.m
                                                     gsub("ln.alpha","Sgen",dimnames(alphas)[[2]])))
 
 # Calculate Sgen for each sample of MCMC pars (1 set for Basic Ricker and AR1 Ricker, 1 per brood year for Kalman Filter Ricker)
-for(i in 1:num.alphas){	
-  
+for(i in 1:num.alphas){
+
   print(paste("alpha index:",i))
 
-  vals.tmp <- mapply(calcRickerProxy, a = alphas[,i], b = betas, sd = sigmas,sr.scale = sr.scale ) 
+  vals.tmp <- mapply(calcRickerProxy, a = alphas[,i], b = betas, sd = sigmas,sr.scale = sr.scale )
   check.df <- data.frame(alphas[,i], betas,vals.tmp)
   quants.tmp <- quantile(vals.tmp,probs.use,na.rm=TRUE)
   sgen.quants[,i] <- quants.tmp
   sgen.sample[,i] <- vals.tmp
-  
+
 }
 
 # append sgen to $Percentiles Object
@@ -65,7 +65,7 @@ mcmc.obj.out[[1]]$Percentiles <- mcmc.obj.out[[1]]$Percentiles  %>%
 det.a <- mcmc.obj[[1]]$Medians[mcmc.obj[[1]]$Medians$VarType == "ln_a","Det"]
 det.b <- mcmc.obj[[1]]$Medians[mcmc.obj[[1]]$Medians$VarType == "b","Det"]
 det.sd <- mcmc.obj[[1]]$Medians[mcmc.obj[[1]]$Medians$VarType == "sd","Det"]
-det.sgen <- mapply(calcRickerProxy, a = det.a, b = rep(det.b,length(det.a)),sd =rep(det.sd,length(det.a)))  
+det.sgen <- mapply(calcRickerProxy, a = det.a, b = rep(det.b,length(det.a)),sd =rep(det.sd,length(det.a)))
 
 mcmc.obj.out[[1]]$Medians <- mcmc.obj.out[[1]]$Medians %>%
   bind_rows(
@@ -74,7 +74,7 @@ mcmc.obj.out[[1]]$Medians <- mcmc.obj.out[[1]]$Medians %>%
       mcmc.obj.out[[1]]$Medians %>% dplyr::filter(VarType == "Seq.c") %>% select(YrIdx,Yr),
       sgen.quants  %>% t() %>% as.data.frame() %>%
           rownames_to_column("Variable") %>% select(Variable,p10,p25,p50,p75, p90),
-      Det = det.sgen) %>% 
+      Det = det.sgen) %>%
   select (VarType, Variable, everything()) %>%
   mutate(Diff = p50 - Det ) %>%
   mutate(PercDiff = round(Diff/Det*100,1) )
@@ -91,7 +91,7 @@ mcmc.obj.out[[1]]$MCMC$MCMC.samples <- cbind(mcmc.obj.out[[1]]$MCMC$MCMC.samples
 
 print("Starting fitted curve calcs")
 
-spn.vals.use <- calcRickerProxy(a=det.a[1], b =det.b,  
+spn.vals.use <- calcRickerProxy(a=det.a[1], b =det.b,
                                 spn.vals = NULL, sr.scale = sr.scale,out.type = "curve")[["spn"]]
 
 #print(tail(spn.vals.use))
@@ -101,17 +101,23 @@ rec.quants <- array(data = NA,dim = c(length(spn.vals.use),length(probs.use),dim
                                         paste0("p",probs.use*100),
                                         gsub("ln.alpha","Index",dimnames(alphas)[[2]])))
 
-for(i in 1:num.alphas){	
+exp.rec.list <- vector(mode = "list", length = num.alphas)
+
+
+for(i in 1:num.alphas){
 print(paste("alpha index:",i))
-  
+
 exp.rec.tmp <- mapply(calcRickerProxy, a = alphas[,i], b =betas, sd = sigmas,
           MoreArgs = list(spn.vals = spn.vals.use, sr.scale = sr.scale,out.type = "rec")) %>% round()
-		  
-#print(tail(exp.rec.tmp))		  
+
+#print(tail(exp.rec.tmp))
+
+exp.rec.list[[i]] <- exp.rec.tmp
+
 rec.quants[,,i] <-  apply(exp.rec.tmp,MARGIN = 1,quantile, probs=probs.use,na.rm=TRUE ) %>% t()
 }
 
-mcmc.obj.out[[1]]$RickerCurve <- list(spn.vec = spn.vals.use, rec.arr.quants = rec.quants)
+mcmc.obj.out[[1]]$RickerCurve <- list(spn.vec = spn.vals.use, rec.arr.quants = rec.quants,rec.arr = exp.rec.list )
 
 return(mcmc.obj.out)
 
