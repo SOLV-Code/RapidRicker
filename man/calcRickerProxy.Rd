@@ -4,7 +4,14 @@
 \alias{calcRickerProxy}
 \title{calcRickerProxy}
 \usage{
-calcRickerProxy(a, b, spn.vals = NULL, sr.scale = 10^6, out.type = "sgen")
+calcRickerProxy(
+  a,
+  b,
+  sd = NULL,
+  spn.vals = NULL,
+  sr.scale = 10^6,
+  out.type = "sgen"
+)
 }
 \arguments{
 \item{a}{intercept from ln(R/S) vs S}
