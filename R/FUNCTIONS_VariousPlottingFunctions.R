@@ -1,9 +1,8 @@
-#' Plotting Functions
+#' box_add
 #'
 #' These functions create various plot components.
-#' @keywords plots
+#' @keywords plot add-on
 #' @export
-
 
 box_add <- function (perc.vec, at, width, col, bg, label,dir="v") {
   
@@ -31,7 +30,11 @@ box_add <- function (perc.vec, at, width, col, bg, label,dir="v") {
  
  
  
-
+#' kernel_margin
+#'
+#' These functions create various plot components.
+#' @keywords plot add-on
+#' @export
 
 kernel_margin <- function(x,at, width, col,dir="v"){
   
