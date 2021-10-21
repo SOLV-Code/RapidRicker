@@ -8,6 +8,7 @@ include.dependencies <- function(){
 #' @import R2jags
 #' @import rstan
 #' @import rstanarm
+#' @import MASS
 #' @return Nothing returned.
 #' @export
 
