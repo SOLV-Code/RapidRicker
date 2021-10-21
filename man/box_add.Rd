@@ -2,11 +2,13 @@
 % Please edit documentation in R/FUNCTIONS_VariousPlottingFunctions.R
 \name{box_add}
 \alias{box_add}
-\title{Plotting Functions}
+\alias{kernel_margin}
+\title{box_add}
 \usage{
-box_add(perc.vec, at, width, col, bg, label)
+box_add(perc.vec, at, width, col, bg, label, dir = "v")
+
+kernel_margin(x, at, width, col, dir = "v")
 }
 \description{
-These functions create various plot components.
+These functions generate various plot additions.
 }
-\keyword{plots}

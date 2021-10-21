@@ -4,10 +4,10 @@
 \alias{calcDetRickerBM}
 \title{calcDetRickerBM}
 \usage{
-calcDetRickerBM(sr_obj, min.obs = 15, resids = FALSE)
+calcDetRickerBM(sr_obj, sr.scale = 10^6, min.obs = 15, resids = FALSE)
 }
 \arguments{
-\item{sr_obj}{a data frame with Year and Spn, logRpS (Data for 1 Stock!). Other variables can be there but are not used (RpS, Qual, ExpF etc)}
+\item{sr_obj}{a data frame with Year and Spn, logRpS , and Rec (Data for 1 Stock!). Other variables can be there but are not used (RpS, Qual, ExpF etc)}
 
 \item{min.obs}{min number of S-R pairs needed to fit a model}
 
