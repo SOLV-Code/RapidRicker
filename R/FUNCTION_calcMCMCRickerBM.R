@@ -50,6 +50,7 @@ missing.yrs <- length(setdiff(min(sr.use$Year):max(sr.use$Year),sr.use$Year)) > 
 
 # if have enough data, do the MCMC
 if(dim(sr.use)[1] >= min.obs){   skip.mcmc <- FALSE  }
+if(dim(sr.use)[1] < min.obs){   skip.mcmc <- TRUE  }
 
 # unless have missing years and a time varying model
 if(missing.yrs & model.type %in% c("Kalman","AR1")){
