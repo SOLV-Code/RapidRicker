@@ -49,7 +49,7 @@ for(i in 1:num.alphas){
   print(paste("alpha index:",i))
 
   vals.tmp <- mapply(calcRickerProxy, a = alphas[,i], b = betas, sd = sigmas,sr.scale = sr.scale )
-  check.df <- data.frame(alphas[,i], betas,vals.tmp)
+  #check.df <- data.frame(alphas[,i], betas,vals.tmp)
   quants.tmp <- quantile(vals.tmp,probs.use,na.rm=TRUE)
   sgen.quants[,i] <- quants.tmp
   sgen.sample[,i] <- vals.tmp
