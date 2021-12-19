@@ -1,13 +1,13 @@
 # Have compiled 4 alternative versions of Sgen Calculations
-# HoltOgden2013:  using a solver function extracted from Holt and Ogden (2013) 
+# HoltOgden2013:  using a solver function extracted from Holt and Ogden (2013)
 # SamSim: using a solver function extracted from the samSim R package
 # Connorsetal2022: using solver function from Yukon Ck Res Doc
 # BruteForce: doing a brute force approximation
 
 # References
 
-# Holt, C.A. and A. Ogden. 2013. Software for assessing status of Conservation Units under 
-# Canada’s Wild Salmon Policy: Instructional manual.  Can. Tech. Rep. Fish. Aquat. Sci. 
+# Holt, C.A. and A. Ogden. 2013. Software for assessing status of Conservation Units under
+# Canada’s Wild Salmon Policy: Instructional manual.  Can. Tech. Rep. Fish. Aquat. Sci.
 # 3058: vi + 43 p.
 # https://waves-vagues.dfo-mpo.gc.ca/Library/351191.pdf
 
@@ -15,21 +15,21 @@
 #  Need proper samSim citation
 # https://github.com/Pacific-salmon-assess/samSim
 
-# Connors, B.M., Cunningham C., Bradley C.A., Hamazaki T., and Liller, Z.W. 2022. 
-# Estimates of biological benchmarks for the Canadian-origin Yukon River mainstem Chinook salmon 
-# (Oncorhynchus tshawytscha) stock aggregate. 
+# Connors, B.M., Cunningham C., Bradley C.A., Hamazaki T., and Liller, Z.W. 2022.
+# Estimates of biological benchmarks for the Canadian-origin Yukon River mainstem Chinook salmon
+# (Oncorhynchus tshawytscha) stock aggregate.
 # DFO Can. Sci. Advis. Sec. Res. Doc. 2021/nnn. 42 + 88 p.
 
 
 
 #' calcRickerSgen
 #'
-#' This function calculates Sgen for a Ricker a,b,sigma parameters, and optionally Smsy.
-#' NOTE: If method is "HoltOgden2013", then Smsy is is always calculated based on Hilborn (1985) approximation,
+#' This function calculates Sgen for a set of Ricker ln.a,b,sigma parameters, and optionally Smsy.
+#' NOTE: If method is "HoltOgden2013", then Smsy is always calculated based on Hilborn (1985) approximation,
 #' and if Smsy is provided, it will give a warning that it was ignored. Note: This function DOES NOT apply bias correction on alpha.
 #' Whether the output is bias-corrected estimates or not depends on the par set provided by the user. This keeps the parameter
 #' estimation and benchark calculation steps clearly separated, given on-going debates around the bias correction.
-#' 
+#'
 #' @param X  a data frame with columns ln.a, b, sigma, and optionally Smsy
 #' @param method  one of "HoltOgden2013", "samSim", "Connorsetal2022","BruteForce"
 #' @param sr.scale scalar applied to SR data in the model fitting step, need it here to scale up the Sgen values
@@ -38,79 +38,79 @@
 #' @export
 
 calcRickerSgen <- function(X, method,sr.scale = 1, out.type = "Full"){
-  
+
 
 if(!(method %in% c("HoltOgden2013", "samSim", "Connorsetal2022","BruteForce") )){
   warning("Method must be one of HoltOgden2013, SamSim, Connorsetal2022, BruteForce")
   stop()}
-  
-  
 
-#---------------------------------------------    
-  
+
+
+#---------------------------------------------
+
 if(method == "HoltOgden2013") {
-  
+
   if(!is.null(X$Smsy) & sum(is.na(X$Smsy)) == 0){warning("Smsy provided as input, but not used for this method! ")}
-  
-  
+
+
   if(is.null(X$sigma)){sigma <- rep(1,dim(X)[1])}
-  
+
    sgen.est <- unlist(mapply(Sgen.solver.HO, a = exp(X$ln.a), b = X$b, sig = sigma))  * sr.scale
-   
+
 
 } # end if HoltOgden2013
-  
-#---------------------------------------------    
-  
-  
-if(method == "samSim") {   
-  
-if(is.null(X$Smsy) | sum(is.na(X$Smsy)) > 0){warning("Need to provide Smsy column in input data frame for this method! "); stop()}  
-  
+
+#---------------------------------------------
+
+
+if(method == "samSim") {
+
+if(is.null(X$Smsy) | sum(is.na(X$Smsy)) > 0){warning("Need to provide Smsy column in input data frame for this method! "); stop()}
+
 
 
    if(is.null(X$sigma)){sigma <- rep(1,dim(X)[1])}
-  
 
-  samsim.out <-  mapply(sGenSolver.samSim.wrapper, ln.a = X$ln.a, b = X$b, sigma = sigma,SMSY = X$Smsy)    
+
+  samsim.out <-  mapply(sGenSolver.samSim.wrapper, ln.a = X$ln.a, b = X$b, sigma = sigma,SMSY = X$Smsy)
    sgen.est <- samsim.out  * sr.scale
-   
-   
-} # end if samSim  
 
-#---------------------------------------------    
 
-if(method == "Connorsetal2022") { 
+} # end if samSim
 
-  if(is.null(X$Smsy) | sum(is.na(X$Smsy)) > 0){warning("Need to provide Smsy column in input data frame for this method! "); stop()}  
-  
+#---------------------------------------------
+
+if(method == "Connorsetal2022") {
+
+  if(is.null(X$Smsy) | sum(is.na(X$Smsy)) > 0){warning("Need to provide Smsy column in input data frame for this method! "); stop()}
+
   # https://stackoverflow.com/questions/38961221/uniroot-solution-in-r
-  
-  
-  bc.out<-   mapply(get_Sgen.bc, a = exp(X$ln.a),b = X$b,int_lower = -1, int_upper =  1/X$b*2, 
-				SMSY = X$Smsy/sr.scale)    
-                    
-    sgen.est <- bc.out * sr.scale 
+
+
+  bc.out<-   mapply(get_Sgen.bc, a = exp(X$ln.a),b = X$b,int_lower = -1, int_upper =  1/X$b*2,
+				SMSY = X$Smsy/sr.scale)
+
+    sgen.est <- bc.out * sr.scale
 
 }  # end if "Connorsetal2022"
-  
 
-if(method == "BruteForce") { 
-    
-  if(is.null(X$Smsy) | sum(is.na(X$Smsy)) > 0){warning("Need to provide Smsy column in input data frame for this method! "); stop()}  
-  
+
+if(method == "BruteForce") {
+
+  if(is.null(X$Smsy) | sum(is.na(X$Smsy)) > 0){warning("Need to provide Smsy column in input data frame for this method! "); stop()}
+
   sgen.est <-   mapply(sgen.proxy, ln.a = X$ln.a ,b = X$b, Smsy = X$Smsy, sr.scale = sr.scale )
-    
-  }   
-  
-  
-  
-  
+
+  }
+
+
+
+
 
 if(out.type == "Full"){return(bind_cols(X,SgenCalc = method,Sgen = sgen.est) %>% mutate(Ratio = round(Smsy/Sgen,2) )) }
 if(out.type == "BMOnly"){return(sgen.est)  }
 
-} # end calcRickerSgen 
+} # end calcRickerSgen
 
 
 
@@ -158,7 +158,7 @@ sGenOptimum.samSim <- function(S, theta, sMSY) {
   prt <- S * exp(a - b * S)
   epsilon <- log(sMSY) - log(prt)
   nLogLike <- sum(dnorm(epsilon, 0, sig, log = T))
-  
+
   return(list(prt = prt, epsilon = epsilon, nLogLike = nLogLike, S = S))
 }
 
@@ -181,10 +181,10 @@ sGenSolver.samSim <- function(theta, sMSY) {
 # ----------------------------------------------------------------------------------
 
 
-get_Sgen.bc <- function(a, b, int_lower, int_upper, SMSY) { 
-  fun_Sgen.bc <- function(Sgen, a, b, SMSY) {Sgen * a * exp( - b* Sgen) - SMSY} 
-  Sgen <- uniroot(fun_Sgen.bc, interval=c(int_lower, int_upper), a=a, b=b, SMSY=SMSY)$root  
-  } 
+get_Sgen.bc <- function(a, b, int_lower, int_upper, SMSY) {
+  fun_Sgen.bc <- function(Sgen, a, b, SMSY) {Sgen * a * exp( - b* Sgen) - SMSY}
+  Sgen <- uniroot(fun_Sgen.bc, interval=c(int_lower, int_upper), a=a, b=b, SMSY=SMSY)$root
+  }
 
 
 

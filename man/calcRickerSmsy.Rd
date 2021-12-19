@@ -13,7 +13,7 @@ calcRickerSmsy(X, method, sr.scale = 1, out.type = "Full")
 
 \item{sr.scale}{scalar applied to SR data in the model fitting step, need it here to scale up the Sgen values}
 
-\item{out.type}{either "SmsyOnly" or "Full"}
+\item{out.type}{either "BMOnly" or "Full"}
 }
 \description{
 This function calculates Smsy for a Ricker a,b parameters. Note: This function DOES NOT apply bias correction on alpha.
