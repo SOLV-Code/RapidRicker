@@ -5,7 +5,7 @@
 \alias{kernel_margin}
 \title{box_add}
 \usage{
-box_add(perc.vec, at, width, col, bg, label, dir = "v")
+box_add(perc.vec, at, width, col, bg, label = NULL, dir = "v")
 
 kernel_margin(x, at, width, col, dir = "v")
 }
