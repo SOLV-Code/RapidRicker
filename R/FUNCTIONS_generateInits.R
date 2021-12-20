@@ -1,7 +1,7 @@
 #' generateInits
 #'
 #' This function generates  initial values ("inits") for the MCMC sampling forms. Defaults settings are under development. Follow the discussion at \href{https://github.com/SOLV-Code/RapidRicker/issues/71}{this thread}.
-#' @param priors output from \code{\link[RapidRicker]{genratePriors}}
+#' @param priors output from \code{\link[RapidRicker]{generatePriors}}
 #' @param sr.scale an integer value used to rescale the Spn and Rec variables in sr_obj, prior to the MCMC fit, default = 10^6 (i.e. convert to millions). NOTE: If sr.scale is different from 1, then
 #' the benchmark estimates are scaled back, but the MCMC estimates of alpha and beta will be in different units then the alpha and beta estimates from the deterministic fit.
 #' @param model_type one of "Basic", "Kalman", or "AR1".  For details, see \href{https://github.com/SOLV-Code/RapidRicker/wiki/3:--Ricker-Model-Forms-in-BUGS-JAGS}{this wiki}.

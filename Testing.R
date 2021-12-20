@@ -4,7 +4,7 @@
 library(tidyverse)
 library(RapidRicker)
 
-sr.use <- SR_Sample[SR_Sample$Stock == "Stock2",] %>% select(Year, Spn, Rec,logRpS)
+sr.use <- SR_Sample[SR_Sample$Stock == "Stock3",] %>% select(Year, Spn, Rec,logRpS)
 sr.use
 
 sr.scale.use <- 10^6
@@ -48,6 +48,94 @@ inits.ricker <- generateInits(priors.ricker)
 inits.ricker
 
 
+
+
+############################
+# NEW FUNCTION: MODEL FITS ONLY
+
+
+ricker.test <- calcMCMCModelFit(
+  sr_obj = sr.use, sr.scale = sr.scale.use  ,
+  model.type = "Basic",
+  model.file = "BUILT_IN_MODEL_Ricker_BUGS.txt",
+  min.obs = 15,
+  mcmc.settings = list(n.chains = 2, n.burnin = 20000, n.thin = 60, n.samples = 50000),
+  mcmc.inits = inits.ricker,
+  mcmc.priors = priors.ricker,
+  output = "post",
+  out.path = "MCMC_Out",
+  out.label = "MCMC",
+  mcmc.seed = "default",
+  tracing = FALSE
+)
+
+ricker.test$Medians
+ricker.test$Percentiles
+ricker.test$priors.used
+ricker.test$inits.used
+
+
+
+ricker.test.alt <- calcMCMCModelFit(
+  sr_obj = sr.use, sr.scale = sr.scale.use  ,
+  model.type = "Basic",
+  model.file = "BUILT_IN_MODEL_RickerAltBiasCorr_BUGS.txt",
+  min.obs = 15,
+  mcmc.settings = list(n.chains = 2, n.burnin = 20000, n.thin = 60, n.samples = 50000),
+  mcmc.inits = inits.ricker,
+  mcmc.priors = priors.ricker,
+  output = "post",
+  out.path = "MCMC_Out",
+  out.label = "MCMC",
+  mcmc.seed = "default",
+  tracing = FALSE
+)
+
+ricker.test.alt$Medians
+ricker.test.alt$Percentiles
+ricker.test.alt$priors.used
+ricker.test.alt$inits.used
+
+
+
+
+ricker.test$Medians %>% dplyr::filter(VarType=="sd") %>% select(starts_with("p",ignore.case = FALSE))
+ricker.test.alt$Medians %>% dplyr::filter(VarType=="sd") %>% select(starts_with("p",ignore.case = FALSE))
+
+
+ln.a.comp <- bind_cols(Version = c("Orig","Orig Corr","Alt","Alt Corr"),
+bind_rows(ricker.test$Medians %>% dplyr::filter(VarType=="ln_a") %>% select(starts_with("p",ignore.case = FALSE)),
+ricker.test$Medians %>% dplyr::filter(VarType=="ln_a_c") %>% select(starts_with("p",ignore.case = FALSE)),
+ricker.test.alt$Medians %>% dplyr::filter(VarType=="ln_a") %>% select(starts_with("p",ignore.case = FALSE)),
+ricker.test.alt$Medians %>% dplyr::filter(VarType=="ln_a_c") %>% select(starts_with("p",ignore.case = FALSE))
+))
+
+y.lim <- range(ln.a.orig,ln.a.c.orig,ln.a.alt,ln.a.c.alt )
+plot(0:5,0:5,ylim=y.lim,type="n",xlab="",ylab = "ln.a", bty="n",axes=FALSE, main="ln.a posteriors")
+axis(2)
+
+lines(1:4, ln.a.comp$p50,col="darkblue",type="o",pch=19 )
+segments(1:4, ln.a.comp$p25,1:4,ln.a.comp$p75,col="darkblue",pch=19 ,lwd=3)
+segments(1:4, ln.a.comp$p10,1:4,ln.a.comp$p90,col="darkblue",pch=19 ,lwd=1)
+text(1:4,par("usr")[3],ln.a.comp$Version,xpd=NA)
+
+
+orig.resids <- ricker.test$Medians %>% dplyr::filter(VarType == "log.resid") %>% select(p50) %>% unlist()
+alt.resids <- ricker.test.alt$Medians %>% dplyr::filter(VarType == "log.resid") %>% select(p50) %>% unlist()
+
+yrs.vec <- ricker.test$Medians %>% dplyr::filter(VarType == "log.resid") %>% select(Yr) %>% unlist()
+
+
+plot(yrs.vec,orig.resids,type="o",pch=19,col="darkblue",xlab='Yr',ylab="log.resid",bty="n", main="resids")
+lines(yrs.vec,alt.resids,type="o",pch=21,col="red",bg="white")
+legend("bottomleft",legend = c("Orig", "Direct"),pch=c(19,21),col = c("darkblue", "red"),bty="n")
+
+
+
+
+
+##################
+#
 
 ricker.test <- calcMCMCRickerBM(
   sr_obj = sr.use, sr.scale = sr.scale.use  ,
