@@ -69,7 +69,7 @@ yr.match <- data.frame(YrIdx = 1 : sum(!is.na(sr.use$Rec)), Yr = sr.use$Year)
 
 
 pars.track.in <- c("ln.alpha","ln.alpha.c","beta","sigma","deviance", "log.resid")
-pars.labels <- c("ln_a","ln_a_c","b","sd","deviance", ,"log.resid")
+pars.labels <- c("ln_a","ln_a_c","b","sd","deviance", "log.resid")
 
 if(tolower(model.type) == "ar1"){
   pars.track.in <- c(pars.track.in,"phi")
