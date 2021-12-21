@@ -77,12 +77,12 @@ ricker.test$priors.used
 ricker.test$inits.used
 
 
-bm.df <- calcMCMCRickerBM(fit_obj = ricker.test, sr.scale = 10^6,
+bm.out <- calcMCMCRickerBM(fit_obj = ricker.test, sr.scale = 10^6,
                           Smsy.method = "Scheuerell2016",
                           Sgen.method = "Connorsetal2022",
-                          drop.resids = TRUE)
-bm.df$Summary
-head(bm.df$MCMC)
+                          drop.resids = FALSE)
+bm.out$Summary
+head(bm.out$MCMC)
 
 
 

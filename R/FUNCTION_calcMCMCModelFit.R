@@ -61,16 +61,8 @@ if(missing.yrs & model.type %in% c("Kalman","AR1")){
 yr.match <- data.frame(YrIdx = 1 : sum(!is.na(sr.use$Rec)), Yr = sr.use$Year)
 #print(yr.match)
 
-
-
-
 pars.track.in <- c("ln.alpha","ln.alpha.c","beta","sigma","deviance", "log.resid")
-pars.labels <- c("ln_a","ln_a_c","b","sd","deviance", "log.resid")
-
-if(tolower(model.type) == "ar1"){
-  pars.track.in <- c(pars.track.in,"phi")
-  pars.labels <- c(pars.labels,"phi")
-}
+if(tolower(model.type) == "ar1"){  pars.track.in <- c(pars.track.in,"phi")}
 
 
 
@@ -125,16 +117,8 @@ tmp.out <- doRJAGS(data.obj = mcmc.data,
 perc.df <-  tmp.out$MCMC.Percentiles %>%
   as.data.frame() %>%
   select(matches(paste(pars.track.in,collapse="|")))  %>%
-  t() %>%  as.data.frame() %>% rownames_to_column() %>% rename(Variable = rowname)
+  t() %>%  as.data.frame() %>% rownames_to_column() %>% dplyr::rename(Variable = rowname)
 
-
-# rescale the BM measures and relabel the Vars
-#perc.df[grepl(paste(pars.rescale,collapse="|"), perc.df$Variable),  2:dim(perc.df)[2] ] <-
-#              perc.df[grepl(paste(pars.rescale,collapse="|"), perc.df$Variable),  2:dim(perc.df)[2] ] * sr.scale
-
-
-# KLUDGE WARNING: do in reverse order, so the .c2 are done before .c
-for(i in length(pars.track.in):1){  perc.df$Variable <- gsub(pars.track.in[i],pars.labels[i],perc.df$Variable) }
 
 
 summary.df <-  c(
@@ -148,10 +132,12 @@ summary.df$VarType[summary.df$VarType==""] <- summary.df$Variable[summary.df$Var
 
 
 # calculate perc diff from det estimate
-det.ricker.bm <- calcDetRickerBM(sr.use ,sr.scale = sr.scale, min.obs = min.obs) # generates a vector with par and BM est
+det.ricker.fit <- calcDetModelFit(sr.use ,sr.scale = sr.scale, min.obs = min.obs) 
+# generates a vector with par est
 
 
-summary.df <- left_join(as.data.frame(summary.df),  data.frame(VarType = names(det.ricker.bm),Det = det.ricker.bm), by = "VarType") %>%
+summary.df <- left_join(as.data.frame(summary.df),  
+data.frame(VarType = names(det.ricker.fit),Det = det.ricker.fit), by = "VarType") %>%
                     mutate(Diff = p50 - Det) %>% mutate(PercDiff = round(Diff/Det *100,1)) %>%
                       select(VarType,Variable,YrIdx,Yr,everything())
 
@@ -169,11 +155,11 @@ warning("Not enough data to fit a model (num obs < user-specified min.obs)")
 
 
 out.vec <-  c(n_obs = dim(sr.use)[1],
-			ln_a = NA,
-			ln_a_c = NA,
-			a = NA,
-			b = NA,
-			sd = NA,
+			ln.alpha = NA,
+			ln.alpha.c = NA,
+			alpha = NA,
+			beta = NA,
+			sigma = NA,
 			deviance = NA,
 			log.resid = NA
 			)

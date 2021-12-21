@@ -110,7 +110,8 @@ ricker.test.alt$Summary %>% dplyr::filter(VarType=="ln_a_c") %>% select(starts_w
 ))
 
 y.lim <- range(ln.a.orig,ln.a.c.orig,ln.a.alt,ln.a.c.alt )
-plot(0:5,0:5,ylim=y.lim,type="n",xlab="",ylab = "ln.a", bty="n",axes=FALSE, main="ln.a posteriors")
+plot(0:5,0:5,ylim=c(1,2.5),
+     type="n",xlab="",ylab = "ln.a", bty="n",axes=FALSE, main="ln.a posteriors")
 axis(2)
 
 lines(1:4, ln.a.comp$p50,col="darkblue",type="o",pch=19 )

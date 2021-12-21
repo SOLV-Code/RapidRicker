@@ -56,9 +56,19 @@ mcmc.df <- mcmc.df[,!resid.idx]
 
 
 
-summary.df <- t(apply(mcmc.df, MARGIN =2, quantile,probs = seq(0.1,0.9,by=0.1))) %>% as.data.frame()
+summary.df <- t(apply(mcmc.df, MARGIN =2, quantile,probs = seq(0.1,0.9,by=0.1))) %>% 
+					as.data.frame()
 				
 names(summary.df) <- paste0("p",seq(0.1,0.9,by=0.1)*100)
+
+summary.df <- summary.df %>% rownames_to_column("Variable")
+
+
+
+#fit_obj$Summary
+
+
+
 
 
 return(list(Summary = summary.df , MCMC = mcmc.df))
