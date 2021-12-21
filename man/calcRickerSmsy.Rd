@@ -4,10 +4,10 @@
 \alias{calcRickerSmsy}
 \title{calcRickerSmsy}
 \usage{
-calcRickerSmsy(X, method, sr.scale = 1, out.type = "Full")
+calcRickerSmsy(X, method = "Scheuerell2016", sr.scale = 1, out.type = "Full")
 }
 \arguments{
-\item{X}{a data frame with columns ln.a, b}
+\item{X}{a data frame with columns ln.alpha, beta}
 
 \item{method}{one of "Hilborn1985","Petermanetal2000","Scheuerell2016","BruteForce"}
 

@@ -7,7 +7,7 @@
 calcRickerOtherBM(X, sr.scale = 1, out.type = "Full")
 }
 \arguments{
-\item{X}{a data frame with columns ln.a, b}
+\item{X}{a data frame with columns ln.alpha, beta}
 
 \item{sr.scale}{scalar applied to SR data in the model fitting step, need it here to scale up the Sgen values}
 

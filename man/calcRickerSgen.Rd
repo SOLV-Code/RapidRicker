@@ -4,7 +4,7 @@
 \alias{calcRickerSgen}
 \title{calcRickerSgen}
 \usage{
-calcRickerSgen(X, method, sr.scale = 1, out.type = "Full")
+calcRickerSgen(X, method = "Connorsetal2022", sr.scale = 1, out.type = "Full")
 }
 \arguments{
 \item{X}{a data frame with columns ln.a, b, sigma, and optionally Smsy}
