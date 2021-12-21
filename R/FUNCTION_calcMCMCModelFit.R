@@ -10,11 +10,12 @@
 #' @param mcmc.settings a list with n.chains (2), n.burnin (20000), n.thin (60), and n.samples (50000). Default values in brackets.
 #' @param mcmc.inits a list of lists with inits for each chain. Default is "list(list(tau_R=3, S.max=1),list(tau_R=7, S.max=2))"
 #' @param mcmc.priors a list with p.alpha, p.beta, tau_alpha,tau_beta (if model.file = "MODEL_Ricker_BUGS.txt" )
-#' @param output one of "short" (only return summary stats for key parameters in a list object), "post" (also save posterior distribution samples to folder), or "all" (also produce pdf files with standard diagnostic plots)
-#' @param out.path text string specifying  folder. if output is "post" or "all", the generated files will be stored to this folder
-#' @param out.label label use in the output files if output is "post" or "all"
+#' @param mcmc.output one of "short" (only return summary stats for key parameters in a list object), "post" (also save posterior distribution samples to folder), or "all" (also produce pdf files with standard diagnostic plots). This is passed on to the internal call of \code{\link[RapidRicker]{doRJAGS}}.
+#' @param out.path text string specifying  folder. if mcmc.output is "post" or "all", the generated files will be stored to this folder
+#' @param out.label label use in the output files if mcmc.output is "post" or "all"
 #' @param mcmc.seed either "default" or an integer giving the random seed for starting MCMC (R2Jags default is 123)
 #' @param tracing if TRUE, diagnostic details for intermediate objects will be printed to the screen for debugging
+#' @param fit.summary if TRUE, output object includes a summary of the posteriors. if FALSE, only the MCMC samples are included (typically feed those into the benchmark calculations, and then calculated the summaries after.).
 #' @keywords Ricker fit, Bayesian, MCMC, posterior, 
 #' @export
 #' @examples
@@ -29,11 +30,12 @@ calcMCMCModelFit <- function(sr_obj, sr.scale = 10^6,
 					mcmc.inits = "default",
 					mcmc.priors = list(p.alpha = 0,tau_alpha = 0.0001, p.beta = 1 , tau_beta = 0.1,max.scalar = 3,
 					                   shape.tau_R = 0.001,lambda_tau_R=0.01,shape.tauw = 0.01,lambda_tauw=0.001),
-					output = "short",
+					mcmc.output = "short",
 					out.path = "MCMC_Out",
 					out.label = "MCMC",
 					mcmc.seed = "default",
-					tracing = FALSE
+					tracing = FALSE,
+					fit.summary = TRUE
 					){
 
 
@@ -55,10 +57,6 @@ if(missing.yrs & model.type %in% c("Kalman","AR1")){
   skip.mcmc <- TRUE
   warning("Gaps in the time series. Can't do Kalman Filter or AR 1 model, Returning NAs")
   }
-
-
-
-
 
 
 
@@ -179,14 +177,6 @@ out.vec <-  c(n_obs = dim(sr.use)[1],
 			b = NA,
 			sd = NA,
 			deviance = NA,
-			Smax = NA,
-			Seq = NA,
-			Seq.c = NA,
-			Smsy_h = NA,
-			Umsy_h = NA,
-			Seq.c2 = NA,
-			Smsy_p = NA,
-			Umsy_p = NA,
 			log.resid = NA
 			)
 
