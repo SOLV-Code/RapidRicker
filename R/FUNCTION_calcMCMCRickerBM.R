@@ -26,6 +26,13 @@ require(tidyverse)
 
 
 mcmc.df <- fit_obj$MCMC$MCMC.samples %>% as.data.frame()
+
+#--------------------------------------------------------
+# Constant Prod Models (1 alpha)
+
+if(fit_obj$model.type %in% c("Basic", "AR1")){
+
+
 bm.in.raw <- mcmc.df %>% select(ln.alpha,beta)
 bm.in.corr <- mcmc.df %>% select(ln.alpha.c,beta) %>% dplyr::rename(ln.alpha=ln.alpha.c)
 
@@ -63,12 +70,24 @@ names(summary.df) <- paste0("p",seq(0.1,0.9,by=0.1)*100)
 
 summary.df <- summary.df %>% rownames_to_column("Variable")
 
+} # end constant prod models
+
+#--------------------------------------------------------
+# Time-varying Prod Models (1 alpha)
+
+if(fit_obj$model.type %in% c("Kalman")){
 
 
-#fit_obj$Summary
 
 
 
+
+
+
+
+
+
+}
 
 
 return(list(Summary = summary.df , MCMC = mcmc.df))

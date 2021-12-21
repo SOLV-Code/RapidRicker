@@ -3,6 +3,7 @@
 export(RapidRicker)
 export(amendMCMC)
 export(box_add)
+export(calcDetModelFit)
 export(calcDetRickerBM)
 export(calcMCMCModelFit)
 export(calcMCMCRickerBM)

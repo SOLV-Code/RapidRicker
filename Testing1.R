@@ -158,7 +158,10 @@ ricker.kf.test <- calcMCMCModelFit(
 
 ricker.kf.test$Summary
 names(ricker.kf.test)
-ricker.kf.test$MCMC$
+ricker.kf.test$model.type
+ricker.kf.test$yr.match
+
+#ricker.kf.test$MCMC$
 
 head(ricker.kf.test$MCMC.samples)
 ricker.kf.test$priors.used

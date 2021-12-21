@@ -183,7 +183,7 @@ tmp.out <- NA
 }
 
 return(list(model.type = model.type, model.file = model.file,Summary = summary.df, MCMC = tmp.out, sr.scale = sr.scale,
-            priors.used = mcmc.priors, inits.used = mcmc.inits))
+            priors.used = mcmc.priors, inits.used = mcmc.inits,yr.match = yr.match))
 
 }
 
