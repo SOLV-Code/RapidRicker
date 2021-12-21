@@ -62,15 +62,15 @@ ricker.test <- calcMCMCModelFit(
   mcmc.settings = list(n.chains = 2, n.burnin = 20000, n.thin = 60, n.samples = 50000),
   mcmc.inits = inits.ricker,
   mcmc.priors = priors.ricker,
-  output = "post",
-  out.path = "MCMC_Out",
-  out.label = "MCMC",
+  mcmc.output = "post",
+  mcmc.out.path = "MCMC_Out",
+  mcmc.out.label = "MCMC",
   mcmc.seed = "default",
   tracing = FALSE
 )
 
-ricker.test$Medians
-ricker.test$Percentiles
+ricker.test$Summary
+head(ricker.test$MCMC)
 ricker.test$priors.used
 ricker.test$inits.used
 
@@ -84,30 +84,29 @@ ricker.test.alt <- calcMCMCModelFit(
   mcmc.settings = list(n.chains = 2, n.burnin = 20000, n.thin = 60, n.samples = 50000),
   mcmc.inits = inits.ricker,
   mcmc.priors = priors.ricker,
-  output = "post",
-  out.path = "MCMC_Out",
-  out.label = "MCMC",
+  mcmc.output = "post",
+  mcmc.out.path = "MCMC_Out",
+  mcmc.out.label = "MCMC",
   mcmc.seed = "default",
   tracing = FALSE
 )
 
-ricker.test.alt$Medians
-ricker.test.alt$Percentiles
+ricker.test.alt$Summary
 ricker.test.alt$priors.used
 ricker.test.alt$inits.used
 
 
 
 
-ricker.test$Medians %>% dplyr::filter(VarType=="sd") %>% select(starts_with("p",ignore.case = FALSE))
-ricker.test.alt$Medians %>% dplyr::filter(VarType=="sd") %>% select(starts_with("p",ignore.case = FALSE))
+ricker.test$Summary %>% dplyr::filter(VarType=="sd") %>% select(starts_with("p",ignore.case = FALSE))
+ricker.test.alt$Summary %>% dplyr::filter(VarType=="sd") %>% select(starts_with("p",ignore.case = FALSE))
 
 
 ln.a.comp <- bind_cols(Version = c("Orig","Orig Corr","Alt","Alt Corr"),
-bind_rows(ricker.test$Medians %>% dplyr::filter(VarType=="ln_a") %>% select(starts_with("p",ignore.case = FALSE)),
-ricker.test$Medians %>% dplyr::filter(VarType=="ln_a_c") %>% select(starts_with("p",ignore.case = FALSE)),
-ricker.test.alt$Medians %>% dplyr::filter(VarType=="ln_a") %>% select(starts_with("p",ignore.case = FALSE)),
-ricker.test.alt$Medians %>% dplyr::filter(VarType=="ln_a_c") %>% select(starts_with("p",ignore.case = FALSE))
+bind_rows(ricker.test$Summary %>% dplyr::filter(VarType=="ln_a") %>% select(starts_with("p",ignore.case = FALSE)),
+ricker.test$Summary %>% dplyr::filter(VarType=="ln_a_c") %>% select(starts_with("p",ignore.case = FALSE)),
+ricker.test.alt$Summary %>% dplyr::filter(VarType=="ln_a") %>% select(starts_with("p",ignore.case = FALSE)),
+ricker.test.alt$Summary %>% dplyr::filter(VarType=="ln_a_c") %>% select(starts_with("p",ignore.case = FALSE))
 ))
 
 y.lim <- range(ln.a.orig,ln.a.c.orig,ln.a.alt,ln.a.c.alt )
@@ -120,10 +119,10 @@ segments(1:4, ln.a.comp$p10,1:4,ln.a.comp$p90,col="darkblue",pch=19 ,lwd=1)
 text(1:4,par("usr")[3],ln.a.comp$Version,xpd=NA)
 
 
-orig.resids <- ricker.test$Medians %>% dplyr::filter(VarType == "log.resid") %>% select(p50) %>% unlist()
-alt.resids <- ricker.test.alt$Medians %>% dplyr::filter(VarType == "log.resid") %>% select(p50) %>% unlist()
+orig.resids <- ricker.test$Summary %>% dplyr::filter(VarType == "log.resid") %>% select(p50) %>% unlist()
+alt.resids <- ricker.test.alt$Summary %>% dplyr::filter(VarType == "log.resid") %>% select(p50) %>% unlist()
 
-yrs.vec <- ricker.test$Medians %>% dplyr::filter(VarType == "log.resid") %>% select(Yr) %>% unlist()
+yrs.vec <- ricker.test$Summary %>% dplyr::filter(VarType == "log.resid") %>% select(Yr) %>% unlist()
 
 
 plot(yrs.vec,orig.resids,type="o",pch=19,col="darkblue",xlab='Yr',ylab="log.resid",bty="n", main="resids")
@@ -132,10 +131,61 @@ legend("bottomleft",legend = c("Orig", "Direct"),pch=c(19,21),col = c("darkblue"
 
 
 
+#########################################################
+#
+
+
+mcmc.df <- ricker.test$MCMC$MCMC.samples %>% as.data.frame
+bm.in.raw <- mcmc.df %>% select(ln.alpha,beta)
+bm.in.corr <- mcmc.df %>% select(ln.alpha.c,beta) %>% dplyr::rename(ln.alpha=ln.alpha.c)
+
+
+
+
+mcmc.df <- bind_cols(mcmc.df,
+                     calcRickerOtherBM(bm.in.raw , sr.scale =sr.scale.use, out.type = "BMOnly") %>% select(Smax,Seq),
+                     Seq.c = calcRickerOtherBM(bm.in.corr , sr.scale =sr.scale.use, out.type = "BMOnly") %>% select(Seq) %>% unlist(),
+                     Smsy = calcRickerSmsy(mcmc.in.raw , method = "Scheuerell2016",sr.scale =sr.scale.use, out.type = "BMOnly"),
+                     Smsy.c = calcRickerSmsy(mcmc.in.corr , method = "Scheuerell2016",sr.scale =sr.scale.use, out.type = "BMOnly")
+                     )
+
+
+mcmc.df <- bind_cols(mcmc.df,
+                     Sgen = calcRickerSgen(mcmc.df %>% select(ln.alpha,beta,sigma,Smsy),
+                                           method = "Connorsetal2022",sr.scale = sr.scale.use, out.type = "BMOnly"),
+                     Sgen.c = calcRickerSgen(mcmc.df %>% select(ln.alpha.c,beta,sigma,Smsy.c) %>%
+                                               dplyr::rename(ln.alpha=ln.alpha.c,Smsy = Smsy.c),
+                                           method = "Connorsetal2022",sr.scale = sr.scale.use, out.type = "BMOnly"),
+                       ) %>% mutate(SgenRatio = Smsy/Sgen,SgenRatio.c = Smsy.c/Sgen.c)
+
+
+resid.idx <- grepl("log.resid",names(mcmc.df))
+
+mcmc.df <- bind_cols(mcmc.df[,!resid.idx],mcmc.df[,resid.idx])
+
+
+
+head(mcmc.df)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ##################
-#
+# OLD
 
 ricker.test <- calcMCMCRickerBM(
   sr_obj = sr.use, sr.scale = sr.scale.use  ,
@@ -152,7 +202,7 @@ ricker.test <- calcMCMCRickerBM(
   tracing = FALSE
 )
 
-ricker.test$Medians
+ricker.test$Summary
 ricker.test$Percentiles
 ricker.test$priors.used
 ricker.test$inits.used

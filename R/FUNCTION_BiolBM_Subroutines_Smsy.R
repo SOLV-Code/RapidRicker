@@ -30,14 +30,14 @@
 #' Whether the output is bias-corrected estimates or not depends on the par set provided by the user. This keeps the parameter
 #' estimation and benchark calculation steps clearly separated, given on-going debates around the bias correction.
 #' 
-#' @param X  a data frame with columns ln.a, b
+#' @param X  a data frame with columns ln.alpha, beta
 #' @param method  one of "Hilborn1985","Petermanetal2000","Scheuerell2016","BruteForce"
 #' @param sr.scale scalar applied to SR data in the model fitting step, need it here to scale up the Sgen values
 #' @param out.type either "BMOnly" or "Full"
 #' @keywords Smsy
 #' @export
 
-calcRickerSmsy<- function(X, method,sr.scale =1, out.type = "Full"){
+calcRickerSmsy <- function(X, method = "Scheuerell2016",sr.scale =1, out.type = "Full"){
   
 
 if(!(method %in% c("Hilborn1985","Petermanetal2000","Scheuerell2016","BruteForce") )){
@@ -46,21 +46,21 @@ if(!(method %in% c("Hilborn1985","Petermanetal2000","Scheuerell2016","BruteForce
   
 
 if(method == "Hilborn1985") {
-  smsy.est <-  X$ln.a/X$b * (0.5-0.07*X$ln.a) * sr.scale
+  smsy.est <-  X$ln.alpha/X$beta * (0.5-0.07*X$ln.alpha) * sr.scale
   }
 
 if(method == "Petermanetal2000") {   
-  peterman.approx <- (0.5 - 0.65 * X$ln.a^1.27 / (8.7 + X$ln.a^1.27))
-  smsy.est <- X$ln.a * peterman.approx / X$b  * sr.scale
+  peterman.approx <- (0.5 - 0.65 * X$ln.alpha^1.27 / (8.7 + X$ln.alpha^1.27))
+  smsy.est <- X$ln.alpha * peterman.approx / X$beta  * sr.scale
 } 
 
 if(method == "Scheuerell2016") { 
 # adapted from samSim package (https://github.com/Pacific-salmon-assess/samSim)
-  smsy.est <- (1 - gsl::lambert_W0(exp(1 - X$ln.a))) / X$b * sr.scale
+  smsy.est <- (1 - gsl::lambert_W0(exp(1 - X$ln.alpha))) / X$beta * sr.scale
 } 
   
 if(method == "BruteForce") { 
-    smsy.est <-   mapply(smsy.proxy, ln.a = X$ln.a ,b = X$b, sr.scale = sr.scale )
+    smsy.est <-   mapply(smsy.proxy, ln.a = X$ln.alpha ,b = X$beta, sr.scale = sr.scale )
 }   
   
 
