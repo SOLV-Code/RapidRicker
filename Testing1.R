@@ -41,17 +41,19 @@ generatePriors(sr_obj = sr.use ,sr.scale=10^6,model_type = "Kalman", custom.list
 
 
 
-priors.ricker <- generatePriors(sr_obj = sr.use , sr.scale=10^6, model_type = "Basic")
-priors.ricker
 
-inits.ricker <- generateInits(priors.ricker)
-inits.ricker
 
 
 
 
 ############################
 # NEW FUNCTION TESTING
+
+priors.ricker <- generatePriors(sr_obj = sr.use , sr.scale=10^6, model_type = "Basic")
+priors.ricker
+
+inits.ricker <- generateInits(priors.ricker)
+inits.ricker
 
 
 ricker.test <- calcMCMCModelFit(
@@ -79,23 +81,93 @@ bm.df <- calcMCMCRickerBM(fit_obj = ricker.test, sr.scale = 10^6,
                           Smsy.method = "Scheuerell2016",
                           Sgen.method = "Connorsetal2022",
                           drop.resids = TRUE)
-
-
 bm.df$Summary
-
-
 head(bm.df$MCMC)
 
 
 
+# -------------------------------------------------------------
+
+
+
+priors.ar1 <- generatePriors(sr_obj = sr.use , sr.scale=10^6, model_type = "AR1")
+priors.ar1
+
+inits.ar1  <- generateInits(priors.ar1)
+inits.ar1
+
+
+ricker.ar1.test <- calcMCMCModelFit(
+  sr_obj = sr.use, sr.scale = sr.scale.use  ,
+  model.type = "AR1",
+  model.file = "BUILT_IN_MODEL_RickerAR1_BUGS.txt",
+  min.obs = 15,
+  mcmc.settings = list(n.chains = 2, n.burnin = 20000, n.thin = 60, n.samples = 50000),
+  mcmc.inits = inits.ar1,
+  mcmc.priors = priors.ar1,
+  mcmc.output = "post",
+  mcmc.out.path = "MCMC_Out",
+  mcmc.out.label = "MCMC",
+  mcmc.seed = "default",
+  tracing = FALSE
+)
+
+ricker.ar1.test$Summary
+head(ricker.ar1.test$MCMC)
+ricker.ar1.test$priors.used
+ricker.ar1.test$inits.used
+
+
+bm.ar1.df <- calcMCMCRickerBM(fit_obj = ricker.ar1.test, sr.scale = 10^6,
+                          Smsy.method = "Scheuerell2016",
+                          Sgen.method = "Connorsetal2022",
+                          drop.resids = TRUE)
+bm.ar1.df$Summary
+head(bm.ar1.df$MCMC)
 
 
 
 
 
 
+# -------------------------------------------------------------
 
 
+
+priors.kf<- generatePriors(sr_obj = sr.use , sr.scale=10^6, model_type = "Kalman")
+priors.kf
+
+inits.kf <- generateInits(priors.kf)
+inits.kf
+
+
+ricker.kf.test <- calcMCMCModelFit(
+  sr_obj = sr.use, sr.scale = sr.scale.use  ,
+  model.type = "Kalman",
+  model.file = "BUILT_IN_MODEL_RickerKalman_BUGS.txt",
+  min.obs = 15,
+  mcmc.settings = list(n.chains = 2, n.burnin = 20000, n.thin = 60, n.samples = 50000),
+  mcmc.inits = inits.kf,
+  mcmc.priors = priors.kf,
+  mcmc.output = "post",
+  mcmc.out.path = "MCMC_Out",
+  mcmc.out.label = "MCMC",
+  mcmc.seed = "default",
+  tracing = FALSE
+)
+
+ricker.kf.test$Summary
+head(ricker.kf.test$MCMC)
+ricker.kf.test$priors.used
+ricker.kf.test$inits.used
+
+
+bm.kf.df <- calcMCMCRickerBM(fit_obj = ricker.kf.test, sr.scale = 10^6,
+                              Smsy.method = "Scheuerell2016",
+                              Sgen.method = "Connorsetal2022",
+                              drop.resids = TRUE)
+bm.kf.df$Summary
+head(bm.kf.df$MCMC)
 
 
 
