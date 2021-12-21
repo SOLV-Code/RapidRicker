@@ -11,11 +11,10 @@
 #' @param mcmc.inits a list of lists with inits for each chain. Default is "list(list(tau_R=3, S.max=1),list(tau_R=7, S.max=2))"
 #' @param mcmc.priors a list with p.alpha, p.beta, tau_alpha,tau_beta (if model.file = "MODEL_Ricker_BUGS.txt" )
 #' @param mcmc.output one of "short" (only return summary stats for key parameters in a list object), "post" (also save posterior distribution samples to folder), or "all" (also produce pdf files with standard diagnostic plots). This is passed on to the internal call of \code{\link[RapidRicker]{doRJAGS}}.
-#' @param out.path text string specifying  folder. if mcmc.output is "post" or "all", the generated files will be stored to this folder
-#' @param out.label label use in the output files if mcmc.output is "post" or "all"
+#' @param mcmc.out.path text string specifying  folder. if mcmc.output is "post" or "all", the generated files will be stored to this folder
+#' @param mcmc.out.label label use in the output files if mcmc.output is "post" or "all"
 #' @param mcmc.seed either "default" or an integer giving the random seed for starting MCMC (R2Jags default is 123)
 #' @param tracing if TRUE, diagnostic details for intermediate objects will be printed to the screen for debugging
-#' @param fit.summary if TRUE, output object includes a summary of the posteriors. if FALSE, only the MCMC samples are included (typically feed those into the benchmark calculations, and then calculated the summaries after.).
 #' @keywords Ricker fit, Bayesian, MCMC, posterior, 
 #' @export
 #' @examples
@@ -31,11 +30,10 @@ calcMCMCModelFit <- function(sr_obj, sr.scale = 10^6,
 					mcmc.priors = list(p.alpha = 0,tau_alpha = 0.0001, p.beta = 1 , tau_beta = 0.1,max.scalar = 3,
 					                   shape.tau_R = 0.001,lambda_tau_R=0.01,shape.tauw = 0.01,lambda_tauw=0.001),
 					mcmc.output = "short",
-					out.path = "MCMC_Out",
-					out.label = "MCMC",
+					mcmc.out.path = "MCMC_Out",
+					mcmc.out.label = "MCMC",
 					mcmc.seed = "default",
-					tracing = FALSE,
-					fit.summary = TRUE
+					tracing = FALSE
 					){
 
 
@@ -112,9 +110,9 @@ tmp.out <- doRJAGS(data.obj = mcmc.data,
                     inits = mcmc.inits,
                     settings = mcmc.settings ,
                     pars.track = pars.track.in,
-                    out.label= out.label,
-					out.path= out.path,
-					output=output,
+                    out.label= mcmc.out.label,
+					out.path= mcmc.out.path,
+					output= mcmc.output,
                     mcmc.seed = mcmc.seed,
 					tracing = tracing
 					)
@@ -139,21 +137,21 @@ perc.df <-  tmp.out$MCMC.Percentiles %>%
 for(i in length(pars.track.in):1){  perc.df$Variable <- gsub(pars.track.in[i],pars.labels[i],perc.df$Variable) }
 
 
-medians.df <-  c(
+summary.df <-  c(
 			perc.df %>% select(Variable,p10,p25,p50,p75,p90) %>% as.data.frame() %>%
 			      mutate(VarType = substr(Variable, 1, regexpr("\\[",Variable)-1)) %>%
 			      mutate(YrIdx = as.numeric(substr(Variable, regexpr("\\[",Variable)+1, regexpr("\\]",Variable)-1 )))  %>%
 			      left_join(yr.match,by="YrIdx")
 			)
 
-medians.df$VarType[medians.df$VarType==""] <- medians.df$Variable[medians.df$VarType==""]
+summary.df$VarType[summary.df$VarType==""] <- summary.df$Variable[summary.df$VarType==""]
 
 
 # calculate perc diff from det estimate
 det.ricker.bm <- calcDetRickerBM(sr.use ,sr.scale = sr.scale, min.obs = min.obs) # generates a vector with par and BM est
 
 
-medians.df <- left_join(as.data.frame(medians.df),  data.frame(VarType = names(det.ricker.bm),Det = det.ricker.bm), by = "VarType") %>%
+summary.df <- left_join(as.data.frame(summary.df),  data.frame(VarType = names(det.ricker.bm),Det = det.ricker.bm), by = "VarType") %>%
                     mutate(Diff = p50 - Det) %>% mutate(PercDiff = round(Diff/Det *100,1)) %>%
                       select(VarType,Variable,YrIdx,Yr,everything())
 
@@ -191,15 +189,14 @@ perc.df <- as.data.frame(matrix(NA,ncol= length(pars.labels),nrow = length(perc.
           t() %>%  as.data.frame() %>% rownames_to_column() %>% rename(Variable = rowname)
 
 
-medians.df <- data.frame(VarType = perc.df$Variable,Variable = perc.df$Variable,
+summary.df <- data.frame(VarType = perc.df$Variable,Variable = perc.df$Variable,
                          YrIdx = NA, Yr  = NA, p10 = NA, p25 = NA, p50 = NA,
                          p75 = NA, p90 = NA, Det = NA, Diff = NA, PercDiff = NA)
 tmp.out <- NA
 
 }
 
-return(list(Medians = medians.df, Percentiles = perc.df,
-            MCMC = tmp.out, sr.scale = sr.scale,
+return(list(Summary = summary.df, MCMC = tmp.out, sr.scale = sr.scale,
             priors.used = mcmc.priors, inits.used = mcmc.inits))
 
 }

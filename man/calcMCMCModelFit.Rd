@@ -15,9 +15,9 @@ calcMCMCModelFit(
   mcmc.priors = list(p.alpha = 0, tau_alpha = 1e-04, p.beta = 1, tau_beta = 0.1,
     max.scalar = 3, shape.tau_R = 0.001, lambda_tau_R = 0.01, shape.tauw = 0.01,
     lambda_tauw = 0.001),
-  output = "short",
-  out.path = "MCMC_Out",
-  out.label = "MCMC",
+  mcmc.output = "short",
+  mcmc.out.path = "MCMC_Out",
+  mcmc.out.label = "MCMC",
   mcmc.seed = "default",
   tracing = FALSE
 )
@@ -40,11 +40,11 @@ the benchmark estimates are scaled back, but the MCMC estimates of alpha and bet
 
 \item{mcmc.priors}{a list with p.alpha, p.beta, tau_alpha,tau_beta (if model.file = "MODEL_Ricker_BUGS.txt" )}
 
-\item{output}{one of "short" (only return summary stats for key parameters in a list object), "post" (also save posterior distribution samples to folder), or "all" (also produce pdf files with standard diagnostic plots)}
+\item{mcmc.output}{one of "short" (only return summary stats for key parameters in a list object), "post" (also save posterior distribution samples to folder), or "all" (also produce pdf files with standard diagnostic plots). This is passed on to the internal call of \code{\link[RapidRicker]{doRJAGS}}.}
 
-\item{out.path}{text string specifying  folder. if output is "post" or "all", the generated files will be stored to this folder}
+\item{mcmc.out.path}{text string specifying  folder. if mcmc.output is "post" or "all", the generated files will be stored to this folder}
 
-\item{out.label}{label use in the output files if output is "post" or "all"}
+\item{mcmc.out.label}{label use in the output files if mcmc.output is "post" or "all"}
 
 \item{mcmc.seed}{either "default" or an integer giving the random seed for starting MCMC (R2Jags default is 123)}
 

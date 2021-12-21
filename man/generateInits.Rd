@@ -7,7 +7,7 @@
 generateInits(priors, model_type = "Basic", n.chains = 2, filename = NULL)
 }
 \arguments{
-\item{priors}{output from \code{\link[RapidRicker]{genratePriors}}}
+\item{priors}{output from \code{\link[RapidRicker]{generatePriors}}}
 
 \item{model_type}{one of "Basic", "Kalman", or "AR1".  For details, see \href{https://github.com/SOLV-Code/RapidRicker/wiki/3:--Ricker-Model-Forms-in-BUGS-JAGS}{this wiki}.}
 
