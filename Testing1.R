@@ -77,12 +77,12 @@ ricker.test$priors.used
 ricker.test$inits.used
 
 
-bm.df <- calcMCMCRickerBM(fit_obj = ricker.test, sr.scale = 10^6,
+bm.out <- calcMCMCRickerBM(fit_obj = ricker.test, sr.scale = 10^6,
                           Smsy.method = "Scheuerell2016",
                           Sgen.method = "Connorsetal2022",
-                          drop.resids = TRUE)
-bm.df$Summary
-head(bm.df$MCMC)
+                          drop.resids = FALSE)
+bm.out$Summary
+head(bm.out$MCMC)
 
 
 
@@ -157,9 +157,19 @@ ricker.kf.test <- calcMCMCModelFit(
 )
 
 ricker.kf.test$Summary
-head(ricker.kf.test$MCMC)
+names(ricker.kf.test)
+ricker.kf.test$MCMC$
+
+head(ricker.kf.test$MCMC.samples)
 ricker.kf.test$priors.used
 ricker.kf.test$inits.used
+
+
+names(ricker.kf.test)
+
+head(ricker.kf.test$MCMC$MCMC.samples)
+
+
 
 
 bm.kf.df <- calcMCMCRickerBM(fit_obj = ricker.kf.test, sr.scale = 10^6,
