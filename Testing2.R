@@ -135,39 +135,18 @@ legend("bottomleft",legend = c("Orig", "Direct"),pch=c(19,21),col = c("darkblue"
 #
 
 
-mcmc.df <- ricker.test$MCMC$MCMC.samples %>% as.data.frame
-bm.in.raw <- mcmc.df %>% select(ln.alpha,beta)
-bm.in.corr <- mcmc.df %>% select(ln.alpha.c,beta) %>% dplyr::rename(ln.alpha=ln.alpha.c)
+bm.df <- calcMCMCRickerBM(fit_obj = ricker.test, sr.scale = 10^6,
+                          Smsy.method = "Scheuerell2016",
+                          Sgen.method = "Connorsetal2022",
+                          drop.resids = TRUE)
 
 
+bm.df$Summary
 
 
-mcmc.df <- bind_cols(mcmc.df,
-                     calcRickerOtherBM(bm.in.raw , sr.scale =sr.scale.use, out.type = "BMOnly") %>% select(Smax,Seq),
-                     Seq.c = calcRickerOtherBM(bm.in.corr , sr.scale =sr.scale.use, out.type = "BMOnly") %>% select(Seq) %>% unlist(),
-                     Smsy = calcRickerSmsy(mcmc.in.raw , method = "Scheuerell2016",sr.scale =sr.scale.use, out.type = "BMOnly"),
-                     Smsy.c = calcRickerSmsy(mcmc.in.corr , method = "Scheuerell2016",sr.scale =sr.scale.use, out.type = "BMOnly")
-                     )
+head(bm.df$MCMC)
 
-
-mcmc.df <- bind_cols(mcmc.df,
-                     Sgen = calcRickerSgen(mcmc.df %>% select(ln.alpha,beta,sigma,Smsy),
-                                           method = "Connorsetal2022",sr.scale = sr.scale.use, out.type = "BMOnly"),
-                     Sgen.c = calcRickerSgen(mcmc.df %>% select(ln.alpha.c,beta,sigma,Smsy.c) %>%
-                                               dplyr::rename(ln.alpha=ln.alpha.c,Smsy = Smsy.c),
-                                           method = "Connorsetal2022",sr.scale = sr.scale.use, out.type = "BMOnly"),
-                       ) %>% mutate(SgenRatio = Smsy/Sgen,SgenRatio.c = Smsy.c/Sgen.c)
-
-
-resid.idx <- grepl("log.resid",names(mcmc.df))
-
-mcmc.df <- bind_cols(mcmc.df[,!resid.idx],mcmc.df[,resid.idx])
-
-
-
-head(mcmc.df)
-
-
+bm.df$Summary$Sgen
 
 
 
@@ -186,6 +165,8 @@ head(mcmc.df)
 
 ##################
 # OLD
+
+if(FALSE){
 
 ricker.test <- calcMCMCRickerBM(
   sr_obj = sr.use, sr.scale = sr.scale.use  ,
@@ -316,5 +297,5 @@ rickerAR1.test$Percentiles
 
 sort(unique(rickerAR1.test$Medians$VarType))
 
-
+}
 
