@@ -81,6 +81,7 @@ bm.out <- calcMCMCRickerBM(fit_obj = ricker.test, sr.scale = 10^6,
                           Smsy.method = "Scheuerell2016",
                           Sgen.method = "Connorsetal2022",
                           drop.resids = FALSE)
+names(bm.out)
 bm.out$Summary
 head(bm.out$MCMC)
 
@@ -121,7 +122,7 @@ ricker.ar1.test$inits.used
 bm.ar1.df <- calcMCMCRickerBM(fit_obj = ricker.ar1.test, sr.scale = 10^6,
                           Smsy.method = "Scheuerell2016",
                           Sgen.method = "Connorsetal2022",
-                          drop.resids = TRUE)
+                          drop.resids = FALSE)
 bm.ar1.df$Summary
 head(bm.ar1.df$MCMC)
 
@@ -157,6 +158,7 @@ ricker.kf.test <- calcMCMCModelFit(
 )
 
 ricker.kf.test$Summary
+ricker.kf.test$Summary[,1:2]
 names(ricker.kf.test)
 ricker.kf.test$model.type
 ricker.kf.test$yr.match
