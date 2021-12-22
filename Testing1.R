@@ -163,7 +163,7 @@ ricker.kf.test$yr.match
 
 #ricker.kf.test$MCMC$
 
-head(ricker.kf.test$MCMC.samples)
+head(ricker.kf.test$MCMC$MCMC.samples)
 ricker.kf.test$priors.used
 ricker.kf.test$inits.used
 
@@ -171,8 +171,6 @@ ricker.kf.test$inits.used
 names(ricker.kf.test)
 
 head(ricker.kf.test$MCMC$MCMC.samples)
-
-
 
 
 bm.kf.df <- calcMCMCRickerBM(fit_obj = ricker.kf.test, sr.scale = 10^6,

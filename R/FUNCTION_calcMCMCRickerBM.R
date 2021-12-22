@@ -78,11 +78,24 @@ summary.df <- summary.df %>% rownames_to_column("Variable")
 if(fit_obj$model.type %in% c("Kalman")){
 
 
+num.br.yrs <- dim(fit_obj$yr.match)[1]
+
+print(num.br.yrs)
+
+i <- 1
+bm.in.raw <- mcmc.df %>% 
+		select(contains(paste0("ln.alpha[",i,"]")),beta) %>% 
+		dplyr::rename(ln.alpha=paste0("ln.alpha[",i,"]"))
+
+bm.in.corr <- mcmc.df %>% 
+		select(contains(paste0("ln.alpha.c[",i,"]")),beta) %>% 
+		dplyr::rename(ln.alpha=paste0("ln.alpha.c[",i,"]"))
 
 
 
 
 
+#for(i in 2:num.br.yrs){
 
 
 
