@@ -178,6 +178,7 @@ bm.kf.df <- calcMCMCRickerBM(fit_obj = ricker.kf.test, sr.scale = 10^6,
                               Sgen.method = "Connorsetal2022",
                               drop.resids = TRUE)
 bm.kf.df$Summary
+bm.kf.df$Summary$Variable
 head(bm.kf.df$MCMC)
 
 
