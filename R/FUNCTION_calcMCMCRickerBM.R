@@ -126,8 +126,15 @@ summary.df <- t(apply(mcmc.df, MARGIN =2, quantile,probs = seq(0.1,0.9,by=0.1)))
 				
 names(summary.df) <- paste0("p",seq(0.1,0.9,by=0.1)*100)
 
-summary.df <- summary.df %>% rownames_to_column("Variable")
+summary.df <- summary.df %>% rownames_to_column("Variable") %>%
+					mutate(VarType =  gsub("\\[[^()]*\\]", "", Variable)) %>%
+					#https://stackoverflow.com/questions/28955367/extract-text-in-parentheses-in-r
+					select(VarType,everything())
 
+
+# reorganize
+summary.df  <- bind_rows(summary.df %>% dplyr::filter(VarType != "log.resid"),
+						summary.df %>% dplyr::filter(VarType == "log.resid"))
 
 return(list(Summary = summary.df , MCMC = mcmc.df))
 
