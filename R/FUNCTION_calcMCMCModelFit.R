@@ -61,9 +61,9 @@ if(missing.yrs & model.type %in% c("Kalman","AR1")){
 yr.match <- data.frame(YrIdx = 1 : sum(!is.na(sr.use$Rec)), Yr = sr.use$Year)
 #print(yr.match)
 
-pars.track.in <- c("ln.alpha","ln.alpha.c","beta","sigma","deviance", "log.resid")
+pars.track.in <- c("ln.alpha","ln.alpha.c","beta","sigma","deviance")
 if(tolower(model.type) == "ar1"){  pars.track.in <- c(pars.track.in,"phi")}
-
+pars.track.in <- c(pars.track.in, "log.resid")
 
 
 
@@ -140,6 +140,11 @@ summary.df <- left_join(as.data.frame(summary.df),
 data.frame(VarType = names(det.ricker.fit),Det = det.ricker.fit), by = "VarType") %>%
                     mutate(Diff = p50 - Det) %>% mutate(PercDiff = round(Diff/Det *100,1)) %>%
                       select(VarType,Variable,YrIdx,Yr,everything())
+
+
+# reorganize
+summary.df  <- bind_rows(summary.df %>% dplyr::filter(VarType != "log.resid"),
+						summary.df %>% dplyr::filter(VarType == "log.resid"))
 
 
 
