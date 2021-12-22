@@ -26,6 +26,13 @@ require(tidyverse)
 
 
 mcmc.df <- fit_obj$MCMC$MCMC.samples %>% as.data.frame()
+
+#--------------------------------------------------------
+# Constant Prod Models (1 alpha)
+
+if(fit_obj$model.type %in% c("Basic", "AR1")){
+
+
 bm.in.raw <- mcmc.df %>% select(ln.alpha,beta)
 bm.in.corr <- mcmc.df %>% select(ln.alpha.c,beta) %>% dplyr::rename(ln.alpha=ln.alpha.c)
 
@@ -48,11 +55,69 @@ mcmc.df <- bind_cols(mcmc.df,
 
 
 
+
+
+} # end constant prod models
+
+#--------------------------------------------------------
+# Time-varying Prod Models (1 alpha)
+
+if(fit_obj$model.type %in% c("Kalman")){
+
+
+bm.smax <- calcRickerOtherBM(mcmc.df %>% select(contains("ln.alpha[1]"),beta) %>% 	
+			dplyr::rename(ln.alpha="ln.alpha[1]"), 
+			sr.scale =sr.scale, out.type = "BMOnly") %>% select(Smax)
+
+num.br.yrs <- dim(fit_obj$yr.match)[1]
+
+for(i in 1:num.br.yrs){
+
+
+
+bm.in.raw <- mcmc.df %>% 
+		select(contains(paste0("ln.alpha[",i,"]")),beta,sigma) %>% 
+		dplyr::rename(ln.alpha=paste0("ln.alpha[",i,"]"))
+
+bm.in.corr <- mcmc.df %>% 
+		select(contains(paste0("ln.alpha.c[",i,"]")),beta,sigma) %>% 
+		dplyr::rename(ln.alpha=paste0("ln.alpha.c[",i,"]"))
+
+
+bm.tmp <- bind_cols(calcRickerOtherBM(bm.in.raw , sr.scale =sr.scale, out.type = "BMOnly") %>% select(Seq),
+                     Seq.c = calcRickerOtherBM(bm.in.corr , sr.scale =sr.scale, out.type = "BMOnly") %>% select(Seq) %>% unlist(),
+                     Smsy = calcRickerSmsy(bm.in.raw , method = Smsy.method,sr.scale =sr.scale, out.type = "BMOnly"),
+                     Smsy.c = calcRickerSmsy(bm.in.corr , method = Smsy.method,sr.scale =sr.scale, out.type = "BMOnly")
+                     )
+					 
+
+bm.tmp <- bind_cols(bm.tmp , Smax = bm.smax, 
+                     Sgen = calcRickerSgen(bind_cols(bm.in.raw, bm.tmp %>% select(Smsy)),
+                                           method = Sgen.method,sr.scale = sr.scale, out.type = "BMOnly"),
+                     Sgen.c = calcRickerSgen(bind_cols(bm.in.corr, bm.tmp %>% select(Smsy.c)) %>%
+                                               dplyr::rename(Smsy = Smsy.c),
+                                           method = Sgen.method,sr.scale = sr.scale, out.type = "BMOnly"),
+                       ) %>% mutate(SgenRatio = Smsy/Sgen,SgenRatio.c = Smsy.c/Sgen.c)
+
+
+names(bm.tmp) <- paste0(names(bm.tmp),"[",i,"]")	
+
+
+mcmc.df <- bind_cols(mcmc.df,bm.tmp)
+
+
+} # end looping through KF brood years
+
+
+
+
+} # end if Kalman
+
+
 if(drop.resids){
 resid.idx <- grepl("log.resid",names(mcmc.df))
 mcmc.df <- mcmc.df[,!resid.idx]
 }
-
 
 
 
@@ -62,13 +127,6 @@ summary.df <- t(apply(mcmc.df, MARGIN =2, quantile,probs = seq(0.1,0.9,by=0.1)))
 names(summary.df) <- paste0("p",seq(0.1,0.9,by=0.1)*100)
 
 summary.df <- summary.df %>% rownames_to_column("Variable")
-
-
-
-#fit_obj$Summary
-
-
-
 
 
 return(list(Summary = summary.df , MCMC = mcmc.df))

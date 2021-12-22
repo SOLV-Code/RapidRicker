@@ -8,7 +8,8 @@ calcMCMCRickerBM(
   fit_obj,
   sr.scale = 10^6,
   Smsy.method = "Scheuerell2016",
-  Sgen.method = "Connorsetal2022"
+  Sgen.method = "Connorsetal2022",
+  drop.resids = TRUE
 )
 }
 \arguments{
@@ -17,6 +18,8 @@ calcMCMCRickerBM(
 \item{sr.scale}{one of "HoltOgden2013", "samSim", "Connorsetal2022","BruteForce". Default is "Connorsetal2022"}
 
 \item{Smsy.method}{one of  "Hilborn1985","Petermanetal2000","Scheuerell2016","BruteForce". Default is "Scheuerell2016".}
+
+\item{drop.resids}{if TRUE, exclude the annual residuals from the output}
 }
 \description{
 This function calculates calculates standard biological benchmarks (Smsy, Seq, Smax, Umsy),
