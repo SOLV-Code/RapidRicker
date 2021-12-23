@@ -49,6 +49,27 @@ generatePriors(sr_obj = sr.use ,sr.scale=10^6,model_type = "Kalman", custom.list
 ############################
 # NEW FUNCTION TESTING
 
+# DETERMINISTIC
+
+
+ricker.det.fit <- calcDetModelFit(
+  sr_obj = sr.use, sr.scale = sr.scale.use  ,
+  min.obs = 15,
+  resids = TRUE)
+
+ricker.det.fit
+
+calcDetRickerBM(fit_obj = ricker.det.fit,
+                sr.scale = 10^6,
+                Smsy.method = "Scheuerell2016",
+                Sgen.method = "Connorsetal2022")
+
+
+
+
+
+# BAYESIAN
+
 priors.ricker <- generatePriors(sr_obj = sr.use , sr.scale=10^6, model_type = "Basic")
 priors.ricker
 
@@ -182,7 +203,7 @@ bm.kf.df <- calcMCMCRickerBM(fit_obj = ricker.kf.test, sr.scale = 10^6,
                               Smsy.method = "Scheuerell2016",
                               Sgen.method = "Connorsetal2022",
                               drop.resids = FALSE)
-bm.kf.df$Summary
+head(bm.kf.df$Summary)
 bm.kf.df$Summary$Variable
 head(bm.kf.df$MCMC)
 
