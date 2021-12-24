@@ -92,6 +92,7 @@ ricker.test <- calcMCMCModelFit(
   tracing = FALSE
 )
 
+names(ricker.test)
 ricker.test$Summary
 head(ricker.test$MCMC)
 ricker.test$priors.used

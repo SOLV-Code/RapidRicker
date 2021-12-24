@@ -135,9 +135,10 @@ summary.df$VarType[summary.df$VarType==""] <- summary.df$Variable[summary.df$Var
 det.ricker.fit <- calcDetModelFit(sr.use ,sr.scale = sr.scale, min.obs = min.obs) 
 # generates a vector with par est
 
+#print(det.ricker.fit$pars)
 
 summary.df <- left_join(as.data.frame(summary.df),  
-data.frame(VarType = names(det.ricker.fit),Det = det.ricker.fit), by = "VarType") %>%
+data.frame(VarType = names(det.ricker.fit$pars),Det = t(det.ricker.fit$pars)), by = "VarType") %>%
                     mutate(Diff = p50 - Det) %>% mutate(PercDiff = round(Diff/Det *100,1)) %>%
                       select(VarType,Variable,YrIdx,Yr,everything())
 
@@ -185,10 +186,13 @@ summary.df <- data.frame(VarType = perc.df$Variable,Variable = perc.df$Variable,
                          p75 = NA, p90 = NA, Det = NA, Diff = NA, PercDiff = NA)
 tmp.out <- NA
 
+det.pars <- NULL 
+
+
 }
 
 return(list(model.type = model.type, model.file = model.file,Summary = summary.df, MCMC = tmp.out, sr.scale = sr.scale,
-            priors.used = mcmc.priors, inits.used = mcmc.inits,yr.match = yr.match))
+            priors.used = mcmc.priors, inits.used = mcmc.inits,yr.match = yr.match,det.fit = det.ricker.fit))
 
 }
 
