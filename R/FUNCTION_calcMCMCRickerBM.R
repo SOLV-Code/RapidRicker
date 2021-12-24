@@ -136,6 +136,20 @@ summary.df <- summary.df %>% rownames_to_column("Variable") %>%
 summary.df  <- bind_rows(summary.df %>% dplyr::filter(VarType != "log.resid"),
 						summary.df %>% dplyr::filter(VarType == "log.resid"))
 
+
+# Det BM
+
+det.bm <- calcDetRickerBM(fit_obj$det.fit,sr.scale = 10^6,
+					Smsy.method = "Scheuerell2016",
+					Sgen.method = "Connorsetal2022")
+
+summary.df <- left_join(as.data.frame(summary.df),  
+				data.frame(VarType = names(det.bm),Det = t(det.bm)), by = "VarType") %>%
+                    mutate(Diff = p50 - Det) %>% mutate(PercDiff = round(Diff/Det *100,1)) %>%
+                      select(VarType,Variable,everything()) #YrIdx,Yr,
+
+
+
 return(list(Summary = summary.df , MCMC = mcmc.df))
 
 }
