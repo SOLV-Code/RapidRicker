@@ -195,7 +195,11 @@ ricker.kf.test$priors.used
 ricker.kf.test$inits.used
 
 
+ricker.kf.test$det.fit
+
+
 names(ricker.kf.test)
+ricker.kf.test$yr.match
 
 head(ricker.kf.test$MCMC$MCMC.samples)
 
