@@ -187,7 +187,7 @@ ricker.kf.test$Summary[,1:2]
 names(ricker.kf.test)
 ricker.kf.test$model.type
 ricker.kf.test$yr.match
-
+write.csv(ricker.kf.test$Summary,"test.csv")
 #ricker.kf.test$MCMC$
 
 head(ricker.kf.test$MCMC$MCMC.samples)
@@ -195,7 +195,11 @@ ricker.kf.test$priors.used
 ricker.kf.test$inits.used
 
 
+ricker.kf.test$det.fit
+
+
 names(ricker.kf.test)
+ricker.kf.test$yr.match
 
 head(ricker.kf.test$MCMC$MCMC.samples)
 
@@ -206,7 +210,7 @@ bm.kf.df <- calcMCMCRickerBM(fit_obj = ricker.kf.test, sr.scale = 10^6,
                               drop.resids = FALSE)
 head(bm.kf.df$Summary)
 bm.kf.df$Summary$Variable
-head(bm.kf.df$MCMC)
+names(bm.kf.df$MCMC)
 
-
-
+dim(bm.kf.df$Summary)
+write.csv(bm.kf.df$Summary,"test2.csv")

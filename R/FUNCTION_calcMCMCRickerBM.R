@@ -71,8 +71,8 @@ bm.smax <- calcRickerOtherBM(mcmc.df %>% select(contains("ln.alpha[1]"),beta) %>
 
 num.br.yrs <- dim(fit_obj$yr.match)[1]
 
-for(i in 1:num.br.yrs){
 
+for(i in 1:num.br.yrs){
 
 
 bm.in.raw <- mcmc.df %>% 
@@ -89,7 +89,7 @@ bm.tmp <- bind_cols(calcRickerOtherBM(bm.in.raw , sr.scale =sr.scale, out.type =
                      Smsy = calcRickerSmsy(bm.in.raw , method = Smsy.method,sr.scale =sr.scale, out.type = "BMOnly"),
                      Smsy.c = calcRickerSmsy(bm.in.corr , method = Smsy.method,sr.scale =sr.scale, out.type = "BMOnly")
                      )
-					 
+				 
 
 bm.tmp <- bind_cols(bm.tmp , Smax = bm.smax, 
                      Sgen = calcRickerSgen(bind_cols(bm.in.raw, bm.tmp %>% select(Smsy)),
@@ -123,7 +123,8 @@ mcmc.df <- mcmc.df[,!resid.idx]
 
 summary.df <- t(apply(mcmc.df, MARGIN =2, quantile,probs = seq(0.1,0.9,by=0.1))) %>% 
 					as.data.frame()
-				
+
+			
 names(summary.df) <- paste0("p",seq(0.1,0.9,by=0.1)*100)
 
 summary.df <- summary.df %>% rownames_to_column("Variable") %>%
@@ -137,19 +138,30 @@ summary.df  <- bind_rows(summary.df %>% dplyr::filter(VarType != "log.resid"),
 						summary.df %>% dplyr::filter(VarType == "log.resid"))
 
 
+
+print("-----------------------------------------")
+print(dim(summary.df))
+print(summary.df$Variable)
+print(head(summary.df))	
+
+
 # Det BM
 
 det.bm <- calcDetRickerBM(fit_obj$det.fit,sr.scale = 10^6,
 					Smsy.method = "Scheuerell2016",
 					Sgen.method = "Connorsetal2022")
-					
+
+print("-------------")
+print(det.bm)					
 det.df <- bind_rows(data.frame(VarType = names(det.bm),Det = t(det.bm)),
 					fit_obj$Summary %>% select(VarType,Det) %>% drop_na())
 
-print(det.df)
+print("-------------")
+print(unique(det.df))
+
 
 summary.df <- left_join(as.data.frame(summary.df),  
-				det.df, by = "VarType") %>%
+				unique(det.df), by = "VarType") %>%
                     mutate(Diff = p50 - Det) %>% mutate(PercDiff = round(Diff/Det *100,1)) %>%
                       select(VarType,Variable,everything()) #YrIdx,Yr,
 
