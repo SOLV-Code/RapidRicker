@@ -75,7 +75,23 @@ out.list <- bind_cols(Type = "Fixed Prod",YrIdx = NA,Yr = NA,
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 return(out.list)
 
 
-} # end testBiasCorr
+} # end compareBiasCorr

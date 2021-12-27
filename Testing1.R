@@ -221,4 +221,22 @@ bm.kf.df$Summary$Variable
 names(bm.kf.df$MCMC)
 
 dim(bm.kf.df$Summary)
-write.csv(bm.kf.df$Summary,"test2.csv")
+
+
+med.a.vec <- bm.kf.df$Summary %>%
+              dplyr::filter(VarType == "ln.alpha") %>%
+              select(p50) %>% unlist()
+med.a.c.vec <- bm.kf.df$Summary %>%
+  dplyr::filter(VarType == "ln.alpha.c") %>%
+  select(p50) %>% unlist()
+
+
+which.max(med.a.vec)
+which.min(med.a.vec)
+which.max((med.a.c.vec-med.a.vec)/med.a.vec)
+
+
+
+
+
+#write.csv(bm.kf.df$Summary,"test2.csv")

@@ -159,7 +159,11 @@ summary.df <- left_join(as.data.frame(summary.df),
 
 
 
-return(list(Summary = summary.df , MCMC = mcmc.df,model.type = fit_obj$model.type,methods = list(Smsy = Smsy.method, Sgen = Sgen.method)))
+return(list(Summary = summary.df , MCMC = mcmc.df,
+	model.type = fit_obj$model.type,
+	methods = list(Smsy = Smsy.method, Sgen = Sgen.method)),
+	yr.match <- fit_obj$yr.match
+	)
 
 }
 
