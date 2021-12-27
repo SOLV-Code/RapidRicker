@@ -1,7 +1,7 @@
 #' compareBiasCorr
 #'
 #' This function generates a summary of raw and bias-corrected  values for SR parameters and resulting biological
-#' benchmarks, using 
+#' benchmarks, using different approaches for implementing the bias correction.
 #' @param bm bm_obj output from \code{\link[RapidRicker]{calcMCMCRickerBM}}.
 #' @return a data frame with 1 column for each parameter (ln.a,Seq,Smsy,Sgen) and different versions in rows. Versions include: deterministic estimate with and without bias correction. Mean estimate of MCMC posteriors with (1) no bias correction, (2) bias correction using mean ln.a and mean sigma, and (3) bias correction applied to each MCMC sample and then calculate the mean. Median estimate and perentiles of MCMC posteriors with (1) no bias correction, (2)  bias correction applied to each MCMC sample.
 #' @keywords bias correction, MCMC, posterior
@@ -9,6 +9,10 @@
 
 
 compareBiasCorr <- function(bm_obj){
+
+
+
+if(bm_obj$model.type %in% c("Basic", "AR1")){
 
 
 means.df <- apply(bm_obj$MCMC,MARGIN = 2,mean) %>% as.data.frame()
@@ -63,7 +67,15 @@ out.cs[out.cs$Stat == "Det" & out.cs$BiasCorr == "Sample" ,"BiasCorr"] <- "Mean"
 
 
 
-return(bind_rows(out.none,mean.corr,out.cs) %>% arrange(Stat))
+out.list <- bind_cols(Type = "Fixed Prod",YrIdx = NA,Yr = NA,
+				bind_rows(out.none,mean.corr,out.cs)) %>% arrange(Stat)
+
+
+} # end if Basic or AR1
+
+
+
+return(out.list)
 
 
 } # end testBiasCorr
