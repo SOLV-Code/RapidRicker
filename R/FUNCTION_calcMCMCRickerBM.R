@@ -121,11 +121,11 @@ mcmc.df <- mcmc.df[,!resid.idx]
 
 
 
-summary.df <- t(apply(mcmc.df, MARGIN =2, quantile,probs = seq(0.1,0.9,by=0.1))) %>% 
+summary.df <- t(apply(mcmc.df, MARGIN =2, quantile,probs = c(0.1,0.25,0.5,0.75,0.9))) %>% 
 					as.data.frame()
 
 			
-names(summary.df) <- paste0("p",seq(0.1,0.9,by=0.1)*100)
+names(summary.df) <- paste0("p",c(0.1,0.25,0.5,0.75,0.9)*100)
 
 summary.df <- summary.df %>% rownames_to_column("Variable") %>%
 					mutate(VarType =  gsub("\\[[^()]*\\]", "", Variable)) %>%

@@ -99,16 +99,81 @@ ricker.test$priors.used
 ricker.test$inits.used
 
 
-bm.out <- calcMCMCRickerBM(fit_obj = ricker.test, sr.scale = 10^6,
+bm.out <- calcMCMCRickerBM(fit_obj = ricker.test, sr.scale = sr.scale.use,
                           Smsy.method = "Scheuerell2016",
                           Sgen.method = "Connorsetal2022",
                           drop.resids = FALSE)
 names(bm.out)
-bm.out$Summary
-
-
+bm.out$Summary[1:14,]
 
 head(bm.out$MCMC)
+
+
+means.df <- apply(bm.out$MCMC,MARGIN = 2,mean) %>% as.data.frame()
+names(means.df) <- "Mean"
+
+
+bm_obj <- bm.out$Summary %>% dplyr::rename(Median = p50) %>%
+            left_join(means.df %>% rownames_to_column("Variable"),by="Variable")
+
+
+vars.vec <- c("ln.alpha", "Seq","Smsy","Sgen","SgenRatio")
+
+# no bias correction
+out.none <- bm_obj %>% dplyr::filter(VarType  %in% c("beta","sigma",vars.vec)) %>%
+  select(Variable,Det,Mean,Median, p10,p25,p75,p90) %>%
+  column_to_rownames("Variable") %>%
+  t() %>% as.data.frame() %>%
+  rownames_to_column("Stat") %>%
+  mutate(BiasCorr = "None") %>%
+  select(Stat, BiasCorr,everything())
+
+
+mean.corr <- out.none %>% dplyr::filter(out.none$Stat == "Mean" & out.none$BiasCorr == "None" ) %>%
+                select(Stat, BiasCorr, beta, ln.alpha, sigma)
+mean.corr$BiasCorr <- "Mean"
+mean.corr$ln.alpha <- mean.corr$ln.alpha + mean.corr$sigma^2/2
+mean.corr
+
+mean.corr <- calcRickerOtherBM(X = mean.corr,out.type="Full") %>% select(-Smax)
+mean.corr <- calcRickerSmsy(X = mean.corr , method = "Scheuerell2016",sr.scale = sr.scale.use, out.type = "Full")
+mean.corr <- calcRickerSgen(X = mean.corr , method = "Connorsetal2022",sr.scale = sr.scale.use, out.type = "Full") %>%
+              select(-SmsyCalc,-SgenCalc) %>% dplyr::rename(SgenRatio = Ratio)
+mean.corr
+
+
+
+# bias corr applied to each MCMC sample
+
+out.cs<- bm_obj %>% dplyr::filter(VarType  %in% c("beta","sigma",paste0(vars.vec,".c"))) %>%
+  select(Variable,Det,Mean,Median, p10,p25,p75,p90) %>%
+  column_to_rownames("Variable") %>%
+  t() %>% as.data.frame() %>%
+  rownames_to_column("Stat") %>%
+  mutate(BiasCorr = "Sample") %>%
+  select(Stat, BiasCorr,everything())
+
+names(out.cs) <- gsub(".c","",names(out.cs))
+out.cs[out.cs$Stat == "Det" & out.cs$BiasCorr == "Sample" ,"BiasCorr"] <- "Mean"
+
+
+
+
+
+
+bind_rows(out.none,mean.corr,out.cs) %>% arrange(Stat)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
