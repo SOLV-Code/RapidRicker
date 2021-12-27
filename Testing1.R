@@ -1,6 +1,7 @@
 # TESTING SCRIPT
 
-
+library(devtools)
+load_all()
 library(tidyverse)
 library(RapidRicker)
 
@@ -99,16 +100,23 @@ ricker.test$priors.used
 ricker.test$inits.used
 
 
-bm.out <- calcMCMCRickerBM(fit_obj = ricker.test, sr.scale = 10^6,
+bm.out <- calcMCMCRickerBM(fit_obj = ricker.test, sr.scale = sr.scale.use,
                           Smsy.method = "Scheuerell2016",
                           Sgen.method = "Connorsetal2022",
                           drop.resids = FALSE)
 names(bm.out)
-bm.out$Summary
-
-
+bm.out$Summary[1:14,]
 
 head(bm.out$MCMC)
+
+
+?compareBiasCorr
+compareBiasCorr(bm_obj = bm.out)
+
+
+
+
+
 
 
 

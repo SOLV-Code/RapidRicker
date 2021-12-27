@@ -1,6 +1,6 @@
 #' calcDetRickerBM
 #'
-#' This function calculates calculates standard biological benchmarks (Smsy, Seq, Smax, Umsy),
+#' This function calculates standard biological benchmarks (Smsy, Seq, Smax, Umsy),
 #' for the deterministic model fits applying the subroutines \code{\link[RapidRicker]{calcRickerSmsy}}, \code{\link[RapidRicker]{calcRickerSgen}},
 #' and \code{\link[RapidRicker]{calcRickerOtherBM}} with user-specified settings.
 #' @param fit_obj a list object are not used (RpS, Qual, ExpF etc)
@@ -24,12 +24,22 @@ calcDetRickerBM <- function(fit_obj,sr.scale = 10^6,
 
 
 bm.vec <-  bind_cols(
-				calcRickerOtherBM(fit_obj$pars, sr.scale =sr.scale, out.type = "BMOnly") %>% select(Smax,Seq),
+				calcRickerOtherBM(fit_obj$pars, sr.scale =sr.scale, out.type = "Full"), #%>% select(Smax,Seq),
 				Seq.c = calcRickerOtherBM(fit_obj$pars %>% select (-ln.alpha) %>% dplyr::rename(ln.alpha = ln.alpha.c) , sr.scale =sr.scale, out.type = "BMOnly") %>% select(Seq) %>% unlist(),
                 Smsy = calcRickerSmsy(fit_obj$pars , method = Smsy.method,sr.scale =sr.scale, out.type = "BMOnly"),
                 Smsy.c = calcRickerSmsy(fit_obj$pars %>% select (-ln.alpha) %>% dplyr::rename(ln.alpha = ln.alpha.c) , method = Smsy.method,sr.scale =sr.scale, out.type = "BMOnly")
                      )
                      
+
+bm.vec <- bind_cols(bm.vec,
+                     Sgen = calcRickerSgen(bm.vec %>% select(ln.alpha,beta,sigma,Smsy),
+                                           method = Sgen.method,sr.scale = sr.scale, out.type = "BMOnly"),
+                     Sgen.c = calcRickerSgen(bm.vec %>% select(ln.alpha.c,beta,sigma,Smsy.c) %>%
+                                               dplyr::rename(ln.alpha=ln.alpha.c,Smsy = Smsy.c),
+                                           method = Sgen.method,sr.scale = sr.scale, out.type = "BMOnly"),
+                       ) %>% mutate(SgenRatio = Smsy/Sgen,SgenRatio.c = Smsy.c/Sgen.c)
+
+
 
 
 

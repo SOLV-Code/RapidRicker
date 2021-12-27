@@ -1,8 +1,8 @@
 ---
-title: "BM_Calc_Test"
-output: rmarkdown::html_vignette
+title: "RapidRicker: Bayesian SR Model Fits and Benchmark Calculations"
+output: rmarkdown::pdf_document
 vignette: >
-  %\VignetteIndexEntry{BM_Calc_Test}
+  %\VignetteIndexEntry{RapidRicker_BM_Calcs}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -14,13 +14,12 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-library(RapidRicker)
-```
 
 
+# Introduction
 
 
+## Package Purpose
 
 This function calculates Ricker Model parameters for spawner-recruit data with a simple linear fit of log(R/S) ~ S implemented with an MCMC using the jags() function from the R2jags package. For details such as model form and variable definitions, refer to \href{https://github.com/SOLV-Code/RapidRicker/wiki/MCMC-Using-R2Jags}{this wiki page}. Note that these are designed as quick fits to support initial exploration of Bayesian posteriors,  to support a pre-screeing of assumptions before setting up a proper model fit. Some standard diagnostics can be part of the output, but the function does NOT do any quality control for you. Also, the default priors and inits may not make sense for your data. There are many tutorials available online for linear model fits and associated diagnostics using R2jags (e.g. \href{http://biometry.github.io/APES//LectureNotes/StatsCafe/Linear_models_jags.html}{here},\href{https://rpubs.com/corey_sparks/30893}{here}, and \href{https://rpubs.com/Niko/332320}{here}).
 Also calculates standard biological benchmarks (Smsy, Seq, Smax, Umsy). Benchmark calculations were adapted from BUGS code used in Miller & Pestal (2020), available \href{https://www.dfo-mpo.gc.ca/csas-sccs/Publications/ResDocs-DocRech/2020/2020_035-eng.pdf}{here}.
@@ -28,6 +27,83 @@ Two versions for some BM are produced: "_h" = Hilborn Proxy (\href{https://cdnsc
 @param sr_obj a data frame with Spn,Rec (actual numbers, not thousands or  millions) for the MCMC and logRpS for the deterministic fit (Data for 1 Stock!). Other variables can be there but are not used (RpS, Qual, ExpF etc)
 @param sr.scale an integer value used to rescale the Spn and Rec variables in sr_obj, prior to the MCMC fit, default = 10^6 (i.e. convert to millions). NOTE: If sr.scale is different from 1, then
 the benchmark estimates are scaled back, but the MCMC estimates of alpha and beta will be in different units then the alpha and beta estimates from the deterministic fit.
+
+
+## This Vignette
+
+* Model fits
+* Benchmark calculations
+
+- Bayesian implementation: MCMC using rJAGS
+
+Note: data check fns and det tests are applied to data set with multiple stocks. The Bayesian fits are done stock-by-stock in  a loop.
+
+
+
+# Install & Load *RapidRicker* Package
+
+
+To install this package directly from github, use
+
+
+```
+
+install.packages("devtools") # Install the devtools package
+library(devtools) # Load the devtools package.
+install_github("SOLV-Code/RapidRicker", dependencies = TRUE,
+                build_vignettes = FALSE)
+
+```
+
+**3 Warnings** will show, letting you know that the packages *R2jags*, *coda*, *rstan*, and *rstanarm* have functions with the same name: *traceplot()* and *loo()*. After installing *RapidRicker*, you need to make sure you call these functions explicitly (e.g. ```coda::traceplot()``` rather than just ```traceplot()```).
+
+
+Then load the package with
+
+```{r setup, echo=TRUE, results = FALSE, message = FALSE, warning = FALSE}
+library(RapidRicker)
+```
+
+\clearpage
+
+# SR Model Fits and Benchmark Calculations
+
+
+## Key Functions
+
+
+
+## Model Types
+
+
+
+
+
+
+## Worked Example: Basic Ricker
+
+
+
+
+
+
+
+
+
+## Worked Example: Ricker AR1
+
+
+
+
+
+
+
+## Worked Example: Kalman-Filter Ricker with Time-varying Productivity
+
+
+
+
+
 
 
 

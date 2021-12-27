@@ -121,11 +121,11 @@ mcmc.df <- mcmc.df[,!resid.idx]
 
 
 
-summary.df <- t(apply(mcmc.df, MARGIN =2, quantile,probs = seq(0.1,0.9,by=0.1))) %>% 
+summary.df <- t(apply(mcmc.df, MARGIN =2, quantile,probs = c(0.1,0.25,0.5,0.75,0.9))) %>% 
 					as.data.frame()
 
 			
-names(summary.df) <- paste0("p",seq(0.1,0.9,by=0.1)*100)
+names(summary.df) <- paste0("p",c(0.1,0.25,0.5,0.75,0.9)*100)
 
 summary.df <- summary.df %>% rownames_to_column("Variable") %>%
 					mutate(VarType =  gsub("\\[[^()]*\\]", "", Variable)) %>%
@@ -139,25 +139,17 @@ summary.df  <- bind_rows(summary.df %>% dplyr::filter(VarType != "log.resid"),
 
 
 
-print("-----------------------------------------")
-print(dim(summary.df))
-print(summary.df$Variable)
-print(head(summary.df))	
-
-
 # Det BM
 
 det.bm <- calcDetRickerBM(fit_obj$det.fit,sr.scale = 10^6,
 					Smsy.method = "Scheuerell2016",
 					Sgen.method = "Connorsetal2022")
 
-print("-------------")
-print(det.bm)					
+				
 det.df <- bind_rows(data.frame(VarType = names(det.bm),Det = t(det.bm)),
 					fit_obj$Summary %>% select(VarType,Det) %>% drop_na())
 
-print("-------------")
-print(unique(det.df))
+
 
 
 summary.df <- left_join(as.data.frame(summary.df),  
@@ -167,7 +159,7 @@ summary.df <- left_join(as.data.frame(summary.df),
 
 
 
-return(list(Summary = summary.df , MCMC = mcmc.df))
+return(list(Summary = summary.df , MCMC = mcmc.df,methods = list(Smsy = Smsy.method, Sgen = Sgen.method)))
 
 }
 
