@@ -139,25 +139,17 @@ summary.df  <- bind_rows(summary.df %>% dplyr::filter(VarType != "log.resid"),
 
 
 
-print("-----------------------------------------")
-print(dim(summary.df))
-print(summary.df$Variable)
-print(head(summary.df))	
-
-
 # Det BM
 
 det.bm <- calcDetRickerBM(fit_obj$det.fit,sr.scale = 10^6,
 					Smsy.method = "Scheuerell2016",
 					Sgen.method = "Connorsetal2022")
 
-print("-------------")
-print(det.bm)					
+				
 det.df <- bind_rows(data.frame(VarType = names(det.bm),Det = t(det.bm)),
 					fit_obj$Summary %>% select(VarType,Det) %>% drop_na())
 
-print("-------------")
-print(unique(det.df))
+
 
 
 summary.df <- left_join(as.data.frame(summary.df),  
@@ -167,7 +159,7 @@ summary.df <- left_join(as.data.frame(summary.df),
 
 
 
-return(list(Summary = summary.df , MCMC = mcmc.df))
+return(list(Summary = summary.df , MCMC = mcmc.df,methods = list(Smsy = Smsy.method, Sgen = Sgen.method)))
 
 }
 

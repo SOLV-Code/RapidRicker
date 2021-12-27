@@ -4,9 +4,20 @@
 \alias{calcDetRickerBM}
 \title{calcDetRickerBM}
 \usage{
-calcDetRickerBM(sr_obj, sr.scale = 10^6, min.obs = 15, resids = FALSE)
+calcDetRickerBM(
+  fit_obj,
+  sr.scale = 10^6,
+  Smsy.method = "Scheuerell2016",
+  Sgen.method = "Connorsetal2022"
+)
 }
 \arguments{
+\item{fit_obj}{a list object are not used (RpS, Qual, ExpF etc)}
+
+\item{sr.scale}{one of "HoltOgden2013", "samSim", "Connorsetal2022","BruteForce". Default is "Connorsetal2022"}
+
+\item{Smsy.method}{one of  "Hilborn1985","Petermanetal2000","Scheuerell2016","BruteForce". Default is "Scheuerell2016".}
+
 \item{sr_obj}{a data frame with Year and Spn, logRpS , and Rec (Data for 1 Stock!). Other variables can be there but are not used (RpS, Qual, ExpF etc)}
 
 \item{min.obs}{min number of S-R pairs needed to fit a model}
@@ -14,9 +25,9 @@ calcDetRickerBM(sr_obj, sr.scale = 10^6, min.obs = 15, resids = FALSE)
 \item{resids}{if TRUE, add the residuals to the output}
 }
 \description{
-This function calculates Ricker Model parameters for spawner-recruit data using a simple linear regression of log(R/S) ~ S.  Note that these are simple deterministic model fits intended for rapid testing of input data!
-Also calculates standard biological benchmarks (Smsy, Seq, Smax, Umsy). Benchmark calculations were adapted from BUGS code used in Miller & Pestal (2020), available \href{https://www.dfo-mpo.gc.ca/csas-sccs/Publications/ResDocs-DocRech/2020/2020_035-eng.pdf}{here}.
-Two versions for some BM are produced: "_h" = Hilborn Proxy (\href{https://cdnsciencepub.com/doi/pdf/10.1139/f85-230}{Hilborn 1985}) and "_p" = Peterman Proxy" (\href{https://cdnsciencepub.com/doi/pdf/10.1139/f99-204}{Peterman et al. 2000}).
+This function calculates standard biological benchmarks (Smsy, Seq, Smax, Umsy),
+for the deterministic model fits applying the subroutines \code{\link[RapidRicker]{calcRickerSmsy}}, \code{\link[RapidRicker]{calcRickerSgen}},
+and \code{\link[RapidRicker]{calcRickerOtherBM}} with user-specified settings.
 }
 \examples{
 ricker.bm <- calcDetRickerBM(SR_Sample[SR_Sample$Stock == "Stock1",],min.obs = 10)

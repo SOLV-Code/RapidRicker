@@ -1,6 +1,6 @@
 #' calcDetRickerBM
 #'
-#' This function calculates calculates standard biological benchmarks (Smsy, Seq, Smax, Umsy),
+#' This function calculates standard biological benchmarks (Smsy, Seq, Smax, Umsy),
 #' for the deterministic model fits applying the subroutines \code{\link[RapidRicker]{calcRickerSmsy}}, \code{\link[RapidRicker]{calcRickerSgen}},
 #' and \code{\link[RapidRicker]{calcRickerOtherBM}} with user-specified settings.
 #' @param fit_obj a list object are not used (RpS, Qual, ExpF etc)
