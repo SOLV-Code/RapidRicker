@@ -112,12 +112,7 @@ bm.obj.summary <- bm_obj$Summary %>% dplyr::rename(Median = p50) %>%
 
 for(i in 1: length(idx.vec)){
 
-print(idx.vec[i])
-
 vars.vec.use <- paste0(vars.vec, "[",idx.vec[i],"]")
-
-#print(vars.vec.use)
-
 
 
 # no bias correction
@@ -131,7 +126,17 @@ out.none <- bm.obj.summary %>% dplyr::filter(Variable  %in% c("beta","sigma",var
 
 names(out.none) <- gsub(paste0("\\[",idx.vec[i],"\\]"),"",names(out.none))
 
+# bias corr using mean ln.alpha and mean sigma
 
+mean.corr <- out.none %>% dplyr::filter(out.none$Stat == "Mean" & out.none$BiasCorr == "None" ) %>%
+                select(Stat, BiasCorr, beta, ln.alpha, sigma)
+mean.corr$BiasCorr <- "Mean"
+mean.corr$ln.alpha <- mean.corr$ln.alpha + mean.corr$sigma^2/2
+
+mean.corr <- calcRickerOtherBM(X = mean.corr,out.type="Full") %>% select(-Smax)
+mean.corr <- calcRickerSmsy(X = mean.corr , method = bm_obj$methods$Smsy ,sr.scale = sr.scale.use, out.type = "Full")
+mean.corr <- calcRickerSgen(X = mean.corr , method = bm_obj$methods$Sgen,sr.scale = sr.scale.use, out.type = "Full") %>%
+              select(-SmsyCalc,-SgenCalc) %>% dplyr::rename(SgenRatio = Ratio)
 
 
 # bias corr applied to each MCMC sample
@@ -153,7 +158,7 @@ out.cs[out.cs$Stat == "Det" & out.cs$BiasCorr == "Sample" ,"BiasCorr"] <- "Mean"
 if(i ==1){
 
 out.df <- bind_cols(Model = bm_obj$model.type, Type = "VarProd", 
-				YrType = names(idx.vec)[i], YrIdx = idx.vec[i],Yr = NA,
+				YrType = names(idx.vec)[i], YrIdx = idx.vec[i],Yr = bm_obj$yr.match$Yr[idx.vec[i]],
 				bind_rows(out.none,#mean.corr,
 				out.cs)) %>% arrange(Stat)
 				}
@@ -161,8 +166,8 @@ out.df <- bind_cols(Model = bm_obj$model.type, Type = "VarProd",
 if(i > 1){				
 				
 out.df <- bind_rows(out.df,bind_cols(Model = bm_obj$model.type, Type = "VarProd", 
-				YrType = names(idx.vec)[i], YrIdx = idx.vec[i],Yr = NA,
-				bind_rows(out.none,#mean.corr,
+				YrType = names(idx.vec)[i], YrIdx = idx.vec[i],Yr = bm_obj$yr.match$Yr[idx.vec[i]],
+				bind_rows(out.none,mean.corr,
 				out.cs)) %>% arrange(Stat) )
 }
 

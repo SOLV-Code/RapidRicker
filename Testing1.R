@@ -215,12 +215,14 @@ bm.kf.df <- calcMCMCRickerBM(fit_obj = ricker.kf.test, sr.scale = 10^6,
                               Smsy.method = "Scheuerell2016",
                               Sgen.method = "Connorsetal2022",
                               drop.resids = FALSE)
+
+names(bm.kf.df)
 head(bm.kf.df$Summary)
 bm.kf.df$Summary$Variable
 names(bm.kf.df$MCMC)
 
 dim(bm.kf.df$Summary)
-
+bm.kf.df$yr.match
 
 
 compareBiasCorr(bm_obj = bm.kf.df)
