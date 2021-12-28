@@ -111,9 +111,8 @@ head(bm.out$MCMC)
 
 
 ?compareBiasCorr
-compareBiasCorr(bm_obj = bm.out)
-
-
+basic.bias.corr <- compareBiasCorr(bm_obj = bm.out)
+basic.bias.corr
 
 
 
@@ -161,7 +160,7 @@ head(bm.ar1.df$MCMC)
 
 
 
-
+compareBiasCorr(bm_obj = bm.ar1.df )
 
 
 # -------------------------------------------------------------
@@ -216,9 +215,19 @@ bm.kf.df <- calcMCMCRickerBM(fit_obj = ricker.kf.test, sr.scale = 10^6,
                               Smsy.method = "Scheuerell2016",
                               Sgen.method = "Connorsetal2022",
                               drop.resids = FALSE)
+
+names(bm.kf.df)
 head(bm.kf.df$Summary)
 bm.kf.df$Summary$Variable
 names(bm.kf.df$MCMC)
 
 dim(bm.kf.df$Summary)
-write.csv(bm.kf.df$Summary,"test2.csv")
+bm.kf.df$yr.match
+
+
+compareBiasCorr(bm_obj = bm.kf.df)
+
+
+
+
+#write.csv(bm.kf.df$Summary,"test2.csv")
