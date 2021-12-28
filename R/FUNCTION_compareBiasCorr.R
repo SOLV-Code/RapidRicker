@@ -67,7 +67,7 @@ out.cs[out.cs$Stat == "Det" & out.cs$BiasCorr == "Sample" ,"BiasCorr"] <- "Mean"
 
 
 
-out.df <- bind_cols(Type = "Fixed Prod", YrType = NA, YrIdx = NA,Yr = NA,
+out.df <- bind_cols(Model = bm_obj$model.type, Type = "FixedProd", YrType = NA, YrIdx = NA,Yr = NA,
 				bind_rows(out.none,mean.corr,out.cs)) %>% arrange(Stat)
 
 
@@ -97,7 +97,7 @@ med.a.c.vec <- bm_obj$Summary %>%
 
 idx.vec <- c(which.max(med.a.vec),which.min(med.a.vec),which.max((med.a.c.vec-med.a.vec)/med.a.vec)
 				)
-names(idx.vec) <- c("max alpha","min alpha","max corr")
+names(idx.vec) <- c("MaxAlpha","MinAlpha","MaxCorr")
 
 
 means.df <- apply(bm_obj$MCMC,MARGIN = 2,mean) %>% as.data.frame()
@@ -132,11 +132,41 @@ out.none <- bm.obj.summary %>% dplyr::filter(Variable  %in% c("beta","sigma",var
 names(out.none) <- gsub(paste0("\\[",idx.vec[i],"\\]"),"",names(out.none))
 
 
-print(out.none)
+
+
+# bias corr applied to each MCMC sample
+
+out.cs<- bm.obj.summary %>% dplyr::filter(Variable  %in% c("beta","sigma",paste0(vars.vec,".c","[",idx.vec[i],"]"))) %>%
+  select(Variable,Det,Mean,Median, p10,p25,p75,p90) %>%
+  column_to_rownames("Variable") %>%
+  t() %>% as.data.frame() %>%
+  rownames_to_column("Stat") %>%
+  mutate(BiasCorr = "Sample") %>%
+  select(Stat, BiasCorr,everything())
+
+names(out.cs) <- gsub(".c","",names(out.cs))
+names(out.cs) <- gsub(paste0("\\[",idx.vec[i],"\\]"),"",names(out.cs))
+out.cs[out.cs$Stat == "Det" & out.cs$BiasCorr == "Sample" ,"BiasCorr"] <- "Mean"
 
 
 
+if(i ==1){
 
+out.df <- bind_cols(Model = bm_obj$model.type, Type = "VarProd", 
+				YrType = names(idx.vec)[i], YrIdx = idx.vec[i],Yr = NA,
+				bind_rows(out.none,#mean.corr,
+				out.cs)) %>% arrange(Stat)
+				}
+				
+if(i > 1){				
+				
+out.df <- bind_rows(out.df,bind_cols(Model = bm_obj$model.type, Type = "VarProd", 
+				YrType = names(idx.vec)[i], YrIdx = idx.vec[i],Yr = NA,
+				bind_rows(out.none,#mean.corr,
+				out.cs)) %>% arrange(Stat) )
+}
+
+#print(out.df)
 
 
 
