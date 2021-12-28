@@ -111,9 +111,8 @@ head(bm.out$MCMC)
 
 
 ?compareBiasCorr
-compareBiasCorr(bm_obj = bm.out)
-
-
+basic.bias.corr <- compareBiasCorr(bm_obj = bm.out)
+basic.bias.corr
 
 
 
@@ -223,18 +222,8 @@ names(bm.kf.df$MCMC)
 dim(bm.kf.df$Summary)
 
 
-med.a.vec <- bm.kf.df$Summary %>%
-              dplyr::filter(VarType == "ln.alpha") %>%
-              select(p50) %>% unlist()
-med.a.c.vec <- bm.kf.df$Summary %>%
-  dplyr::filter(VarType == "ln.alpha.c") %>%
-  select(p50) %>% unlist()
 
-
-which.max(med.a.vec)
-which.min(med.a.vec)
-which.max((med.a.c.vec-med.a.vec)/med.a.vec)
-
+compareBiasCorr(bm_obj = bm.kf.df)
 
 
 
