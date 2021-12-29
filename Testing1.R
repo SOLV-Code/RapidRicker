@@ -111,7 +111,7 @@ head(bm.out$MCMC)
 
 
 ?compareBiasCorr
-basic.bias.corr <- compareBiasCorr(bm_obj = bm.out)
+basic.bias.corr <- compareBiasCorr(bm_obj = bm.out,sr.scale = sr.scale.use)
 basic.bias.corr
 
 
@@ -160,7 +160,7 @@ head(bm.ar1.df$MCMC)
 
 
 
-compareBiasCorr(bm_obj = bm.ar1.df )
+compareBiasCorr(bm_obj = bm.ar1.df,sr.scale = sr.scale.use)
 
 
 # -------------------------------------------------------------
@@ -225,7 +225,7 @@ dim(bm.kf.df$Summary)
 bm.kf.df$yr.match
 
 
-compareBiasCorr(bm_obj = bm.kf.df)
+compareBiasCorr(bm_obj = bm.kf.df,sr.scale = sr.scale.use)
 
 
 
