@@ -8,7 +8,7 @@
 #' @export
 
 
-compareBiasCorr <- function(bm_obj){
+compareBiasCorr <- function(bm_obj,sr.scale){
 
 vars.vec <- c("ln.alpha", "Seq","Smsy","Sgen","SgenRatio")
 
@@ -45,8 +45,8 @@ mean.corr$ln.alpha <- mean.corr$ln.alpha + mean.corr$sigma^2/2
 mean.corr
 
 mean.corr <- calcRickerOtherBM(X = mean.corr,out.type="Full") %>% select(-Smax)
-mean.corr <- calcRickerSmsy(X = mean.corr , method = bm_obj$methods$Smsy ,sr.scale = sr.scale.use, out.type = "Full")
-mean.corr <- calcRickerSgen(X = mean.corr , method = bm_obj$methods$Sgen,sr.scale = sr.scale.use, out.type = "Full") %>%
+mean.corr <- calcRickerSmsy(X = mean.corr , method = bm_obj$methods$Smsy ,sr.scale = sr.scale, out.type = "Full")
+mean.corr <- calcRickerSgen(X = mean.corr , method = bm_obj$methods$Sgen,sr.scale = sr.scale, out.type = "Full") %>%
               select(-SmsyCalc,-SgenCalc) %>% dplyr::rename(SgenRatio = Ratio)
 #mean.corr
 
@@ -134,8 +134,8 @@ mean.corr$BiasCorr <- "Mean"
 mean.corr$ln.alpha <- mean.corr$ln.alpha + mean.corr$sigma^2/2
 
 mean.corr <- calcRickerOtherBM(X = mean.corr,out.type="Full") %>% select(-Smax)
-mean.corr <- calcRickerSmsy(X = mean.corr , method = bm_obj$methods$Smsy ,sr.scale = sr.scale.use, out.type = "Full")
-mean.corr <- calcRickerSgen(X = mean.corr , method = bm_obj$methods$Sgen,sr.scale = sr.scale.use, out.type = "Full") %>%
+mean.corr <- calcRickerSmsy(X = mean.corr , method = bm_obj$methods$Smsy ,sr.scale = sr.scale, out.type = "Full")
+mean.corr <- calcRickerSgen(X = mean.corr , method = bm_obj$methods$Sgen,sr.scale = sr.scale, out.type = "Full") %>%
               select(-SmsyCalc,-SgenCalc) %>% dplyr::rename(SgenRatio = Ratio)
 
 
