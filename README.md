@@ -7,8 +7,8 @@ Development Team: Gottfried Pestal, Charmaine Carr-Harris, Steven Cox-Rogers
 **Important Notes:** 
 
 
-* **WARNING**: This package is currently being fundamentally revised. For the next little while, analyses may not run,
-or worse, they may run with nonsense output! Stay tuned for the next working version!** 
+* **WARNING: This package is currently being fundamentally revised. For the next little while, analyses may not run,
+or worse, they may run with nonsense output! Stay tuned for the next working version! Check progress on the [To Do List](https://github.com/SOLV-Code/RapidRicker/issues/118)** 
 
 * This package is under development. Functions may change rapidly and substantially. Do not use these if you are not part of the development team!
 * WARNING: The age comp diagnostics in the data check were not behaving properly. See [this issue](https://github.com/SOLV-Code/RapidRicker/issues/61) for details, and [this wiki page] for context. Therefore, the
