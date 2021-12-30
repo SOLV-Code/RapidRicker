@@ -37,7 +37,7 @@
 #' @keywords Sgen
 #' @export
 
-calcRickerSgen <- function(X, method = "Connorsetal2022",sr.scale = 1, out.type = "Full"){
+calcRickerSgen <- function(X, method = "Connorsetal2022",sr.scale = 1, out.type = "Full",tracing = FALSE){
 
 
 if(!(method %in% c("HoltOgden2013", "samSim", "Connorsetal2022","BruteForce") )){

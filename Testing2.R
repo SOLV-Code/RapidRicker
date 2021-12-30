@@ -50,6 +50,43 @@ inits.ricker
 
 
 
+
+
+
+#############################
+# NEW FUNCTIONS: BM CALCS
+
+
+pars.test.1 <- data.frame(ln.alpha = 1.3, beta = 5e-4)
+
+
+test1.df <- bind_rows(
+  calcRickerSmsy(pars.test.1, method ="BruteForce",sr.scale =1, out.type = "Full"),
+  calcRickerSmsy(pars.test.1, method ="Scheuerell2016",sr.scale =1, out.type = "Full"),
+  calcRickerSmsy(pars.test.1, method ="Hilborn1985",sr.scale =1, out.type = "Full"),
+  calcRickerSmsy(pars.test.1, method ="Petermanetal2000",sr.scale =1, out.type = "Full")
+)
+
+test1.df
+
+test1.df <- calcRickerOtherBM(test1.df,sr.scale = 1, out.type = "Full")
+test1.df
+
+
+test1.out <- bind_rows(
+  calcRickerSgen(X = test1.df, method = "BruteForce" ,sr.scale = 1, out.type = "Full"),
+  calcRickerSgen(X = test1.df, method = "HoltOgden2013" ,sr.scale = 1, out.type = "Full"),
+  calcRickerSgen(X = test1.df, method = "samSim" ,sr.scale = 1, out.type = "Full"),
+  calcRickerSgen(X = test1.df, method = "Connorsetal2022" ,sr.scale = 1, out.type = "Full")
+)
+
+
+test1.out
+
+
+
+
+
 ############################
 # NEW FUNCTION: MODEL FITS ONLY
 
