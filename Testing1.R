@@ -213,7 +213,7 @@ head(ricker.kf.test$MCMC$MCMC.samples)
 
 bm.kf.df <- calcMCMCRickerBM(fit_obj = ricker.kf.test, sr.scale = 10^6,
                               Smsy.method = "Scheuerell2016",
-                              Sgen.method = "Connorsetal2022",
+                              Sgen.method = "BruteForce",
                               drop.resids = FALSE)
 
 names(bm.kf.df)

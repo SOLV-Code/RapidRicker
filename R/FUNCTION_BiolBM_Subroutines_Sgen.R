@@ -30,7 +30,7 @@
 #' Whether the output is bias-corrected estimates or not depends on the par set provided by the user. This keeps the parameter
 #' estimation and benchark calculation steps clearly separated, given on-going debates around the bias correction.
 #'
-#' @param X  a data frame with columns ln.a, b, sigma, and optionally Smsy
+#' @param X  a data frame with columns ln.alpha, beta, sigma, and optionally Smsy
 #' @param method  one of "HoltOgden2013", "samSim", "Connorsetal2022","BruteForce"
 #' @param sr.scale scalar applied to SR data in the model fitting step, need it here to scale up the Sgen values
 #' @param out.type either "BMOnly" or "Full"
@@ -45,17 +45,28 @@ if(!(method %in% c("HoltOgden2013", "samSim", "Connorsetal2022","BruteForce") ))
   stop()}
 
 
+# check for negative ln.a or b pars
+X$ln.alpha[X$ln.alpha < 0] <- NA
+X$beta[X$beta < 0] <- NA
+
+do.idx <- !is.na(X$ln.alpha) & !is.na(X$beta) 
+sgen.est <- rep(NA, dim(X)[1] )
+
+
+
+if(sum(do.idx)>0){
+
 
 #---------------------------------------------
 
 if(method == "HoltOgden2013") {
 
-  if(!is.null(X$Smsy) & sum(is.na(X$Smsy)) == 0){warning("Smsy provided as input, but not used for this method! ")}
+  if(!is.null(X$Smsy[do.idx]) & sum(is.na(X$Smsy[do.idx])) == 0){warning("Smsy provided as input, but not used for this method! ")}
 
 
-  if(is.null(X$sigma)){sigma <- rep(1,dim(X)[1])}
+  if(is.null(X$sigma[do.idx])){sigma <- rep(1,dim(X[do.idx])[1])}
 
-   sgen.est <- unlist(mapply(Sgen.solver.HO, a = exp(X$ln.a), b = X$b, sig = sigma))  * sr.scale
+   sgen.est[do.idx] <- unlist(mapply(Sgen.solver.HO, a = exp(X$ln.alpha[do.idx]), b = X$beta[do.idx], sig = sigma))  * sr.scale
 
 
 } # end if HoltOgden2013
@@ -65,14 +76,16 @@ if(method == "HoltOgden2013") {
 
 if(method == "samSim") {
 
-if(is.null(X$Smsy) | sum(is.na(X$Smsy)) > 0){warning("Need to provide Smsy column in input data frame for this method! "); stop()}
+if(is.null(X$Smsy[do.idx]) | sum(is.na(X$Smsy[do.idx])) > 0){warning("Need to provide Smsy column in input data frame for this method! "); stop()}
 
 
 
-   if(is.null(X$sigma)){sigma <- rep(1,dim(X)[1])}
+   if(is.null(X$sigma[do.idx])){sigma <- rep(1,dim(X[do.idx])[1])}
 
 
-  samsim.out <-  mapply(sGenSolver.samSim.wrapper, ln.a = X$ln.a, b = X$b, sigma = sigma,SMSY = X$Smsy)
+  samsim.out <-  mapply(sGenSolver.samSim.wrapper, ln.a = X$ln.alpha[do.idx], 
+														b = X$beta[do.idx], 
+														sigma = sigma,SMSY = X$Smsy[do.idx])
    sgen.est <- samsim.out  * sr.scale
 
 
@@ -82,12 +95,12 @@ if(is.null(X$Smsy) | sum(is.na(X$Smsy)) > 0){warning("Need to provide Smsy colum
 
 if(method == "Connorsetal2022") {
 
-  if(is.null(X$Smsy) | sum(is.na(X$Smsy)) > 0){warning("Need to provide Smsy column in input data frame for this method! "); stop()}
+  if(is.null(X$Smsy[do.idx]) | sum(is.na(X$Smsy[do.idx])) > 0){warning("Need to provide Smsy column in input data frame for this method! "); stop()}
 
   # https://stackoverflow.com/questions/38961221/uniroot-solution-in-r
 
 
-  bc.out<-   mapply(get_Sgen.bc, a = exp(X$ln.a),b = X$b,int_lower = -1, int_upper =  1/X$b*2,
+  bc.out<-   mapply(get_Sgen.bc, a = exp(X$ln.alpha[do.idx]),b = X$beta[do.idx],int_lower = -1, int_upper =  1/X$b[do.idx]*2,
 				SMSY = X$Smsy/sr.scale)
 
     sgen.est <- bc.out * sr.scale
@@ -97,13 +110,16 @@ if(method == "Connorsetal2022") {
 
 if(method == "BruteForce") {
 
-  if(is.null(X$Smsy) | sum(is.na(X$Smsy)) > 0){warning("Need to provide Smsy column in input data frame for this method! "); stop()}
+  if(is.null(X$Smsy[do.idx]) | sum(is.na(X$Smsy[do.idx])) > 0){warning("Need to provide Smsy column in input data frame for this method! "); stop()}
 
-  sgen.est <-   mapply(sgen.proxy, ln.a = X$ln.a ,b = X$b, Smsy = X$Smsy, sr.scale = sr.scale )
+  sgen.est[do.idx] <-   mapply(sgen.proxy, ln.a = X$ln.alpha[do.idx] ,
+									b = X$beta[do.idx], 
+									Smsy = X$Smsy[do.idx], 
+									sr.scale = sr.scale )
 
   }
 
-
+} # end if any do.idx
 
 
 
@@ -198,15 +214,17 @@ ricker.rec  <- function(S,ricker.lna,ricker.b) {exp( (ricker.lna - ricker.b * S)
 
 sgen.proxy <- function(ln.a,b,Smsy, sr.scale){
 
+
+if(!is.na(ln.a) & !is.na(b)){
+
 spn.check <- seq((1/sr.scale),1.5*Smsy/sr.scale,length.out = 3000)
 rec.check <-  ricker.rec(S = spn.check,ricker.lna = ln.a, ricker.b = b)
-
-#print(spn.check[100:150])
-#print(rec.check[100:150])
-
 s.gen <- min(spn.check[rec.check > Smsy/sr.scale],na.rm=TRUE) *sr.scale
-
 return(s.gen)
+
+}
+
+
 
 
 }

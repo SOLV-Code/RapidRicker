@@ -48,32 +48,39 @@ if(!(method %in% c("Hilborn1985","Petermanetal2000","Scheuerell2016","BruteForce
 X$ln.alpha[X$ln.alpha < 0] <- NA
 X$beta[X$beta < 0] <- NA
 
+do.idx <- !is.na(X$ln.alpha) & !is.na(X$beta)
 
-
-
+smsy.est <- rep(NA, dim(X)[1] )
   
 
+if(sum(do.idx)>0){
+
 if(method == "Hilborn1985") {
-  smsy.est <-  X$ln.alpha/X$beta * (0.5-0.07*X$ln.alpha) * sr.scale
+  smsy.est[do.idx] <-  X$ln.alpha[do.idx]/X$beta[do.idx] * (0.5-0.07*X$ln.alpha[do.idx]) * sr.scale
   }
 
 if(method == "Petermanetal2000") {   
-  peterman.approx <- (0.5 - 0.65 * X$ln.alpha^1.27 / (8.7 + X$ln.alpha^1.27))
-  smsy.est <- X$ln.alpha * peterman.approx / X$beta  * sr.scale
+  peterman.approx <- (0.5 - 0.65 * X$ln.alpha[do.idx]^1.27 / (8.7 + X$ln.alpha[do.idx]^1.27))
+  smsy.est[do.idx] <- X$ln.alpha[do.idx] * peterman.approx[do.idx] / X$beta[do.idx]  * sr.scale
 } 
 
 if(method == "Scheuerell2016") { 
 # adapted from samSim package (https://github.com/Pacific-salmon-assess/samSim)
   
-  smsy.est <- (1 - gsl::lambert_W0(exp(1 - X$ln.alpha))) / X$beta * sr.scale
+
+  smsy.est[do.idx] <- (1 - gsl::lambert_W0(exp(1 - X$ln.alpha[do.idx]))) / X$beta[do.idx] * sr.scale
   
   
 } 
   
 if(method == "BruteForce") { 
-    smsy.est <-   mapply(smsy.proxy, ln.a = X$ln.alpha ,b = X$beta, sr.scale = sr.scale )
+print(X$ln.alpha[do.idx])
+print( X$beta[do.idx])
+    smsy.est[do.idx] <-   mapply(smsy.proxy, ln.a = X$ln.alpha[do.idx] ,b = X$beta[do.idx], 
+		sr.scale = sr.scale )
 }   
-  
+ 
+} # end if any do.idx 
 
 if(out.type == "Full"){return(bind_cols(X,SmsyCalc = method, Smsy = smsy.est)) }
 if(out.type == "BMOnly"){return(smsy.est)  }
