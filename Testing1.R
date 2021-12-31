@@ -213,17 +213,8 @@ head(ricker.kf.test$MCMC$MCMC.samples)
 
 bm.kf.df <- calcMCMCRickerBM(fit_obj = ricker.kf.test, sr.scale = 10^6,
                               Smsy.method = "Scheuerell2016",
-                              Sgen.method = "HoltOgden2013",
+                              Sgen.method = "samSim",
                               drop.resids = FALSE)
-
-tmp.do.idx
-
-tmp %>% dplyr::filter(is.na(Smsy))
-which(tmp.in[,"ln.alpha[34]"]<0)
-tmp[362,]
-tmp.in %>% select("ln.alpha[34]",beta)
-
-tmp.X[362,]
 
 
 names(bm.kf.df)

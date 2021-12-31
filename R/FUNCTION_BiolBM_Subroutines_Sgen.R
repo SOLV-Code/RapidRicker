@@ -54,8 +54,7 @@ X$beta[X$beta < 0] <- NA
 do.idx <- !is.na(X$ln.alpha) & !is.na(X$beta) 
 sgen.est <- rep(NA, dim(X)[1] )
 
-tmp.X <<- X
-tmp.do.idx <<- do.idx
+
 
 if(sum(do.idx)>0){
 
@@ -67,9 +66,10 @@ if(method == "HoltOgden2013") {
   if(!is.null(X$Smsy[do.idx]) & sum(is.na(X$Smsy[do.idx])) == 0){warning("Smsy provided as input, but not used for this method! ")}
 
 
-  if(is.null(X$sigma[do.idx])){sigma <- rep(1,dim(X[do.idx])[1])}
+  if(is.null(X$sigma)){X$sigma <- 1}
 
-   sgen.est[do.idx] <- unlist(mapply(Sgen.solver.HO, a = exp(X$ln.alpha[do.idx]), b = X$beta[do.idx], sig = sigma))  * sr.scale
+
+   sgen.est[do.idx] <- unlist(mapply(Sgen.solver.HO, a = exp(X$ln.alpha[do.idx]), b = X$beta[do.idx], sig = X$sigma[do.idx]))  * sr.scale
 
 
 } # end if HoltOgden2013
@@ -83,12 +83,13 @@ if(is.null(X$Smsy[do.idx]) | sum(is.na(X$Smsy[do.idx])) > 0){warning("Need to pr
 
 
 
-   if(is.null(X$sigma[do.idx])){sigma <- rep(1,dim(X[do.idx])[1])}
+     if(is.null(X$sigma)){X$sigma <- 1}
 
 
   samsim.out <-  mapply(sGenSolver.samSim.wrapper, ln.a = X$ln.alpha[do.idx], 
 														b = X$beta[do.idx], 
-														sigma = sigma,SMSY = X$Smsy[do.idx])
+														sigma = X$sigma[do.idx],
+														SMSY = X$Smsy[do.idx])
    sgen.est[do.idx] <- samsim.out  * sr.scale
 
 
