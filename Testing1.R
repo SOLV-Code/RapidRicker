@@ -159,6 +159,8 @@ bm.ar1.df$Summary
 head(bm.ar1.df$MCMC)
 
 
+colSums(is.na(bm.ar1.df$MCMC)) %>% as.data.frame() %>% rownames_to_column("Variable") %>% dplyr::rename(NumNA = ".")
+
 
 compareBiasCorr(bm_obj = bm.ar1.df,sr.scale = sr.scale.use)
 
@@ -217,15 +219,20 @@ bm.kf.df <- calcMCMCRickerBM(fit_obj = ricker.kf.test, sr.scale = 10^6,
                               drop.resids = FALSE)
 
 
+colSums(is.na(bm.kf.df$MCMC))
+
 names(bm.kf.df)
 head(bm.kf.df$Summary)
 bm.kf.df$Summary$Variable
 names(bm.kf.df$MCMC)
 bm.kf.df$Summary %>% select(Variable, p50)
+bm.kf.df$Summary$NumNA
 
 
 dim(bm.kf.df$Summary)
 bm.kf.df$yr.match
+
+colSums(is.na(bm.kf.df$MCMC))
 
 
 compareBiasCorr(bm_obj = bm.kf.df,sr.scale = sr.scale.use)

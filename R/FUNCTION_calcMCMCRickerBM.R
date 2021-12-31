@@ -150,11 +150,13 @@ det.df <- bind_rows(data.frame(VarType = names(det.bm),Det = t(det.bm)),
 					fit_obj$Summary %>% select(VarType,Det) %>% drop_na())
 
 
+na.count <- colSums(is.na(mcmc.df)) %>% as.data.frame() %>% rownames_to_column("Variable") %>% dplyr::rename(NumNA = ".")
 
 
 summary.df <- left_join(as.data.frame(summary.df),  
 				unique(det.df), by = "VarType") %>%
-                    mutate(Diff = p50 - Det) %>% mutate(PercDiff = round(Diff/Det *100,1)) %>%
+				mutate(Diff = p50 - Det) %>% mutate(PercDiff = round(Diff/Det *100,1)) %>%
+				left_join(na.count, by="Variable") %>%
                       select(VarType,Variable,everything()) #YrIdx,Yr,
 
 
