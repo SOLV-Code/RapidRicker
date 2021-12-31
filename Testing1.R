@@ -213,13 +213,25 @@ head(ricker.kf.test$MCMC$MCMC.samples)
 
 bm.kf.df <- calcMCMCRickerBM(fit_obj = ricker.kf.test, sr.scale = 10^6,
                               Smsy.method = "Scheuerell2016",
-                              Sgen.method = "BruteForce",
+                              Sgen.method = "HoltOgden2013",
                               drop.resids = FALSE)
+
+tmp.do.idx
+
+tmp %>% dplyr::filter(is.na(Smsy))
+which(tmp.in[,"ln.alpha[34]"]<0)
+tmp[362,]
+tmp.in %>% select("ln.alpha[34]",beta)
+
+tmp.X[362,]
+
 
 names(bm.kf.df)
 head(bm.kf.df$Summary)
 bm.kf.df$Summary$Variable
 names(bm.kf.df$MCMC)
+bm.kf.df$Summary %>% select(Variable, p50)
+
 
 dim(bm.kf.df$Summary)
 bm.kf.df$yr.match

@@ -45,6 +45,8 @@ if(!(method %in% c("HoltOgden2013", "samSim", "Connorsetal2022","BruteForce") ))
   stop()}
 
 
+X.orig <- X
+
 # check for negative ln.a or b pars
 X$ln.alpha[X$ln.alpha < 0] <- NA
 X$beta[X$beta < 0] <- NA
@@ -52,7 +54,8 @@ X$beta[X$beta < 0] <- NA
 do.idx <- !is.na(X$ln.alpha) & !is.na(X$beta) 
 sgen.est <- rep(NA, dim(X)[1] )
 
-
+tmp.X <<- X
+tmp.do.idx <<- do.idx
 
 if(sum(do.idx)>0){
 
@@ -86,7 +89,7 @@ if(is.null(X$Smsy[do.idx]) | sum(is.na(X$Smsy[do.idx])) > 0){warning("Need to pr
   samsim.out <-  mapply(sGenSolver.samSim.wrapper, ln.a = X$ln.alpha[do.idx], 
 														b = X$beta[do.idx], 
 														sigma = sigma,SMSY = X$Smsy[do.idx])
-   sgen.est <- samsim.out  * sr.scale
+   sgen.est[do.idx] <- samsim.out  * sr.scale
 
 
 } # end if samSim
@@ -100,10 +103,9 @@ if(method == "Connorsetal2022") {
   # https://stackoverflow.com/questions/38961221/uniroot-solution-in-r
 
 
-  bc.out<-   mapply(get_Sgen.bc, a = exp(X$ln.alpha[do.idx]),b = X$beta[do.idx],int_lower = -1, int_upper =  1/X$b[do.idx]*2,
-				SMSY = X$Smsy/sr.scale)
+  bc.out<-   mapply(get_Sgen.bc, a = exp(X$ln.alpha[do.idx]),b = X$beta[do.idx],int_lower = -1, int_upper =  1/X$b[do.idx]*2, SMSY = X$Smsy[do.idx]/sr.scale)
 
-    sgen.est <- bc.out * sr.scale
+    sgen.est[do.idx] <- bc.out * sr.scale
 
 }  # end if "Connorsetal2022"
 
@@ -123,7 +125,7 @@ if(method == "BruteForce") {
 
 
 
-if(out.type == "Full"){return(bind_cols(X,SgenCalc = method,Sgen = sgen.est) %>% mutate(Ratio = round(Smsy/Sgen,2) )) }
+if(out.type == "Full"){return(bind_cols(X.orig,SgenCalc = method,Sgen = sgen.est) %>% mutate(Ratio = round(Smsy/Sgen,2) )) }
 if(out.type == "BMOnly"){return(sgen.est)  }
 
 } # end calcRickerSgen

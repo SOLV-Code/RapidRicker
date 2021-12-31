@@ -15,6 +15,8 @@
 calcRickerOtherBM<- function(X, sr.scale =1, out.type = "Full"){
 
 
+X.orig <- X
+
 # check for negative ln.a or b pars
 X$ln.alpha[X$ln.alpha < 0] <- NA
 X$beta[X$beta < 0] <- NA
@@ -24,7 +26,7 @@ seq.est <-  (X$ln.alpha/X$beta) *sr.scale
 smax.est <- (1/X$beta) *sr.scale
 
 
-if(out.type == "Full"){return(bind_cols(X,Seq = seq.est,Smax = smax.est)) }
+if(out.type == "Full"){return(bind_cols(X.orig,Seq = seq.est,Smax = smax.est)) }
 if(out.type == "BMOnly"){return(bind_cols(Seq = seq.est,Smax = smax.est))  }
 
 } # end calcRickerOtherBM

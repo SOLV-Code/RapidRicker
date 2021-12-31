@@ -43,6 +43,7 @@ if(!(method %in% c("Hilborn1985","Petermanetal2000","Scheuerell2016","BruteForce
   warning("Method must be one of Hilborn1985,Petermanetal2000,Scheuerell2016, BruteForce")
   stop()}
 
+X.orig <- X
 
 # check for negative ln.a or b pars
 X$ln.alpha[X$ln.alpha < 0] <- NA
@@ -82,7 +83,7 @@ print( X$beta[do.idx])
  
 } # end if any do.idx 
 
-if(out.type == "Full"){return(bind_cols(X,SmsyCalc = method, Smsy = smsy.est)) }
+if(out.type == "Full"){return(bind_cols(X.orig,SmsyCalc = method, Smsy = smsy.est)) }
 if(out.type == "BMOnly"){return(smsy.est)  }
 
 } # end calcRickerSmsy 
