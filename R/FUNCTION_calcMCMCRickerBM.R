@@ -74,6 +74,7 @@ num.br.yrs <- dim(fit_obj$yr.match)[1]
 
 for(i in 1:num.br.yrs){
 
+print(i)
 
 bm.in.raw <- mcmc.df %>% 
 		select(contains(paste0("ln.alpha[",i,"]")),beta,sigma) %>% 
@@ -90,6 +91,8 @@ bm.tmp <- bind_cols(calcRickerOtherBM(bm.in.raw , sr.scale =sr.scale, out.type =
                      Smsy.c = calcRickerSmsy(bm.in.corr , method = Smsy.method,sr.scale =sr.scale, out.type = "BMOnly")
                      )
 				 
+tmp.in <<- mcmc.df
+tmp <<- bm.tmp
 
 bm.tmp <- bind_cols(bm.tmp , Smax = bm.smax, 
                      Sgen = calcRickerSgen(bind_cols(bm.in.raw, bm.tmp %>% select(Smsy)),
@@ -121,7 +124,7 @@ mcmc.df <- mcmc.df[,!resid.idx]
 
 
 
-summary.df <- t(apply(mcmc.df, MARGIN =2, quantile,probs = c(0.1,0.25,0.5,0.75,0.9))) %>% 
+summary.df <- t(apply(mcmc.df, MARGIN =2, quantile,probs = c(0.1,0.25,0.5,0.75,0.9),na.rm=TRUE)) %>% 
 					as.data.frame()
 
 			
