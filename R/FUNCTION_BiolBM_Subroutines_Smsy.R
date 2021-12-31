@@ -39,10 +39,18 @@
 
 calcRickerSmsy <- function(X, method = "Scheuerell2016",sr.scale =1, out.type = "Full"){
   
-
 if(!(method %in% c("Hilborn1985","Petermanetal2000","Scheuerell2016","BruteForce") )){
   warning("Method must be one of Hilborn1985,Petermanetal2000,Scheuerell2016, BruteForce")
   stop()}
+
+
+# check for negative ln.a or b pars
+X$ln.alpha[X$ln.alpha < 0] <- NA
+X$beta[X$beta < 0] <- NA
+
+
+
+
   
 
 if(method == "Hilborn1985") {
@@ -56,7 +64,10 @@ if(method == "Petermanetal2000") {
 
 if(method == "Scheuerell2016") { 
 # adapted from samSim package (https://github.com/Pacific-salmon-assess/samSim)
+  
   smsy.est <- (1 - gsl::lambert_W0(exp(1 - X$ln.alpha))) / X$beta * sr.scale
+  
+  
 } 
   
 if(method == "BruteForce") { 
@@ -81,14 +92,15 @@ if(out.type == "BMOnly"){return(smsy.est)  }
 
 smsy.proxy <- function(ln.a,b,sr.scale){
 
+if(!is.na(ln.a) & !is.na(b)){
 spn.check <- seq((1/sr.scale), 1/b ,length.out = 3000)  
 rec.check <-  ricker.rec(S = spn.check,ricker.lna = ln.a, ricker.b = b)
-
-
 test.df <- data.frame(Spn = spn.check, Rec = rec.check) %>% mutate(Yield = Rec-Spn) %>% arrange(-Rec)
-
-
 s.msy <- spn.check[which.max(rec.check - spn.check) ]  * sr.scale
+}
+
+if(is.na(ln.a) | is.na(b)){s.msy <- NA}
+
 
 return(s.msy)
 

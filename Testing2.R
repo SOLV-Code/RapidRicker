@@ -57,8 +57,8 @@ inits.ricker
 # NEW FUNCTIONS: BM CALCS
 
 
-pars.test.1 <- data.frame(ln.alpha = 1.3, beta = 5e-4)
-
+#pars.test.1 <- data.frame(ln.alpha = 1.3, beta = 5e-4)
+pars.test.1 <- data.frame(ln.alpha = -0.4, beta = 5e-4)
 
 test1.df <- bind_rows(
   calcRickerSmsy(pars.test.1, method ="BruteForce",sr.scale =1, out.type = "Full"),
