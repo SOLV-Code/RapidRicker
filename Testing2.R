@@ -135,18 +135,18 @@ ricker.test.alt$inits.used
 
 
 
-ricker.test$Summary %>% dplyr::filter(VarType=="sd") %>% select(starts_with("p",ignore.case = FALSE))
-ricker.test.alt$Summary %>% dplyr::filter(VarType=="sd") %>% select(starts_with("p",ignore.case = FALSE))
+ricker.test$Summary %>% dplyr::filter(VarType=="sigma") %>% select(starts_with("p",ignore.case = FALSE))
+ricker.test.alt$Summary %>% dplyr::filter(VarType=="sigma") %>% select(starts_with("p",ignore.case = FALSE))
 
 
 ln.a.comp <- bind_cols(Version = c("Orig","Orig Corr","Alt","Alt Corr"),
-bind_rows(ricker.test$Summary %>% dplyr::filter(VarType=="ln_a") %>% select(starts_with("p",ignore.case = FALSE)),
-ricker.test$Summary %>% dplyr::filter(VarType=="ln_a_c") %>% select(starts_with("p",ignore.case = FALSE)),
-ricker.test.alt$Summary %>% dplyr::filter(VarType=="ln_a") %>% select(starts_with("p",ignore.case = FALSE)),
-ricker.test.alt$Summary %>% dplyr::filter(VarType=="ln_a_c") %>% select(starts_with("p",ignore.case = FALSE))
+bind_rows(ricker.test$Summary %>% dplyr::filter(VarType=="ln.alpha") %>% select(starts_with("p",ignore.case = FALSE)),
+ricker.test$Summary %>% dplyr::filter(VarType=="ln.alpha.c") %>% select(starts_with("p",ignore.case = FALSE)),
+ricker.test.alt$Summary %>% dplyr::filter(VarType=="ln.alpha") %>% select(starts_with("p",ignore.case = FALSE)),
+ricker.test.alt$Summary %>% dplyr::filter(VarType=="ln.alpha.c") %>% select(starts_with("p",ignore.case = FALSE))
 ))
 
-y.lim <- range(ln.a.orig,ln.a.c.orig,ln.a.alt,ln.a.c.alt )
+
 plot(0:5,0:5,ylim=c(1,2.5),
      type="n",xlab="",ylab = "ln.a", bty="n",axes=FALSE, main="ln.a posteriors")
 axis(2)
