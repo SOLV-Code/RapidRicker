@@ -62,21 +62,27 @@ if(mcmc.seed=="default"){seed.use <- 123} # this is the default value in R2JAGS
 # Therefore need to set.seed first
 set.seed(seed.use)
 
+
+if("deviance" %in% pars.track){pars.track <- pars.track[pars.track != "deviance"]}
+
 mcmc.obj <- jags(data=data.obj, 
 			inits=inits, 
 			parameters.to.save=pars.track, 
 			model.file=model.fn,  
-			DIC=FALSE,   # set this to FALSE, because explixitly tracking "deviance" as one of the pars.track
+			DIC=TRUE,   # set this to FALSE, because explixitly tracking "deviance" as one of the pars.track
 			n.chains=settings$n.chains, 
 			n.burnin=settings$n.burnin, 
 			n.thin=settings$n.thin, 
 			n.iter=settings$n.samples)
 	
-# if DIC = TRUE, then get this error message
+# if DIC = TRUE and pars.track includes "deviance", then get this error message
 # In addition: Warning message:
 # In FUN(X[[i]], ...) : Failed to set trace monitor for deviance
 # Monitor already exists and cannot be duplicated	
 	
+# BUT: if DIC = FALSE and pars.track includes "deviance", then you get a wrong DIC without error message
+# 
+
 	
 print(paste("MCMC - r2JAGS took",summary(proc.time()-start.time)["elapsed"]))
 
