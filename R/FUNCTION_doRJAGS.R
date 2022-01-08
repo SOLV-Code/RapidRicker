@@ -81,7 +81,7 @@ mcmc.obj <- jags(data=data.obj,
 # Monitor already exists and cannot be duplicated	
 	
 # BUT: if DIC = FALSE and pars.track includes "deviance", then you get a wrong DIC without error message
-# 
+
 
 	
 print(paste("MCMC - r2JAGS took",summary(proc.time()-start.time)["elapsed"]))
@@ -155,6 +155,58 @@ if(!exists("mcmc.dic")){
 mcmc.dic[,] <- c(mcmc.samplestats["deviance","mean"],mcmc.obj$BUGSoutput$pD,mcmc.obj$BUGSoutput$DIC)
 
 if(tracing){print("DIC ----");print(mcmc.dic[,])}
+
+
+# create list object with summary tables
+
+bugs.dic <-  data.frame(pD = mcmc.obj$BUGSoutput$pD, DIC = mcmc.obj$BUGSoutput$DIC)
+
+bugs.summary <- mcmc.obj$BUGSoutput$summary %>%
+                as.data.frame() %>% rownames_to_column("var") %>%
+                dplyr::filter(!grepl("log.resid",var)) %>%
+                mutate(cv = sd/mean)
+
+names(bugs.summary) <- recode(names(bugs.summary),"2.5%" = "p2.5","25%" = "p25",
+                              "50%" = "p50","75%" = "p75", "97.5%" = "p97.5")
+
+fit.table <-   bind_cols(data.frame(pD = bugs.dic$pD,DIC = bugs.dic$DIC, max.Rhat = max(bugs.summary$Rhat),
+                                    med.sigma = bugs.summary %>% dplyr::filter(var=="deviance") %>% select(p50) %>% unlist(),
+                                    med.deviance = bugs.summary %>% dplyr::filter(var=="deviance") %>% select(p50) %>% unlist()
+                                    ),
+                          bugs.summary %>% dplyr::filter(!grepl(".c",var)) %>%
+							dplyr::filter(grepl("ln.alpha",var)) %>% select(cv,n.eff) %>%
+								summarize(num = n(),max.cv = max(cv),
+											min.n.eff = min(n.eff),
+											med.n.eff = median(n.eff),
+											max.n.eff = max(n.eff)) %>% 
+								rename_all(function(x){paste0("ln.alpha.",x)}),
+                          bugs.summary %>% dplyr::filter(var=="beta") %>% select(cv,n.eff) %>% 
+								rename_all(	function(x){paste0("beta.",x)}),
+                          bugs.summary %>% dplyr::filter(var=="sigma") %>% select(cv,n.eff) %>% 
+								rename_all(function(x){paste0("sigma.",x)})
+
+                          )
+
+beta.table <- bugs.summary %>% dplyr::filter(var=="beta") %>% select(mean,sd,cv,starts_with("p"),Rhat,n.eff) %>% select(p50,mean,cv,everything()) %>%
+  dplyr::rename(meadian = p50)
+
+ln.alpha.table <- bugs.summary %>%dplyr::filter(!grepl(".c",var)) %>%
+							dplyr::filter(grepl("ln.alpha",var)) %>% select(mean,sd,cv,starts_with("p"),Rhat,n.eff) %>% select(p50,mean,cv,everything()) %>%
+  dplyr::rename(meadian = p50)
+
+
+if(dim(ln.alpha.table)[1] > 1){yr.idx <- 1:dim(ln.alpha.table)[1]}
+if(dim(ln.alpha.table)[1] == 1){yr.idx <- NA}
+ln.alpha.table <- bind_cols(YrIdx = yr.idx,ln.alpha.table)
+
+
+rownames(fit.table) <- NULL
+rownames(beta.table) <- NULL
+rownames(ln.alpha.table) <- NULL
+
+tables.list <-  list(fit = fit.table, beta = beta.table,ln.alpha = ln.alpha.table,
+					mcmc.summary = bugs.summary)
+
 
 
 
@@ -235,7 +287,7 @@ print("CREATING OUTPUT OBJECT -------------------------------------")
 out.list <- list(mcmc.call=out.label,mcmc.settings=unlist(settings))
 
 if(output %in% c("short","post","all")){out.list<-c(out.list,list(SampleStats=mcmc.samplestats, MCMC.Percentiles=mcmc.percs,Conv.Info="TBI",
-					DIC=mcmc.dic))}
+					DIC=mcmc.dic, tables = tables.list))}
 				
 if(output %in% c("post","all")){out.list<-c(out.list,list(Data=data.obj))}				
 				
