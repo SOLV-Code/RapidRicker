@@ -66,11 +66,17 @@ mcmc.obj <- jags(data=data.obj,
 			inits=inits, 
 			parameters.to.save=pars.track, 
 			model.file=model.fn,  
-			DIC=TRUE,   # set this to FALSE, because explixitly tracking "deviance" as one of the pars.track
+			DIC=FALSE,   # set this to FALSE, because explixitly tracking "deviance" as one of the pars.track
 			n.chains=settings$n.chains, 
 			n.burnin=settings$n.burnin, 
 			n.thin=settings$n.thin, 
 			n.iter=settings$n.samples)
+	
+# if DIC = TRUE, then get this error message
+# In addition: Warning message:
+# In FUN(X[[i]], ...) : Failed to set trace monitor for deviance
+# Monitor already exists and cannot be duplicated	
+	
 	
 print(paste("MCMC - r2JAGS took",summary(proc.time()-start.time)["elapsed"]))
 
