@@ -228,6 +228,7 @@ ricker.kf.test <- calcMCMCModelFit(
   tracing = FALSE
 )
 
+
 ricker.kf.test$Summary
 ricker.kf.test$Summary[,1:2]
 names(ricker.kf.test)

@@ -192,19 +192,31 @@ beta.table <- bugs.summary %>% dplyr::filter(var=="beta") %>% select(mean,sd,cv,
 
 ln.alpha.table <- bugs.summary %>%dplyr::filter(!grepl(".c",var)) %>%
 							dplyr::filter(grepl("ln.alpha",var)) %>% select(mean,sd,cv,starts_with("p"),Rhat,n.eff) %>% select(p50,mean,cv,everything()) %>%
-  dplyr::rename(meadian = p50)
+  dplyr::rename(median = p50)
 
 
 if(dim(ln.alpha.table)[1] > 1){yr.idx <- 1:dim(ln.alpha.table)[1]}
 if(dim(ln.alpha.table)[1] == 1){yr.idx <- NA}
 ln.alpha.table <- bind_cols(YrIdx = yr.idx,ln.alpha.table)
 
+if(dim(ln.alpha.table)[1] == 1){ ln.alpha.table.bookends <- NULL    }
+
+if(dim(ln.alpha.table)[1] > 1){
+print("DOING BOOKENDS----------------")
+	minmax.idx <- c(which.min(ln.alpha.table$median),which.max(ln.alpha.table$median))
+	print(minmax.idx)
+	ln.alpha.table.bookends <- ln.alpha.table[minmax.idx,]
+	}
+
+
 
 rownames(fit.table) <- NULL
 rownames(beta.table) <- NULL
 rownames(ln.alpha.table) <- NULL
 
-tables.list <-  list(fit = fit.table, beta = beta.table,ln.alpha = ln.alpha.table,
+tables.list <-  list(fit = fit.table, beta = beta.table, 
+					ln.alpha.bookends = ln.alpha.table.bookends,
+					ln.alpha = ln.alpha.table,
 					mcmc.summary = bugs.summary)
 
 
