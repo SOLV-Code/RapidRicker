@@ -86,18 +86,51 @@ ricker.test <- calcMCMCModelFit(
   mcmc.settings = list(n.chains = 2, n.burnin = 20000, n.thin = 60, n.samples = 50000),
   mcmc.inits = inits.ricker,
   mcmc.priors = priors.ricker,
-  mcmc.output = "post",
+  mcmc.output = "all",
   mcmc.out.path = "MCMC_Out",
   mcmc.out.label = "MCMC",
   mcmc.seed = "default",
   tracing = FALSE
 )
 
+
+
 names(ricker.test)
 ricker.test$Summary
-head(ricker.test$MCMC)
+names(ricker.test$MCMC)
 ricker.test$priors.used
 ricker.test$inits.used
+
+ricker.test$MCMC$DIC
+
+names(ricker.test$MCMC$MCMC.obj)
+ricker.test$MCMC$MCMC.obj$DIC
+
+
+names(ricker.test$MCMC$MCMC.obj$BUGSoutput)
+ricker.test$MCMC$MCMC.obj$BUGSoutput
+
+ricker.test$MCMC$MCMC.obj$BUGSoutput$pD
+ricker.test$MCMC$MCMC.obj$BUGSoutput$summary
+
+
+names(ricker.test$MCMC)
+ricker.test$MCMC$tables
+
+
+
+
+
+
+
+
+
+
+# ------------------------------------------------------------------------------
+
+
+
+
 
 
 bm.out <- calcMCMCRickerBM(fit_obj = ricker.test, sr.scale = sr.scale.use,
@@ -138,7 +171,7 @@ ricker.ar1.test <- calcMCMCModelFit(
   mcmc.settings = list(n.chains = 2, n.burnin = 20000, n.thin = 60, n.samples = 50000),
   mcmc.inits = inits.ar1,
   mcmc.priors = priors.ar1,
-  mcmc.output = "post",
+  mcmc.output = "all",
   mcmc.out.path = "MCMC_Out",
   mcmc.out.label = "MCMC",
   mcmc.seed = "default",
@@ -149,6 +182,10 @@ ricker.ar1.test$Summary
 head(ricker.ar1.test$MCMC)
 ricker.ar1.test$priors.used
 ricker.ar1.test$inits.used
+
+ricker.ar1.test$MCMC$MCMC.obj$BUGSoutput$summary
+
+ricker.ar1.test$MCMC$tables
 
 
 bm.ar1.df <- calcMCMCRickerBM(fit_obj = ricker.ar1.test, sr.scale = 10^6,
@@ -184,12 +221,13 @@ ricker.kf.test <- calcMCMCModelFit(
   mcmc.settings = list(n.chains = 2, n.burnin = 20000, n.thin = 60, n.samples = 50000),
   mcmc.inits = inits.kf,
   mcmc.priors = priors.kf,
-  mcmc.output = "post",
+  mcmc.output = "all",
   mcmc.out.path = "MCMC_Out",
   mcmc.out.label = "MCMC",
   mcmc.seed = "default",
   tracing = FALSE
 )
+
 
 ricker.kf.test$Summary
 ricker.kf.test$Summary[,1:2]
@@ -211,6 +249,16 @@ names(ricker.kf.test)
 ricker.kf.test$yr.match
 
 head(ricker.kf.test$MCMC$MCMC.samples)
+
+
+names(ricker.kf.test$MCMC$MCMC.obj)
+
+ricker.kf.test$MCMC$tables
+
+
+
+tmp %>% dplyr::filter(var=="beta") %>% select(cv,n.eff) %>% rename_all(function(x){paste0("beta.",x)})
+
 
 
 bm.kf.df <- calcMCMCRickerBM(fit_obj = ricker.kf.test, sr.scale = 10^6,
