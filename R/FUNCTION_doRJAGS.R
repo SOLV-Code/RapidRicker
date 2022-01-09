@@ -202,9 +202,7 @@ ln.alpha.table <- bind_cols(YrIdx = yr.idx,ln.alpha.table)
 if(dim(ln.alpha.table)[1] == 1){ ln.alpha.table.bookends <- NULL    }
 
 if(dim(ln.alpha.table)[1] > 1){
-print("DOING BOOKENDS----------------")
 	minmax.idx <- c(which.min(ln.alpha.table$median),which.max(ln.alpha.table$median))
-	print(minmax.idx)
 	ln.alpha.table.bookends <- ln.alpha.table[minmax.idx,]
 	}
 
