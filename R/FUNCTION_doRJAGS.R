@@ -10,7 +10,8 @@
 #' @param out.path text string specifying  folder. if output is "post" or "all", the generated files will be stored to this folder
 #' @param out.label label use in the output files if output is "post" or "all"
 #' @param mcmc.seed either "default" or an integer giving the random seed for starting MCMC (R2Jags default is 123)
-#' @param tracing if TRUE, diagnostic details for intermediate objects will be printed to the screen for debugging
+#' @param tracing if TRUE, diagnostic details for intermediate objects will be printed to the screen for 
+#' @param optional vector to provide brood years matching the data points (for labelling output)
 #' @keywords R2Jags, MCMC, posterior
 #' @export
 
@@ -21,7 +22,8 @@ doRJAGS <- function(data.obj, model.fn,
 					out.path = "MCMC_Out",
 					out.label = "MCMC",
 					mcmc.seed = "default",
-					tracing = FALSE
+					tracing = FALSE,
+					sr.yrs = NA
 					){
 					
  					 
@@ -195,10 +197,10 @@ ln.alpha.table <- bugs.summary %>%dplyr::filter(!grepl(".c",var)) %>%
   dplyr::rename(median = p50)
 
 
-if(dim(ln.alpha.table)[1] > 1){yr.idx <- 1:dim(ln.alpha.table)[1]}
-if(dim(ln.alpha.table)[1] == 1){yr.idx <- NA}
+if(dim(ln.alpha.table)[1] > 1){yr.idx <- 1:dim(ln.alpha.table)[1]; yrs <- sr.yrs[yr.idx]}
+if(dim(ln.alpha.table)[1] == 1){yr.idx <- NA; yrs <- NA}
 
-ln.alpha.table <- bind_cols(YrIdx = yr.idx,ln.alpha.table)
+ln.alpha.table <- bind_cols(YrIdx = yr.idx, Year = yrs, ln.alpha.table)
 
 if(dim(ln.alpha.table)[1] == 1){ ln.alpha.table.bookends <- ln.alpha.table }
 

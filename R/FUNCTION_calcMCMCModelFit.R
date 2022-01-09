@@ -75,7 +75,6 @@ mcmc.data <- c(list(S = sr.use$Spn / sr.scale, R_Obs = sr.use$Rec / sr.scale, N 
 					mcmc.priors)
 
 print(mcmc.data)
-
 # Get the model file
 
 models.list <- c("BUILT_IN_MODEL_Ricker_BUGS.txt",
@@ -106,7 +105,8 @@ tmp.out <- doRJAGS(data.obj = mcmc.data,
 					out.path= mcmc.out.path,
 					output= mcmc.output,
                     mcmc.seed = mcmc.seed,
-					tracing = tracing
+					tracing = tracing,
+					sr.yrs = sr.use$Year
 					)
 
 #print(names(tmp.out))
