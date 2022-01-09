@@ -4,10 +4,16 @@
 \alias{calcRickerSgen}
 \title{calcRickerSgen}
 \usage{
-calcRickerSgen(X, method = "Connorsetal2022", sr.scale = 1, out.type = "Full")
+calcRickerSgen(
+  X,
+  method = "Connorsetal2022",
+  sr.scale = 1,
+  out.type = "Full",
+  tracing = FALSE
+)
 }
 \arguments{
-\item{X}{a data frame with columns ln.a, b, sigma, and optionally Smsy}
+\item{X}{a data frame with columns ln.alpha, beta, sigma, and optionally Smsy}
 
 \item{method}{one of "HoltOgden2013", "samSim", "Connorsetal2022","BruteForce"}
 
