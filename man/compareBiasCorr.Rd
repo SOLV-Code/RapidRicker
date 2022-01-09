@@ -4,7 +4,7 @@
 \alias{compareBiasCorr}
 \title{compareBiasCorr}
 \usage{
-compareBiasCorr(bm_obj)
+compareBiasCorr(bm_obj, sr.scale)
 }
 \arguments{
 \item{bm}{bm_obj output from \code{\link[RapidRicker]{calcMCMCRickerBM}}.}
@@ -14,7 +14,7 @@ a data frame with 1 column for each parameter (ln.a,Seq,Smsy,Sgen) and different
 }
 \description{
 This function generates a summary of raw and bias-corrected  values for SR parameters and resulting biological
-benchmarks, using
+benchmarks, using different approaches for implementing the bias correction.
 }
 \keyword{MCMC,}
 \keyword{bias}
