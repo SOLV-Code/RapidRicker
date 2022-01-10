@@ -120,27 +120,18 @@ ricker.test$MCMC$tables
 
 
 
-
-
-
-
-
-
-# ------------------------------------------------------------------------------
-
-
-
-
-
-
 bm.out <- calcMCMCRickerBM(fit_obj = ricker.test, sr.scale = sr.scale.use,
                           Smsy.method = "Scheuerell2016",
                           Sgen.method = "Connorsetal2022",
                           drop.resids = FALSE)
 names(bm.out)
-bm.out$Summary[1:14,]
+bm.out$Summary
+
+
+
 
 head(bm.out$MCMC)
+bm.out$yr.match
 
 
 ?compareBiasCorr
@@ -272,6 +263,35 @@ colSums(is.na(bm.kf.df$MCMC))
 names(bm.kf.df)
 head(bm.kf.df$Summary)
 bm.kf.df$Summary$Variable
+
+
+#pattern <- "(\\[.*?\\])"
+#matches <- gregexpr(pattern, bm.kf.df$Summary$Variable)
+#overlap <- regmatches(bm.kf.df$Summary$Variable, matches)
+#overlap_clean <- as.numeric(gsub("\\[","",gsub("\\]","",unlist(overlap) )))
+#overlap_clean
+
+tmp <- bm.kf.df$Summary
+
+
+
+
+
+yrs.need <- grepl("\\[",tmp$Variable)
+yrs.need
+
+
+
+
+
+
+
+x <- bm.out$Summary$Variable[yrs.need]
+df <- data.frame(x)
+df$x = sub(".*\\[([^][]+)].*", "\\1", df$x)
+df
+
+
 names(bm.kf.df$MCMC)
 bm.kf.df$Summary %>% select(Variable, p50)
 bm.kf.df$Summary$NumNA

@@ -128,9 +128,11 @@ summary.df <- t(apply(mcmc.df, MARGIN =2, quantile,probs = c(0.1,0.25,0.5,0.75,0
 names(summary.df) <- paste0("p",c(0.1,0.25,0.5,0.75,0.9)*100)
 
 summary.df <- summary.df %>% rownames_to_column("Variable") %>%
-					mutate(VarType =  gsub("\\[[^()]*\\]", "", Variable)) %>%
 					#https://stackoverflow.com/questions/28955367/extract-text-in-parentheses-in-r
-					select(VarType,everything())
+					mutate(VarType =  gsub("\\[[^()]*\\]", "", Variable)) %>%#https://stackoverflow.com/questions/63459775/how-to-extract-character-strings-outside-of-square-brackets-using-r       
+					mutate(YrIdx = as.numeric(str_extract(Variable, "(?<=\\[)[^]]+"))) %>%
+					left_join(fit_obj$yr.match,by = "YrIdx") %>%
+										select(VarType,Variable, YrIdx, Yr,everything())
 
 
 # reorganize
