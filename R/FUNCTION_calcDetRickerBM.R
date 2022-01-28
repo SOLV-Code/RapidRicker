@@ -26,8 +26,10 @@ calcDetRickerBM <- function(fit_obj,sr.scale = 10^6,
 bm.vec <-  bind_cols(
 				calcRickerOtherBM(fit_obj$pars, sr.scale =sr.scale, out.type = "Full"), #%>% select(Smax,Seq),
 				Seq.c = calcRickerOtherBM(fit_obj$pars %>% select (-ln.alpha) %>% dplyr::rename(ln.alpha = ln.alpha.c) , sr.scale =sr.scale, out.type = "BMOnly") %>% select(Seq) %>% unlist(),
-                Smsy = calcRickerSmsy(fit_obj$pars , method = Smsy.method,sr.scale =sr.scale, out.type = "BMOnly"),
-                Smsy.c = calcRickerSmsy(fit_obj$pars %>% select (-ln.alpha) %>% dplyr::rename(ln.alpha = ln.alpha.c) , method = Smsy.method,sr.scale =sr.scale, out.type = "BMOnly")
+                Smsy = calcRickerSmsy(fit_obj$pars , method = Smsy.method,sr.scale =sr.scale, out.type = "BMOnly")$Smsy,
+                Smsy.c = calcRickerSmsy(fit_obj$pars %>% select (-ln.alpha) %>% dplyr::rename(ln.alpha = ln.alpha.c) , method = Smsy.method,sr.scale =sr.scale, out.type = "BMOnly")$Smsy,
+				Umsy = calcRickerSmsy(fit_obj$pars , method = Smsy.method,sr.scale =sr.scale, out.type = "BMOnly")$Umsy,
+                Umsy.c = calcRickerSmsy(fit_obj$pars %>% select (-ln.alpha) %>% dplyr::rename(ln.alpha = ln.alpha.c) , method = Smsy.method,sr.scale =sr.scale, out.type = "BMOnly")$Umsy
                      )
                      
 

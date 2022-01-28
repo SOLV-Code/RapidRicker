@@ -83,8 +83,12 @@ print( X$beta[do.idx])
  
 } # end if any do.idx 
 
-if(out.type == "Full"){return(bind_cols(X.orig,SmsyCalc = method, Smsy = smsy.est)) }
-if(out.type == "BMOnly"){return(smsy.est)  }
+
+umsy.est <- X$beta * smsy.est/sr.scale
+
+
+if(out.type == "Full"){return(bind_cols(X.orig,SmsyCalc = method, Smsy = smsy.est, Umsy = umsy.est)) }
+if(out.type == "BMOnly"){return(bind_cols(Smsy = smsy.est, Umsy = umsy.est))  }
 
 } # end calcRickerSmsy 
 
