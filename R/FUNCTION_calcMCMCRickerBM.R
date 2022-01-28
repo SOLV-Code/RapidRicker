@@ -40,9 +40,12 @@ bm.in.corr <- mcmc.df %>% select(ln.alpha.c,beta) %>% dplyr::rename(ln.alpha=ln.
 mcmc.df <- bind_cols(mcmc.df,
                      calcRickerOtherBM(bm.in.raw , sr.scale =sr.scale, out.type = "BMOnly") %>% select(Smax,Seq),
                      Seq.c = calcRickerOtherBM(bm.in.corr , sr.scale =sr.scale, out.type = "BMOnly") %>% select(Seq) %>% unlist(),
-                     Smsy = calcRickerSmsy(bm.in.raw , method = Smsy.method,sr.scale =sr.scale, out.type = "BMOnly"),
-                     Smsy.c = calcRickerSmsy(bm.in.corr , method = Smsy.method,sr.scale =sr.scale, out.type = "BMOnly")
+                     Smsy = calcRickerSmsy(bm.in.raw , method = Smsy.method,sr.scale =sr.scale, out.type = "BMOnly")$Smsy,
+                     Smsy.c = calcRickerSmsy(bm.in.corr , method = Smsy.method,sr.scale =sr.scale, out.type = "BMOnly")$Smsy,
+					 Umsy = calcRickerSmsy(bm.in.raw , method = Smsy.method,sr.scale =sr.scale, out.type = "BMOnly")$Umsy,
+                     Umsy.c = calcRickerSmsy(bm.in.corr , method = Smsy.method,sr.scale =sr.scale, out.type = "BMOnly")$Umsy
                      )
+
 
 
 mcmc.df <- bind_cols(mcmc.df,
@@ -85,8 +88,10 @@ bm.in.corr <- mcmc.df %>%
 
 bm.tmp <- bind_cols(calcRickerOtherBM(bm.in.raw , sr.scale =sr.scale, out.type = "BMOnly") %>% select(Seq),
                      Seq.c = calcRickerOtherBM(bm.in.corr , sr.scale =sr.scale, out.type = "BMOnly") %>% select(Seq) %>% unlist(),
-                     Smsy = calcRickerSmsy(bm.in.raw , method = Smsy.method,sr.scale =sr.scale, out.type = "BMOnly"),
-                     Smsy.c = calcRickerSmsy(bm.in.corr , method = Smsy.method,sr.scale =sr.scale, out.type = "BMOnly")
+                     Smsy = calcRickerSmsy(bm.in.raw , method = Smsy.method,sr.scale =sr.scale, out.type = "BMOnly")$Smsy,
+                     Smsy.c = calcRickerSmsy(bm.in.corr , method = Smsy.method,sr.scale =sr.scale, out.type = "BMOnly")$Smsy,
+					 Umsy = calcRickerSmsy(bm.in.raw , method = Smsy.method,sr.scale =sr.scale, out.type = "BMOnly")$Umsy,
+                     Umsy.c = calcRickerSmsy(bm.in.corr , method = Smsy.method,sr.scale =sr.scale, out.type = "BMOnly")$Umsy
                      )
 				 
 
@@ -124,6 +129,8 @@ mcmc.df <- mcmc.df[,!resid.idx]
 summary.df <- t(apply(mcmc.df, MARGIN =2, quantile,probs = c(0.1,0.25,0.5,0.75,0.9),na.rm=TRUE)) %>% 
 					as.data.frame()
 
+
+
 			
 names(summary.df) <- paste0("p",c(0.1,0.25,0.5,0.75,0.9)*100)
 
@@ -147,12 +154,16 @@ det.bm <- calcDetRickerBM(fit_obj$det.fit,sr.scale = 10^6,
 					Smsy.method = "Scheuerell2016",
 					Sgen.method = "Connorsetal2022")
 
+
 				
 det.df <- bind_rows(data.frame(VarType = names(det.bm),Det = t(det.bm)),
 					fit_obj$Summary %>% select(VarType,Det) %>% drop_na())
 
 
+
+
 na.count <- colSums(is.na(mcmc.df)) %>% as.data.frame() %>% rownames_to_column("Variable") %>% dplyr::rename(NumNA = ".")
+
 
 
 summary.df <- left_join(as.data.frame(summary.df),  
@@ -160,8 +171,6 @@ summary.df <- left_join(as.data.frame(summary.df),
 				mutate(Diff = p50 - Det) %>% mutate(PercDiff = round(Diff/Det *100,1)) %>%
 				left_join(na.count, by="Variable") %>%
                       select(VarType,Variable,everything()) #YrIdx,Yr,
-
-
 
 return(list(Summary = summary.df , MCMC = mcmc.df,
 	model.type = fit_obj$model.type,
