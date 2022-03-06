@@ -48,7 +48,7 @@ log.resid.0 ~ dnorm(0,tau.red) #T(-3,3)
 tau.red <- tau.white * (1-phi*phi)     
 tau.white ~ dgamma(shape.tauw,lambda_tauw)    
        
-ln.alpha.c <- ln.alpha + (sigma * sigma / 2) # bias correction for lognormal skewness
+ln.alpha.c <- ln.alpha + ((sigma * sigma) / (2 * (1-phi*phi)) ) # bias correction for lognormal skewness
 
 
 }
