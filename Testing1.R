@@ -94,6 +94,8 @@ ricker.test <- calcMCMCModelFit(
 )
 
 
+(50000-20000)/60
+
 
 names(ricker.test)
 ricker.test$Summary
@@ -101,9 +103,27 @@ names(ricker.test$MCMC)
 ricker.test$priors.used
 ricker.test$inits.used
 
+ricker.test$MCMC$tables
+
+
 ricker.test$MCMC$DIC
 
-names(ricker.test$MCMC$MCMC.obj)
+
+ricker.test$MCMC$MCMC.samples
+
+
+dim(ricker.test$MCMC$MCMC.obj$BUGSoutput$sims.array)
+
+
+as.mcmc.list(ricker.test$MCMC$MCMC.obj$BUGSoutput$sims.array[,,"ln.alpha"])
+
+
+
+
+
+tmp <- gelman.plot(as.mcmc.list(ricker.test$MCMC$MCMC.obj$BUGSoutput))
+tmp
+
 ricker.test$MCMC$MCMC.obj$DIC
 
 

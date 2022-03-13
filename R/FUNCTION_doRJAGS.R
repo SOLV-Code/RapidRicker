@@ -10,12 +10,12 @@
 #' @param out.path text string specifying  folder. if output is "post" or "all", the generated files will be stored to this folder
 #' @param out.label label use in the output files if output is "post" or "all"
 #' @param mcmc.seed either "default" or an integer giving the random seed for starting MCMC (R2Jags default is 123)
-#' @param tracing if TRUE, diagnostic details for intermediate objects will be printed to the screen for 
+#' @param tracing if TRUE, diagnostic details for intermediate objects will be printed to the screen for
 #' @param optional vector to provide brood years matching the data points (for labelling output)
 #' @keywords R2Jags, MCMC, posterior
 #' @export
 
-doRJAGS <- function(data.obj, model.fn, 
+doRJAGS <- function(data.obj, model.fn,
                     settings = list(n.chains=2, n.burnin=20000, n.thin=60,n.samples=50000) ,
                     inits, pars.track,
 					output = "short",
@@ -25,9 +25,9 @@ doRJAGS <- function(data.obj, model.fn,
 					tracing = FALSE,
 					sr.yrs = NA
 					){
-					
- 					 
-					 
+
+
+
 
 
 perc.vec <- seq(5,95,by=5) # %iles used in the posterior summaries
@@ -52,7 +52,7 @@ if(output == "all"){
 		CODA.plots <- TRUE   # create plots of the posterior disctributions
 		dir.create(out.path,showWarnings=FALSE) # creates directory, if it already exists it does nothing
 		}
-		
+
 
 start.time <- proc.time()
 print(paste("STARTING R2JAGS MCMC ESTIMATION FOR,", out.label, "-------------------------------------"))
@@ -67,32 +67,32 @@ set.seed(seed.use)
 
 if("deviance" %in% pars.track){pars.track <- pars.track[pars.track != "deviance"]}
 
-mcmc.obj <- jags(data=data.obj, 
-			inits=inits, 
-			parameters.to.save=pars.track, 
-			model.file=model.fn,  
-			DIC=TRUE,   # set this to FALSE, because explixitly tracking "deviance" as one of the pars.track
-			n.chains=settings$n.chains, 
-			n.burnin=settings$n.burnin, 
-			n.thin=settings$n.thin, 
+mcmc.obj <- jags(data=data.obj,
+			inits=inits,
+			parameters.to.save=pars.track,
+			model.file=model.fn,
+			DIC=TRUE,   # previusly set this to FALSE, because explicitly tracking "deviance" as one of the pars.track, but put back in for easier output
+			n.chains=settings$n.chains,
+			n.burnin=settings$n.burnin,
+			n.thin=settings$n.thin,
 			n.iter=settings$n.samples)
-	
+
 # if DIC = TRUE and pars.track includes "deviance", then get this error message
 # In addition: Warning message:
 # In FUN(X[[i]], ...) : Failed to set trace monitor for deviance
-# Monitor already exists and cannot be duplicated	
-	
+# Monitor already exists and cannot be duplicated
+
 # BUT: if DIC = FALSE and pars.track includes "deviance", then you get a wrong DIC without error message
 
 
-	
+
 print(paste("MCMC - r2JAGS took",summary(proc.time()-start.time)["elapsed"]))
 
 
 print(paste("STARTING OUTPUT SUMMARY FOR,", out.label, "-------------------------------------"))
 
 
-# check and store current directory			
+# check and store current directory
 base.dir <- getwd()
 # output
 MCMCsamples <- mcmc.obj$BUGSoutput$sims.matrix
@@ -106,7 +106,7 @@ if(tracing){
 	print("MCMC SubSample");print(MCMCsamples[1:20,]) # extract the first few rows of the chains for alpha
 } # end if tracing
 
-	
+
 
 start.time <- proc.time()
 
@@ -115,25 +115,25 @@ if(write.CODA){
 			dir.create(paste(out.path,"/CODA",sep=""),showWarnings=FALSE) # creates directory, if it already exists it does nothing
 			setwd(paste(out.path,"/CODA",sep=""))
 			write.table(MCMCsamples,paste(out.label,"_pars.txt",sep=""))
-			setwd(base.dir) 
-			} 
+			setwd(base.dir)
+			}
 
-# create or append an array with the MCMC samplestats 
-# NOTE: SEEMS THAT THESE STORAGE ARRAYS DON"T NEED TO BE EXPLICITLY REMOVED. 
+# create or append an array with the MCMC samplestats
+# NOTE: SEEMS THAT THESE STORAGE ARRAYS DON"T NEED TO BE EXPLICITLY REMOVED.
 # THEY DISAPPEAR WHEN THE SUBROUTINE CALL ENDS BECAUSE THEY ARE NOT RETURNED TO THE PARENT FUNCTION
 # SHOULD HOWEVER MAKE THIS MORE ROBUST
-if(!exists("mcmc.samplestats")){	
+if(!exists("mcmc.samplestats")){
 			tmp.stats <- as.array(as.matrix(MCMCsummary))
 			mcmc.samplestats <- array(NA,dim=dim(tmp.stats),dimnames=list(dimnames(tmp.stats)[[1]],dimnames(tmp.stats)[[2]]))
 			} # end if creating new array
-		
-# save stats from current MCMC run		
+
+# save stats from current MCMC run
 mcmc.samplestats[,] <-  as.matrix(MCMCsummary) # NOTE: INCLUDES JAGS DEFAULT THINNING FOR NOW
 
 if(tracing){ print("mcmc.samplestats");print(paste(out.label)); print(mcmc.samplestats[,])}
 
 # create or append an array with the %iles for each tracked variable across chains
-if(!exists("mcmc.percs")){ 
+if(!exists("mcmc.percs")){
 			vars.tmp <- dimnames(MCMCsamples)[[2]]
 			mcmc.percs <- array(NA,dim=c(length(perc.vec),length(vars.tmp)),dimnames=list(paste("p",perc.vec,sep=""),vars.tmp))
 			} # end if creating new array
@@ -145,12 +145,12 @@ mcmc.percs[,] <- apply(MCMCsamples,MARGIN=2,quantile,probs=perc.vec/100)
 if(!exists("mcmc.samples")){
 		mcmc.samples <- array(NA,dim=dim(MCMCsamples),dimnames=list(1:dim(MCMCsamples)[[1]],dimnames(MCMCsamples)[[2]]))
 				}
-mcmc.samples[,] <- MCMCsamples  
+mcmc.samples[,] <- MCMCsamples
 
 
 # create or append list object with DIC
 
-if(!exists("mcmc.dic")){ 
+if(!exists("mcmc.dic")){
 			mcmc.dic <- array(NA,dim=c(1,3),dimnames=list("",c("mean(Dev)","pD","DIC")))
 			} # end if creating new array
 
@@ -168,10 +168,23 @@ bugs.summary <- mcmc.obj$BUGSoutput$summary %>%
                 dplyr::filter(!grepl("log.resid",var)) %>%
                 mutate(cv = sd/mean)
 
+# calc Gewewke diag and Gelman-Rubin Statistic (get 1 for each par)
+g.score <- geweke.diag(mcmc.obj, frac1=0.1, frac2=0.5) # default setting: compare first 10% to last 50%
+
+gelman.out <- gelman.diag(as.mcmc.list(mcmc.obj$BUGSoutput),multivariate = FALSE)
+gelman.range <- range(gelman.out$psrf[,"Upper C.I."])
+
+
+
+
+
 names(bugs.summary) <- recode(names(bugs.summary),"2.5%" = "p2.5","25%" = "p25",
                               "50%" = "p50","75%" = "p75", "97.5%" = "p97.5")
 
 fit.table <-   bind_cols(data.frame(pD = bugs.dic$pD,DIC = bugs.dic$DIC, max.Rhat = max(bugs.summary$Rhat),
+                                    max.abs.G = max(abs(g.score$z)),
+                                    min.gelman = gelman.range[1],
+                                    max.gelman = gelman.range[2],
                                     med.sigma = bugs.summary %>% dplyr::filter(var=="deviance") %>% select(p50) %>% unlist(),
                                     med.deviance = bugs.summary %>% dplyr::filter(var=="deviance") %>% select(p50) %>% unlist()
                                     ),
@@ -180,11 +193,11 @@ fit.table <-   bind_cols(data.frame(pD = bugs.dic$pD,DIC = bugs.dic$DIC, max.Rha
 								summarize(num = n(),max.cv = max(cv),
 											min.n.eff = min(n.eff),
 											med.n.eff = median(n.eff),
-											max.n.eff = max(n.eff)) %>% 
+											max.n.eff = max(n.eff)) %>%
 								rename_all(function(x){paste0("ln.alpha.",x)}),
-                          bugs.summary %>% dplyr::filter(var=="beta") %>% select(cv,n.eff) %>% 
+                          bugs.summary %>% dplyr::filter(var=="beta") %>% select(cv,n.eff) %>%
 								rename_all(	function(x){paste0("beta.",x)}),
-                          bugs.summary %>% dplyr::filter(var=="sigma") %>% select(cv,n.eff) %>% 
+                          bugs.summary %>% dplyr::filter(var=="sigma") %>% select(cv,n.eff) %>%
 								rename_all(function(x){paste0("sigma.",x)})
 
                           )
@@ -215,7 +228,7 @@ rownames(fit.table) <- NULL
 rownames(beta.table) <- NULL
 rownames(ln.alpha.table) <- NULL
 
-tables.list <-  list(fit = fit.table, beta = beta.table, 
+tables.list <-  list(fit = fit.table, beta = beta.table,
 					ln.alpha.bookends = ln.alpha.table.bookends,
 					ln.alpha = ln.alpha.table,
 					mcmc.summary = bugs.summary)
@@ -224,8 +237,8 @@ tables.list <-  list(fit = fit.table, beta = beta.table,
 
 
 if("S" %in% names(data.obj)){spn.tmp <- data.obj$S } 	 # need to check this: should this be na.omit(data.set[,"Spn"])
-		   
-print(paste("Output processing took", summary(proc.time()-start.time)["elapsed"]))	
+
+print(paste("Output processing took", summary(proc.time()-start.time)["elapsed"]))
 
 
 # BUGS JAGS diagnostic plots
@@ -250,7 +263,7 @@ R2jags::traceplot(mcmc.obj,ask=FALSE)# traceplot() not in r2OpenBUGS
 
 dev.off(); setwd(base.dir)  # close pdf and return to working folder
 
-print(paste("JAGS diagnostic plots took", summary(proc.time()-start.time)["elapsed"]))	
+print(paste("JAGS diagnostic plots took", summary(proc.time()-start.time)["elapsed"]))
 
 } # end if  JAGS.diag.plots
 
@@ -267,11 +280,11 @@ print(paste("STARTING CODA DIAGNOSTICS FOR,", paste(out.label), "---------------
 
 dir.create(paste(out.path,"/PLOTS",sep=""),showWarnings=FALSE) # creates directory, if it already exists it does nothing
 
-pdf(paste(out.path,"/PLOTS/", paste(out.label,"DiagnosticPlots_CODA.pdf",sep="_"),sep=""),width=8.5, height=8.5, onefile=TRUE) ; par(mfrow=c(1,1))  # change dir and start pdf 
+pdf(paste(out.path,"/PLOTS/", paste(out.label,"DiagnosticPlots_CODA.pdf",sep="_"),sep=""),width=8.5, height=8.5, onefile=TRUE) ; par(mfrow=c(1,1))  # change dir and start pdf
 print("starting conversion to coda file")
 
 # convert output to make usable for diagnostics from coda package
-coda.obj1 <- as.mcmc(mcmc.obj$BUGSoutput$sims.matrix) 
+coda.obj1 <- as.mcmc(mcmc.obj$BUGSoutput$sims.matrix)
 
 print("conversion to coda file successful")
 
@@ -284,14 +297,14 @@ densplot(coda.obj1)
 #print("flag: starting geweke plot")
 #warning("SKIPPING GEWEKE PLOT FOR NOW in mcmc.sub()")
 #geweke.plot.MOD(coda.obj1)
-	
+
 dev.off(); setwd(base.dir)  # close pdf and return to working folder
 
-print(paste("CODA diagnostic plots took", summary(proc.time()-start.time)["elapsed"]))	
+print(paste("CODA diagnostic plots took", summary(proc.time()-start.time)["elapsed"]))
 
 } # end if  CODA.diag.plots
 
-	
+
 #############################################################
 print("CREATING OUTPUT OBJECT -------------------------------------")
 
@@ -301,9 +314,9 @@ out.list <- list(mcmc.call=out.label,mcmc.settings=unlist(settings))
 
 if(output %in% c("short","post","all")){out.list<-c(out.list,list(SampleStats=mcmc.samplestats, MCMC.Percentiles=mcmc.percs,Conv.Info="TBI",
 					DIC=mcmc.dic, tables = tables.list))}
-				
-if(output %in% c("post","all")){out.list<-c(out.list,list(Data=data.obj))}				
-				
+
+if(output %in% c("post","all")){out.list<-c(out.list,list(Data=data.obj))}
+
 if(output %in% c("post","all")){out.list<-c(out.list,list(MCMC.samples=mcmc.samples))}
 
 if(output =="all"){out.list<-c(out.list,list(MCMC.obj=mcmc.obj))}
@@ -311,7 +324,7 @@ if(output =="all"){out.list<-c(out.list,list(MCMC.obj=mcmc.obj))}
 print(names(out.list))
 
 
-return(out.list) 
+return(out.list)
 
 } #end doRJAGS
 
