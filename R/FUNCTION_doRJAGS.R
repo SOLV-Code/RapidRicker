@@ -171,8 +171,9 @@ bugs.summary <- mcmc.obj$BUGSoutput$summary %>%
 # calc Gewewke diag and Gelman-Rubin Statistic (get 1 for each par)
 g.score <- geweke.diag(mcmc.obj, frac1=0.1, frac2=0.5) # default setting: compare first 10% to last 50%
 
-gelman.out <- gelman.diag(as.mcmc.list(mcmc.obj$BUGSoutput),multivariate = FALSE)
-gelman.range <- range(gelman.out$psrf[,"Upper C.I."])
+gelman.out <- gelman.diag(as.mcmc.list(mcmc.obj$BUGSoutput #,start = settings$n.burnin, end = numeric(0),thin = settings$n.thin
+                                       ),multivariate = FALSE)
+gelman.range <- range(gelman.out$psrf[,"Point est."])
 
 
 

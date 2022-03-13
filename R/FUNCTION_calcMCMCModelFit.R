@@ -15,7 +15,7 @@
 #' @param mcmc.out.label label use in the output files if mcmc.output is "post" or "all"
 #' @param mcmc.seed either "default" or an integer giving the random seed for starting MCMC (R2Jags default is 123)
 #' @param tracing if TRUE, diagnostic details for intermediate objects will be printed to the screen for debugging
-#' @keywords Ricker fit, Bayesian, MCMC, posterior, 
+#' @keywords Ricker fit, Bayesian, MCMC, posterior,
 #' @export
 #' @examples
 #' ricker.fit <- calcMCMCModelFit(SR_Sample[SR_Sample$Stock == "Stock1",],min.obs = 10)
@@ -96,6 +96,24 @@ model.use <- model.file
 
 # Do the MCMC
 
+
+# check the MCMC settings (to avoid crashes in the geweke.diag and gelman.diag fn calls)
+
+retained.sample.per.chain <- (mcmc.settings$n.samples - mcmc.settings$n.burnin) / mcmc.settings$n.thin
+
+
+print(paste("Retained sample per chain =",retained.sample.per.chain))
+
+# https://stackoverflow.com/questions/3476782/check-if-the-number-is-integer
+
+if(!(retained.sample.per.chain%%1==0)){
+  warning("Specified burnin, sample and thin values do not result in integer sample size:  (sample-burnin)/thin has to give an integer value!")
+
+  stop()
+  }
+
+
+
 tmp.out <- doRJAGS(data.obj = mcmc.data,
                     model.fn = model.use, # for details see ?ricker.BUGS
                     inits = mcmc.inits,
@@ -132,12 +150,12 @@ summary.df$VarType[summary.df$VarType==""] <- summary.df$Variable[summary.df$Var
 
 
 # calculate perc diff from det estimate
-det.ricker.fit <- calcDetModelFit(sr.use ,sr.scale = sr.scale, min.obs = min.obs) 
+det.ricker.fit <- calcDetModelFit(sr.use ,sr.scale = sr.scale, min.obs = min.obs)
 # generates a vector with par est
 
 #print(det.ricker.fit$pars)
 
-summary.df <- left_join(as.data.frame(summary.df),  
+summary.df <- left_join(as.data.frame(summary.df),
 data.frame(VarType = names(det.ricker.fit$pars),Det = t(det.ricker.fit$pars)), by = "VarType") %>%
                     mutate(Diff = p50 - Det) %>% mutate(PercDiff = round(Diff/Det *100,1)) %>%
                       select(VarType,Variable,YrIdx,Yr,everything())
@@ -186,7 +204,7 @@ summary.df <- data.frame(VarType = perc.df$Variable,Variable = perc.df$Variable,
                          p75 = NA, p90 = NA, Det = NA, Diff = NA, PercDiff = NA)
 tmp.out <- NA
 
-det.pars <- NULL 
+det.pars <- NULL
 
 
 }
