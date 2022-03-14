@@ -61,13 +61,14 @@ if(!is.na(prior.list$tau_beta) ){ prior.list$tau_beta <- as.numeric(prior.list$t
 if(is.na(prior.list$tau_beta) ){
     #default precision for the lognormal beta is a very low precision (large uncertainty)
     # set at a CV of 10, then calculated as
-    #  sd = CV * p.beta
-    #  tau = (1/sd)^2
-    #prior.list$tau_beta <- (1 / (10 * prior.list$p.beta ))^2
-    # THIS CAUSED PROBLEMS WITH SMALL STOCKS -> SEE ISSUE
+      #sd = CV * p.beta
+      #tau = (1/sd)^2
+    prior.list$tau_beta <- (1 / (100 * prior.list$p.beta ))^2
+    # HAD CV = 10, THIS CAUSED PROBLEMS WITH SMALL STOCKS -> SEE ISSUE
     # https://github.com/SOLV-Code/RapidRicker/issues/91
+  # DOING MORE TESTING!
 
-  prior.list$tau_beta <- 0.00001
+ # prior.list$tau_beta <- 0.00001
 
     }
 
