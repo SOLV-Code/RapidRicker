@@ -80,7 +80,8 @@ print(mcmc.data)
 models.list <- c("BUILT_IN_MODEL_Ricker_BUGS.txt",
 					"BUILT_IN_MODEL_RickerAltBiasCorr_BUGS.txt",
 					"BUILT_IN_MODEL_RickerKalman_BUGS.txt",
-					"BUILT_IN_MODEL_RickerAR1_BUGS.txt")
+					"BUILT_IN_MODEL_RickerAR1_BUGS.txt",
+					"BUILT_IN_MODEL_Ricker_BUGS_AltSmaxPrior.txt")
 
 if(model.file %in% models.list){
 # this extracts the full path to the file in the local installing

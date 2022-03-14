@@ -54,6 +54,7 @@ if(is.na(prior.list$tau_alpha) ){
 if(!is.na(prior.list$p.beta) ){prior.list$p.beta <- as.numeric(prior.list$p.beta)}
 if(is.na(prior.list$p.beta) ){
     #default mean for the lognormal capacity is the natural log of the largest observed Spn
+	# log is taken in JAGS
     prior.list$p.beta <- max(sr_obj$Spn/sr.scale, na.rm = TRUE)
   }
 
@@ -63,6 +64,7 @@ if(is.na(prior.list$tau_beta) ){
     # set at a CV of 10, then calculated as
       #sd = CV * p.beta
       #tau = (1/sd)^2
+	  # log is taken in JAGS
     prior.list$tau_beta <- (1 / (100 * prior.list$p.beta ))^2
     # HAD CV = 10, THIS CAUSED PROBLEMS WITH SMALL STOCKS -> SEE ISSUE
     # https://github.com/SOLV-Code/RapidRicker/issues/91
