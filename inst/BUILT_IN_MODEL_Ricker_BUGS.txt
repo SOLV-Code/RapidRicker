@@ -15,13 +15,17 @@ model{
    }
 
     ln.alpha ~ dnorm(p.alpha,tau_alpha)        #prior for alpha (actually ln.alpha!) -> fix?
-    beta <-1/ S.max					   # prior for beta
+    beta <- 1/ S.max					   # prior for beta
 
 	# new constraint June 2021
 	# typical default is to  set p.beta set at log(max obs Spn)
 	# and max.scalar at 3, so that the Smax prior is bounded by 3 times the largest observed Spn
-    S.max ~ dlnorm(p.beta, tau_beta) T(0,Smax.limit)
-	Smax.limit <- max.scalar * p.beta
+    log.S.max ~ dlnorm(log(S.max.in), tau_beta) T(0,log(Smax.limit))
+	Smax.limit <- log(max.scalar * S.max.in)
+	
+	# non-updating samples (so can plot priors)
+	S.max.prior ~ dlnorm(p.beta, tau_beta) T(0,Smax.limit)
+	ln.alpha.prior ~ dnorm(p.alpha,tau_alpha)
 	
     tau_R ~ dgamma(shape.tau_R,lambda_tau_R)             #prior for precision parameter
     sigma <- 1/sqrt(tau_R) 			# changed based on Fleishman and Evenson

@@ -14,14 +14,15 @@ model{
 	  
    }
 
-    ln.alpha ~ dnorm(p.alpha,tau_alpha)        #prior for alpha (actually ln.alpha!) -> fix?
-    beta <-1/ exp(S.max)					   # prior for beta
+    ln.alpha ~ dnorm(p.alpha,tau_alpha)  #prior for lnalpha 
+    beta <- 1/ S.max				     # prior for beta
 
-	# new constraint June 2021
-	# typical default is to  set p.beta set at log(max obs Spn)
-	# and max.scalar at 3, so that the Smax prior is bounded by 3 times the largest observed Spn
-    S.max ~ dlnorm(log(p.beta), tau_beta) T(log(1/10^6),log(Smax.limit)) # lower bound = 1 fish
-	Smax.limit <- max.scalar * p.beta
+    S.max ~ dunif(1/10^6, max.scalar * S.max.in )  # data is in millions
+
+	
+	# non-updating samples (so can plot priors)
+	S.max.prior ~ dunif(1/10^6, max.scalar * S.max.in)
+	ln.alpha.prior ~ dnorm(p.alpha,tau_alpha)
 	
     tau_R ~ dgamma(shape.tau_R,lambda_tau_R)             #prior for precision parameter
     sigma <- 1/sqrt(tau_R) 			# changed based on Fleishman and Evenson

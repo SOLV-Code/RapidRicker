@@ -61,7 +61,7 @@ if(missing.yrs & model.type %in% c("Kalman","AR1")){
 yr.match <- data.frame(YrIdx = 1 : sum(!is.na(sr.use$Rec)), Yr = sr.use$Year)
 #print(yr.match)
 
-pars.track.in <- c("ln.alpha","ln.alpha.c","beta","sigma","deviance")
+pars.track.in <- c("ln.alpha","ln.alpha.c","beta","sigma","deviance","S.max.prior","ln.alpha.prior")
 if(tolower(model.type) == "ar1"){  pars.track.in <- c(pars.track.in,"phi")}
 pars.track.in <- c(pars.track.in, "log.resid")
 
