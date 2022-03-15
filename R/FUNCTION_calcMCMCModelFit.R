@@ -61,7 +61,7 @@ if(missing.yrs & model.type %in% c("Kalman","AR1")){
 yr.match <- data.frame(YrIdx = 1 : sum(!is.na(sr.use$Rec)), Yr = sr.use$Year)
 #print(yr.match)
 
-pars.track.in <- c("ln.alpha","ln.alpha.c","beta","sigma","deviance")
+pars.track.in <- c("ln.alpha","ln.alpha.c","beta","sigma","deviance","S.max", "S.max.prior","ln.alpha.prior")
 if(tolower(model.type) == "ar1"){  pars.track.in <- c(pars.track.in,"phi")}
 pars.track.in <- c(pars.track.in, "log.resid")
 
@@ -77,10 +77,11 @@ mcmc.data <- c(list(S = sr.use$Spn / sr.scale, R_Obs = sr.use$Rec / sr.scale, N 
 print(mcmc.data)
 # Get the model file
 
-models.list <- c("BUILT_IN_MODEL_Ricker_BUGS.txt",
-					"BUILT_IN_MODEL_RickerAltBiasCorr_BUGS.txt",
-					"BUILT_IN_MODEL_RickerKalman_BUGS.txt",
-					"BUILT_IN_MODEL_RickerAR1_BUGS.txt")
+models.list <- c("BUILT_IN_MODEL_Ricker_LognormalCapPrior.txt",
+					       "BUILT_IN_MODEL_Ricker_UniformCapPrior.txt",
+					        "BUILT_IN_MODEL_RickerKalman_BUGS.txt",
+					        "BUILT_IN_MODEL_RickerAR1_BUGS.txt"
+					        )
 
 if(model.file %in% models.list){
 # this extracts the full path to the file in the local installing

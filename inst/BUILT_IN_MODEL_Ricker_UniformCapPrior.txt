@@ -1,0 +1,27 @@
+model{
+	# adapted from code originally developed by Catherine Michielsens, Sue Grant, and Bronwyn MacDonald.
+	# modifications based on comments and code samples from Ann-Marie Huang, Brendan Connors, Charmaine
+	# Carr-Harris, and Wendell Challenger.
+
+    for (i in 1:N) {                       #loop over N sample points
+      R_Obs[i] ~ dlnorm(logR[i],tau_R)          #likelihood -> predicted value for NA in data set
+      logR[i] <- RS[i] +log(S[i])               # calc log(R) - fitted values
+      RS[i] <- ln.alpha - beta * S[i]           # ricker model
+	  log.resid[i] <-  log(R_Obs[i]) - logR[i] 
+   }
+
+    ln.alpha ~ dnorm(p.alpha,tau_alpha)  #prior for ln.alpha 
+    beta <- 1/ S.max				     # prior for beta
+
+    S.max ~ dunif(1/10^6, max.scalar * smax.in )  # data is in millions
+	
+	# non-updating samples (so can plot priors)
+	S.max.prior ~ dunif(1/10^6, max.scalar * smax.in)
+	ln.alpha.prior ~ dnorm(p.alpha,tau_alpha)
+	
+    tau_R ~ dgamma(shape.tau_R,lambda_tau_R)             #prior for precision parameter
+    sigma <- 1/sqrt(tau_R) 			
+	
+	ln.alpha.c <- ln.alpha + (sigma * sigma / 2) # bias correction for lognormal skewness
+
+}

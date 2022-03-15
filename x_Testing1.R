@@ -95,6 +95,29 @@ ricker.test <- calcMCMCModelFit(
 )
 
 
+
+
+ricker.test <- calcMCMCModelFit(
+  sr_obj = sr.use, sr.scale = sr.scale.use  ,
+  model.type = "Basic",
+  model.file = "BUILT_IN_MODEL_Ricker_BUGS_AltSmaxPrior.txt",
+  min.obs = 15,
+  #mcmc.settings = list(n.chains = 2, n.burnin = 20000, n.thin = 60, n.samples = 50000),
+  mcmc.settings = list(n.chains = 2, n.burnin = 80000, n.thin = 60, n.samples = 140000),
+  mcmc.inits = inits.ricker,
+  mcmc.priors = priors.ricker,
+  mcmc.output = "all",
+  mcmc.out.path = "MCMC_Out",
+  mcmc.out.label = "MCMC",
+  mcmc.seed = "default",
+  tracing = FALSE
+)
+
+
+
+
+
+
 x <- (150000-80000)/60
 x%%1==0
 
