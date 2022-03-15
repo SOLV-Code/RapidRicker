@@ -9,7 +9,8 @@ generatePriors(
   sr.scale = 10^6,
   model_type = "Basic",
   custom.list = NULL,
-  filename = NULL
+  filename = NULL,
+  capacity.prior.type = "uniform"
 )
 }
 \arguments{
@@ -20,9 +21,11 @@ the benchmark estimates are scaled back, but the MCMC estimates of alpha and bet
 
 \item{model_type}{one of "Basic", "Kalman", or "AR1".  For details, see \href{https://github.com/SOLV-Code/RapidRicker/wiki/3:--Ricker-Model-Forms-in-BUGS-JAGS}{this wiki}.}
 
-\item{custom.list}{a list with elements to replace the default values (e.g. "list(p.beta = 0.1)")}
+\item{custom.list}{a list with elements to replace the default values (e.g. "list(smax.in = 0.1)")}
 
 \item{filename}{either NULL, or a file/path for an output file to save the generated priors (e.g. "OUTPUT/Priors.txt")}
+
+\item{capacity.prior.type}{either "uniform" or "lognormal"}
 }
 \description{
 This function generates priors for the alternative Ricker model forms. User-specified values can be fed in for one or more variable to replace the defaults. Defaults are under development. Follow the discussion at \href{https://github.com/SOLV-Code/RapidRicker/issues/71}{this thread}.
