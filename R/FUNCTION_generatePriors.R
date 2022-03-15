@@ -5,21 +5,24 @@
 #' @param sr.scale an integer value used to rescale the Spn and Rec variables in sr_obj, prior to the MCMC fit, default = 10^6 (i.e. convert to millions). NOTE: If sr.scale is different from 1, then
 #' the benchmark estimates are scaled back, but the MCMC estimates of alpha and beta will be in different units then the alpha and beta estimates from the deterministic fit.
 #' @param model_type one of "Basic", "Kalman", or "AR1".  For details, see \href{https://github.com/SOLV-Code/RapidRicker/wiki/3:--Ricker-Model-Forms-in-BUGS-JAGS}{this wiki}.
-#' @param custom.list a list with elements to replace the default values (e.g. "list(p.beta = 0.1)")
+#' @param custom.list a list with elements to replace the default values (e.g. "list(smax.in = 0.1)")
 #' @param filename either NULL, or a file/path for an output file to save the generated priors (e.g. "OUTPUT/Priors.txt")
+#' @param capacity.prior.type either "uniform" or "lognormal"
 #' @keywords priors
 #' @export
 
 
 
-generatePriors <- function(sr_obj,sr.scale=10^6,model_type = "Basic", custom.list = NULL,filename = NULL){
+generatePriors <- function(sr_obj,sr.scale=10^6,model_type = "Basic", custom.list = NULL,filename = NULL,
+                           capacity.prior.type = "uniform"){
 
 
 # priors for all the Ricker model form
-prior.list <- list(p.alpha = NA,tau_alpha = NA, p.beta = NA , tau_beta = NA,max.scalar = NA,
+prior.list <- list(p.alpha = NA,tau_alpha = NA, smax.in = NA , max.scalar = NA,
                    shape.tau_R = NA, lambda_tau_R=NA)
 
 if(model_type %in% c("Kalman","AR1")){ prior.list = c(prior.list, shape.tauw = NA,lambda_tauw=NA) }
+if(capacity.prior.type == "lognormal"){ prior.list = c(prior.list, tau_smax = NA)}
 
 custom.match <- intersect(names(prior.list),names(custom.list))
 #print(custom.match)
@@ -31,9 +34,6 @@ prior.list[custom.match] <- custom.list[custom.match]
 }
 
 
-
-#print(prior.list)
-#print(is.na(prior.list$p.beta))
 
 if(!is.na(prior.list$p.alpha) ){prior.list$p.alpha <- as.numeric(prior.list$p.alpha)} # because it might be text of the spec file has "default" for some entries
 if(is.na(prior.list$p.alpha) ){
@@ -51,33 +51,30 @@ if(is.na(prior.list$tau_alpha) ){
 }
 
 
-if(!is.na(prior.list$p.beta) ){prior.list$p.beta <- as.numeric(prior.list$p.beta)}
-if(is.na(prior.list$p.beta) ){
+if(!is.na(prior.list$smax.in) ){prior.list$smax.in <- as.numeric(prior.list$smax.in)}
+if(is.na(prior.list$smax.in) ){
     #default mean for the lognormal capacity is the natural log of the largest observed Spn
 	# log is taken in JAGS
-    prior.list$p.beta <- max(sr_obj$Spn/sr.scale, na.rm = TRUE)
+    prior.list$smax.in <- max(sr_obj$Spn/sr.scale, na.rm = TRUE)
   }
 
-if(!is.na(prior.list$tau_beta) ){ prior.list$tau_beta <- as.numeric(prior.list$tau_beta)}
-if(is.na(prior.list$tau_beta) ){
+
+if(capacity.prior.type == "lognormal"){
+
+if(!is.na(prior.list$tau_smax) ){ prior.list$tau_smax <- as.numeric(prior.list$tau_smax)}
+if(is.na(prior.list$tau_smax) ){
     #default precision for the lognormal beta is a very low precision (large uncertainty)
-    # set at a CV of 10, then calculated as
-      #sd = CV * p.beta
-      #tau = (1/sd)^2
-	  # log is taken in JAGS
-    prior.list$tau_beta <- (1 / (100 * prior.list$p.beta ))^2
-    # HAD CV = 10, THIS CAUSED PROBLEMS WITH SMALL STOCKS -> SEE ISSUE
-    # https://github.com/SOLV-Code/RapidRicker/issues/91
-  # DOING MORE TESTING!
+    # set at a CV of 1, (100%)
+    # for CV =< 1, SD = SV = tau
+    prior.list$tau_smax <- 1
+}
+}
 
- # prior.list$tau_beta <- 0.00001
-
-    }
 
 
 if(!is.na(prior.list$max.scalar) ){prior.list$max.scalar <- as.numeric(prior.list$max.scalar)}
 if(is.na(prior.list$max.scalar) ){
-  # upper limit on Smax, expressed as a multiple of p.beta
+  # upper limit on Smax, expressed as a multiple of smax.in
   prior.list$max.scalar <- 3
 }
 
@@ -116,7 +113,6 @@ if(is.na(prior.list$lambda_tauw) ){
 if(!is.null(filename)){
   sink(file = filename)
   print("NOTES -----------------------------------")
-  print("For all tau priors: smaller number = smaller precision = wider distribution")
   print("PRIORS ----------------------------------")
   print(prior.list)
   sink()
