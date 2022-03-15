@@ -14,7 +14,8 @@ doRJAGS(
   out.path = "MCMC_Out",
   out.label = "MCMC",
   mcmc.seed = "default",
-  tracing = FALSE
+  tracing = FALSE,
+  sr.yrs = NA
 )
 }
 \arguments{
@@ -36,7 +37,9 @@ doRJAGS(
 
 \item{mcmc.seed}{either "default" or an integer giving the random seed for starting MCMC (R2Jags default is 123)}
 
-\item{tracing}{if TRUE, diagnostic details for intermediate objects will be printed to the screen for debugging}
+\item{tracing}{if TRUE, diagnostic details for intermediate objects will be printed to the screen for}
+
+\item{optional}{vector to provide brood years matching the data points (for labelling output)}
 }
 \description{
 This function is a wrapper for calls to the jags() function of the R2jags package. It is designed for use inside the calcMCMCRickerBM() function, but can be used on its own if you are familiar with BUGS models. Check the code for calcMCMCRickerBM() to see the details. This function is adapted from forecasting code originally developed in collaboration with Sue Grant and Bronwyn MacDonald. Note: This requires installing JAGS from \href{https://sourceforge.net/projects/mcmc-jags/files/latest/download}{here}.
