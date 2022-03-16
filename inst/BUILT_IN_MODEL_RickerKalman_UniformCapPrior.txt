@@ -1,5 +1,7 @@
 model{
 	# adapted from code by Ann-Marie Huang, which was originally contributed by Catherine Michielsens
+	# modifications based on comments and code samples from Ann-Marie Huang, Brendan Connors, Charmaine 
+	# Carr-Harris, and Wendell Challenger.
 
 
     for (i in 1:N) {                       #loop over N sample points
@@ -20,8 +22,11 @@ model{
     ln.alpha[1] ~ dnorm(p.alpha,tau_alpha)        #prior for alpha (actually ln.alpha!)
     beta <-1/ S.max					   # prior for beta
 	
-    S.max ~ dlnorm(p.beta, tau_beta)T(0,Smax.limit)
-	Smax.limit <- max.scalar * p.beta
+	S.max ~ dunif(1/10^6, max.scalar * smax.in )  # data is in millions
+	
+	# non-updating samples (so can plot priors)
+	S.max.prior ~ dunif(1/10^6, max.scalar * smax.in)
+	ln.alpha.prior ~ dnorm(p.alpha,tau_alpha)
 	
     tau_R ~ dgamma(shape.tau_R,lambda_tau_R)                    #prior for precision parameter
     sigma <- 1/sqrt(tau_R) 			# based on Fleishman and Evenson
