@@ -1,6 +1,6 @@
 model{
 	# adapted from code originally developed by Catherine Michielsens, Sue Grant, and Bronwyn MacDonald.
-	# modifications based on comments and code samples from Ann-Marie Huang, Brendan Connors, Charmaine
+	# modifications based on comments and code samples from Ann-Marie Huang, Brendan Connors, Charmaine 
 	# Carr-Harris, and Wendell Challenger.
 
     for (i in 1:N) {                       #loop over N sample points

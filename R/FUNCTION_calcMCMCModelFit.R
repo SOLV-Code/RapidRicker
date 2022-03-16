@@ -79,8 +79,9 @@ print(mcmc.data)
 
 models.list <- c("BUILT_IN_MODEL_Ricker_LognormalCapPrior.txt",
 					       "BUILT_IN_MODEL_Ricker_UniformCapPrior.txt",
-					        "BUILT_IN_MODEL_RickerKalman_BUGS.txt",
-					        "BUILT_IN_MODEL_RickerAR1_BUGS.txt"
+					       "BUILT_IN_MODEL_RickerAR1_LognormalCapPrior.txt",
+					        "BUILT_IN_MODEL_RickerAR1_UniformCapPrior.txt",
+					       "BUILT_IN_MODEL_RickerKalman_BUGS.txt"
 					        )
 
 if(model.file %in% models.list){
