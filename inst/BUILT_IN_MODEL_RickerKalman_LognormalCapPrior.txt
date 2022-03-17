@@ -22,7 +22,7 @@ model{
     ln.alpha[1] ~ dnorm(p.alpha,tau_alpha)        #prior for alpha (actually ln.alpha!)
     beta <-1/ S.max					   # prior for beta
 	
-	S.max ~ dlnorm(smax.in, tau_smax) T(0,smax.limit)
+	S.max ~ dlnorm(log(smax.in), tau_smax) T(0,smax.limit)
 	smax.limit <- max.scalar * smax.in # typical default  3 * (Max Obs)
 
 	# non-updating samples (so can plot priors)

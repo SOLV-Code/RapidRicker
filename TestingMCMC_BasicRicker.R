@@ -126,8 +126,8 @@ median(test.basic.mp$MCMC$MCMC.samples[,"S.max.prior"])
 # Moderately informative Prior (lognormal, CV = 1 , cap at 1.5 * Smax PR Est)
 
 priors.mp <- generatePriors(sr_obj = sr.use , sr.scale=10^6, model_type = "Basic",
-                            custom.list = list(smax.in = 0.5,max.scalar = 1.5,
-                                               tau_smax = calcLognormalTauFromCV(cv=1)),
+                            custom.list = list(smax.in = 0.5,max.scalar = 5,
+                                               tau_smax = calcLognormalTauFromCV(cv=2)),
                             capacity.prior.type = "lognormal")
 priors.mp
 
@@ -167,8 +167,8 @@ median(test.basic.mp$MCMC$MCMC.samples[,"S.max.prior"])
 # Strongly informative Prior (lognormal, CV = 0.3 , cap at 1.5 * Smax PR Est)
 
 priors.sp <- generatePriors(sr_obj = sr.use , sr.scale=10^6, model_type = "Basic",
-                            custom.list = list(smax.in = 0.5,max.scalar = 1.5,
-                                               tau_smax = calcLognormalTauFromCV(cv=0.3)),
+                            custom.list = list(smax.in = 0.5,max.scalar = 25,
+                                               tau_smax = calcLognormalTauFromCV(cv=1)),
                             capacity.prior.type = "lognormal")
 priors.sp
 
@@ -198,8 +198,11 @@ hist(test.basic.sp$MCMC$MCMC.samples[,"S.max"],breaks=20)
 hist(test.basic.sp$MCMC$MCMC.samples[,"S.max.prior"],breaks=20)
 plot(density(test.basic.sp$MCMC$MCMC.samples[,"S.max"]))
 plot(density(test.basic.sp$MCMC$MCMC.samples[,"S.max.prior"]))
+
+
 range(test.basic.sp$MCMC$MCMC.samples[,"S.max.prior"])
 median(test.basic.sp$MCMC$MCMC.samples[,"S.max.prior"])
+
 
 
 #-----------------------------------------------------------------------------------------------------------
