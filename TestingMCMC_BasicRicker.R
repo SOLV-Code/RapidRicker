@@ -8,6 +8,9 @@ library(RapidRicker)
 # testing lognormal  capacity prior conversions
 #-------------------------------------------
 
+calcLognormalTauFromSigma(0.3)
+calcLognormalTauFromSigma(0.5)
+calcLognormalTauFromSigma(0.75)
 
 # testing
 test.vec.sigma <- seq(0.1,2,by=0.1)

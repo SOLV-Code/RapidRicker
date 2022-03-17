@@ -51,6 +51,11 @@ plot(density(test.kf.up$MCMC$MCMC.samples[,"S.max.prior"]))
 range(test.kf.up$MCMC$MCMC.samples[,"S.max.prior"])
 median(test.kf.up$MCMC$MCMC.samples[,"S.max.prior"])
 
+
+test.kf.up$MCMC$tables$ln.alpha.bookends
+
+
+
 #-----------------------------------------------------------------------------------------------------------
 # Weakly informative Prior (Uniform, cap at 1.5 * Smax PR Est)
 # use all defaults in generatePriors()
