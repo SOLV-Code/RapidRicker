@@ -38,7 +38,7 @@ S.max ~ dlnorm(smax.in, tau_smax) T(0,smax.limit)
 smax.limit <- max.scalar * smax.in # typical default  3 * (Max Obs)
 
 # non-updating samples (so can plot priors)
-S.max.prior ~ dlnorm(smax.in, tau_smax) T(0,smax.limit)
+S.max.prior ~ dlnorm(log(smax.in), tau_smax) T(0,smax.limit)
 ln.alpha.prior ~ dnorm(p.alpha,tau_alpha)
 
 tau_R ~ dgamma(shape.tau_R,lambda_tau_R)    #prior for precision parameter     
