@@ -206,8 +206,9 @@ fit.table <-   bind_cols(data.frame(pD = bugs.dic$pD,DIC = bugs.dic$DIC, max.Rha
 beta.table <- bugs.summary %>% dplyr::filter(var=="beta") %>% select(mean,sd,cv,starts_with("p"),Rhat,n.eff) %>% select(p50,mean,cv,everything()) %>%
   dplyr::rename(median = p50)
 
+
 ln.alpha.table <- bugs.summary %>%dplyr::filter(!grepl(".c",var)) %>%
-							dplyr::filter(grepl("ln.alpha",var)) %>% select(mean,sd,cv,starts_with("p"),Rhat,n.eff) %>% select(p50,mean,cv,everything()) %>%
+							dplyr::filter(grepl("ln.alpha",var),var != "ln.alpha.prior") %>% select(mean,sd,cv,starts_with("p"),Rhat,n.eff) %>% select(p50,mean,cv,everything()) %>%
   dplyr::rename(median = p50)
 
 
