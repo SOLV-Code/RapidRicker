@@ -186,7 +186,7 @@ fit.table <-   bind_cols(data.frame(pD = bugs.dic$pD,DIC = bugs.dic$DIC, max.Rha
                                     max.abs.G = max(abs(g.score$z)),
                                     min.gelman = gelman.range[1],
                                     max.gelman = gelman.range[2],
-                                    med.sigma = bugs.summary %>% dplyr::filter(var=="deviance") %>% select(p50) %>% unlist(),
+                                    med.sigma = bugs.summary %>% dplyr::filter(var=="sigma") %>% select(p50) %>% unlist(),
                                     med.deviance = bugs.summary %>% dplyr::filter(var=="deviance") %>% select(p50) %>% unlist()
                                     ),
                           bugs.summary %>% dplyr::filter(!grepl(".c",var)) %>%

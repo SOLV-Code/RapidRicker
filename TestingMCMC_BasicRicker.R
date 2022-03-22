@@ -76,6 +76,9 @@ test.basic.up <- calcMCMCModelFit(
   tracing = FALSE
 )
 
+
+test.basic.up$MCMC$tables
+
 names(test.basic.up)
 test.basic.up$Summary
 hist(test.basic.up$MCMC$MCMC.samples[,"S.max"],breaks=20)
