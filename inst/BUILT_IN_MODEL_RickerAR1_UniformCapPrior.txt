@@ -1,6 +1,6 @@
 model{
 
-# This is a BUGS version of the Ricker model fit with lag-1 autoregression correction (AR1) and associated benchmarks. 
+# This is a JAGS version of the Ricker model fit with lag-1 autoregression correction (AR1). 
 # adapted from code originally developed by Catherine Michielsens, Sue Grant, and Bronwyn MacDonald.
 # modifications based on comments and code samples from Ann-Marie Huang, Brendan Connors, Charmaine 
 # Carr-Harris, and Wendell Challenger.
