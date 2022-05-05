@@ -44,7 +44,7 @@ out.vec <-  c(
 			ln.alpha = round(as.vector(ricker.lna),3), # need as.vector to fix names in output)
 			ln.alpha.c = round(as.vector(ricker.lna.c),3),
 			alpha = round(as.vector(ricker.a),3),
-			alpha.c = round(as.vector(ricker.a),3),
+			alpha.c = round(as.vector(ricker.a.c),3),
 			beta = c(as.vector(ricker.b)),
 			sigma = round(as.vector(ricker.sigma),3)			
 			)
