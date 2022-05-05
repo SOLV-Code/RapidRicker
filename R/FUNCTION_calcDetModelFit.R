@@ -25,7 +25,8 @@ ricker.fit <- lm(sr.use$logRpS ~ sr.use$Spn)
 ricker.sigma <- sigma(ricker.fit)
 ricker.lna <- ricker.fit$coefficients[1]
 ricker.lna.c <- ricker.lna + (ricker.sigma^2  / 2)
-ricker.a <- exp(ricker.lna.c)
+ricker.a <- exp(ricker.lna)
+ricker.a.c <- exp(ricker.lna.c)
 ricker.b <- - ricker.fit$coefficients[2]
 
 
@@ -43,6 +44,7 @@ out.vec <-  c(
 			ln.alpha = round(as.vector(ricker.lna),3), # need as.vector to fix names in output)
 			ln.alpha.c = round(as.vector(ricker.lna.c),3),
 			alpha = round(as.vector(ricker.a),3),
+			alpha.c = round(as.vector(ricker.a),3),
 			beta = c(as.vector(ricker.b)),
 			sigma = round(as.vector(ricker.sigma),3)			
 			)
