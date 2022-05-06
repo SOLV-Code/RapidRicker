@@ -77,7 +77,7 @@ out.vec <- as.data.frame(t(out.vec))
 
 if(!resids) {  return(list(pars = out.vec,sr.data = sr.use)) }
 if(resids) { return(list(pars = out.vec, 
-					resids = data.frame(Year = sr.use$Year,
+					resids = data.frame(Year = sr.use$Year, S.obs = sr.use$Spn
 					logRpS.obs = sr.use$logRpS, logRps.fitted = logRpS.fitted, logRps.resids = logRpS.resids, 
 					R.obs = sr.use$Rec, R.fitted = R.fitted, R.resids = R.resids),
 					sr.data = sr.use ))  }
