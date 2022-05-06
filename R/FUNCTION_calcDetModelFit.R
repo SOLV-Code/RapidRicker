@@ -33,9 +33,11 @@ ricker.b <- - ricker.fit$coefficients[2]
 
 if(resids){
 
-  logRpS.resids <- (ricker.lna - ricker.b * sr.use$Spn) 
+  logRpS.fitted <- (ricker.lna - ricker.b * sr.use$Spn) 
+  R.fitted <-  exp( logRpS.fitted + log(sr.use$Spn) ) *sr.scale
 
-  R.fitted <-  exp( logRpS.resids + log(sr.use$Spn) ) *sr.scale
+
+  logRpS.resids  <- logRpS.fitted  - sr.use$logRpS	
   R.resids <- R.fitted - (sr.use$Rec*sr.scale)
   
 
@@ -75,7 +77,9 @@ out.vec <- as.data.frame(t(out.vec))
 
 if(!resids) {  return(list(pars = out.vec,sr.data = sr.use)) }
 if(resids) { return(list(pars = out.vec, 
-					resids = data.frame(Year = sr.use$Year,logRps.resids = logRpS.resids, R.resids = R.resids),
+					resids = data.frame(Year = sr.use$Year,
+					logRpS.obs = sr.use$logRpS, logRps.fitted = logRpS.fitted, logRps.resids = logRpS.resids, 
+					R.obs = sr.use$Rec, R.fitted = R.fitted, R.resids = R.resids),
 					sr.data = sr.use ))  }
 
 }
