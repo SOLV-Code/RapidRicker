@@ -67,8 +67,8 @@ out.vec <-  c(n_obs = dim(sr.use)[1],
 
 out.vec <- as.data.frame(t(out.vec))
 
-if(!resids) {  return(list(pars = out.vec)) }
-if(resids) { return(list(pars = out.vec, resids = R.resids ))  }
+if(!resids) {  return(list(pars = out.vec,sr.data = sr.use)) }
+if(resids) { return(list(pars = out.vec, resids = R.resids,sr.data = sr.use ))  }
 
 }
 
