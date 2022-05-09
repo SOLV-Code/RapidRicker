@@ -49,12 +49,12 @@ if(resids){
 
 out.vec <-  c(
 			n_obs = dim(sr.use)[1] ,
-			ln.alpha = round(as.vector(ricker.lna),3), # need as.vector to fix names in output)
-			ln.alpha.c = round(as.vector(ricker.lna.c),3),
-			alpha = round(as.vector(ricker.a),3),
-			alpha.c = round(as.vector(ricker.a.c),3),
+			ln.alpha = round(as.vector(ricker.lna),5), # need as.vector to fix names in output)
+			ln.alpha.c = round(as.vector(ricker.lna.c),5),
+			alpha = round(as.vector(ricker.a),5),
+			alpha.c = round(as.vector(ricker.a.c),5),
 			beta = c(as.vector(ricker.b)),
-			sigma = round(as.vector(ricker.sigma),3)			
+			sigma = round(as.vector(ricker.sigma),5)			
 			)
 
 } # if n >= min.obs
