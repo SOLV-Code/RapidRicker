@@ -3,7 +3,7 @@
 # V2: Hamazaki Shiny app (deterministic version is built around gls() fro package {nlme} (which has an AR1 version)
 # Deterministic Hamazaki app: https://hamachan.shinyapps.io/Spawner_Recruit/
 
-# Reason for this test: identical results for stock A, very different fits for Stock B.
+# Reason for this test: just making sure...
 
 # Note: Excel LINEST() gives identical results for Stock A, but different from
 #       both R versions for Stock B (closer to gls version)
