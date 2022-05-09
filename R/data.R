@@ -34,6 +34,22 @@
 "flags_default"
 
 
+#' Spawner Recruit Test Data
+#'
+#' A dataset containing spawners and  recruits by brood year for 2 stocks.
+#'
+#' @format A data frame with  5 required variables:
+#' \describe{
+#'   \item{Stock}{ stock name}
+#'   \item{Year}{brood year}
+#'   \item{Spn}{spawner estimate}
+#'   \item{Rec}{recruitment estimate}
+#'   \item{logRpS}{calculated value of log(Rec/Spn), usually with mutate(logRpS = log(Rec/Spn))}
+#'   \item{}{}
+#'   ...
+#' }
+#' @source Dummy Data
+"gls_test_data"
 
 
 

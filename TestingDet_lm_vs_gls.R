@@ -15,7 +15,7 @@ library(tidyverse)
 library(RapidRicker)
 
 # built in data set
-gls.test.data
+gls_test_data
 
 
 fits.out <- data.frame(Stock = character(), Fit = character(), ln.alpha = numeric(), ln.alpha.c = numeric(),
@@ -24,7 +24,7 @@ fits.out <- data.frame(Stock = character(), Fit = character(), ln.alpha = numeri
 
 for(stk.do in c("Stock A", "Stock B")){
 
-sr.stk <-   gls.test.data %>% dplyr::filter(Stock == stk.do)
+sr.stk <-   gls_test_data %>% dplyr::filter(Stock == stk.do)
 
 
 # RapidRicker fit
