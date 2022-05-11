@@ -9,6 +9,7 @@ include.dependencies <- function(){
 #' @import rstan
 #' @import rstanarm
 #' @import MASS
+#' @import nlme
 #' @return Nothing returned.
 #' @export
 

@@ -65,6 +65,40 @@ fits.out <- bind_rows(fits.out, bind_cols(Stock = stk.do, Fit = "gls()",
                                           alpha = gls.a, alpha.c= gls.a.c, beta = gls.b, sigma= gls.sigma ))
 
 
+
+
+# Do the gls fit with AR1 (from Hamazaki code)
+
+
+gls.ar1.fit <-gls(logRpS ~ Spn,data=sr.stk,correlation=corAR1(form=~1),method='ML')
+names(gls.ar1.fit)
+
+gls.ar1.sigma <- sigma(gls.ar1.fit)
+gls.ar1.lna <- gls.ar1.fit$coefficients[1]
+gls.ar1.lna.c <- gls.ar1.lna + (gls.ar1.sigma^2  / 2)
+gls.ar1.a <- exp(gls.ar1.lna)
+gls.ar1.a.c <- exp(gls.ar1.lna.c)
+gls.ar1.b <- - gls.ar1.fit$coefficients[2]
+
+fits.out <- bind_rows(fits.out, bind_cols(Stock = stk.do, Fit = "gls() with AR1",
+                                          ln.alpha = gls.ar1.lna, ln.alpha.c = gls.ar1.lna.c,
+                                          alpha = gls.ar1.a, alpha.c= gls.ar1.a.c, beta = gls.ar1.b, sigma= gls.ar1.sigma ))
+
+
 }
 
 fits.out
+
+
+
+
+# function test
+
+
+test.lm <- calcDetModelFit(sr_obj = sr.stk,sr.scale = 1, min.obs=15,resids = FALSE, fn.use = "lm", ar1 = FALSE)
+test.gls <- calcDetModelFit(sr_obj = sr.stk,sr.scale = 1, min.obs=15,resids = FALSE, fn.use = "gls", ar1 = FALSE)
+test.gls.ar1 <- calcDetModelFit(sr_obj = sr.stk,sr.scale = 1, min.obs=15,resids = FALSE, fn.use = "gls", ar1 = TRUE)
+
+test.lm$pars
+test.gls$pars
+test.gls.ar1$pars

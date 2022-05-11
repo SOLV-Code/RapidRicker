@@ -1,16 +1,19 @@
 #' calcDetModelFit
 #'
-#' This function calculates Ricker Model parameters for spawner-recruit data using a simple linear regression of log(R/S) ~ S.  Note that these are simple deterministic model fits intended for rapid testing of input data!
+#' This function calculates Ricker Model parameters for spawner-recruit data using a simple linear regression of log(R/S) ~ S.  Note that these are simple deterministic model fits intended for rapid testing of input data! Use of gls() function from {nlme} and AR1 version of deterministic fit, using gls(), contributed by Hamachan Hamazaki (ADFG).
 #' @param sr_obj a data frame with Year and Spn, logRpS , and Rec (Data for 1 Stock!). Other variables can be there but are not used (RpS, Qual, ExpF etc)
 #' @param min.obs min number of S-R pairs needed to fit a model
 #' @param resids if TRUE, add the residuals to the output
-#' @keywords Ricker fit, 
+#' @param fn.use default is "lm" to use lm() from Base R. Alternative is "gls" to use the gls() function from the {nlme} package.
+#' @param ar1  if TRUE, *and* if data set has no missing years, then calculate the Ricker fit with lag-1 autoregression. Note: this uses gls(), regardless of what setting is provided for the gls argument
+#' @param
+#' @keywords Ricker fit,
 #' @export
 #' @examples
-#' ricker.fit <- calcDetModelFitSR_Sample[SR_Sample$Stock == "Stock1",],min.obs = 10)
+#' ricker.fit <- calcDetModelFit(SR_Sample[SR_Sample$Stock == "Stock1",],min.obs = 10)
 #' print(ricker.fit)
 
-calcDetModelFit <- function(sr_obj,sr.scale = 10^6, min.obs=15,resids = FALSE){
+calcDetModelFit <- function(sr_obj,sr.scale = 10^6, min.obs=15,resids = FALSE, fn.use = "lm", ar1 = FALSE){
 
 
 sr.use  <- sr_obj %>% dplyr::filter(!is.na(logRpS),!is.na(Spn)) %>%
@@ -21,7 +24,21 @@ sr.use  <- sr_obj %>% dplyr::filter(!is.na(logRpS),!is.na(Spn)) %>%
 
 if(dim(sr.use)[1] >= min.obs){
 
-ricker.fit <- lm(sr.use$logRpS ~ sr.use$Spn)
+if(fn.use == "lm"){ ricker.fit <- lm(sr.use$logRpS ~ sr.use$Spn)}
+if(fn.use == "gls"){ ricker.fit <- gls(logRpS ~ Spn,data=sr.use,method='ML')}
+
+if(ar1){
+
+yrs.list <- seq(min(sr.use$Year),max(sr.use$Year))
+missing.yr.chk <- all.equal(sort(yrs.list),sort(sr.use$Year))
+
+if(!missing.yr.chk){warning("Missing brood years in data set. Cannot do AR1 fit"); stop()}
+if(missing.yr.chk){ ricker.fit <- gls(logRpS ~ Spn,data=sr.use,correlation=corAR1(form=~1),method='ML')}
+
+
+}
+
+
 ricker.sigma <- sigma(ricker.fit)
 ricker.lna <- ricker.fit$coefficients[1]
 ricker.lna.c <- ricker.lna + (ricker.sigma^2  / 2)
