@@ -79,18 +79,21 @@ head(SR_Sample) # shows the first few rows
 
 
 
-### Worked Examples
+## Worked Examples
+
+
+### Load the Package
 
 
 ```
 library(RapidRicker)
 library(tidyverse)
-
-# ---------------------------------------------
-# run the wrapper function (all tests, all stocks)
+```
 
 
+### Run the wrapper function (all tests, all stocks)
 
+```
 # look at the default criteria for the data check 
 flags_default
 
@@ -116,9 +119,13 @@ head(rapid.ricker.out$BM$Retro)
 head(rapid.ricker.out$PercDiff$RetroPercDiffMin)
 head(rapid.ricker.out$PercDiff$RetroPercDiffMax)
 
+```
 
-#--------------------------------------------------
-# Illustration of Summary Plots
+
+
+### Illustration of Summary Plots
+
+```
 
 pdf(file = "RapidRicker_SamplePlots_Ranks&Tornado.pdf", onefile= TRUE, height = 8.5, width =11)
 
@@ -169,11 +176,15 @@ title(main="Retrospective Test of Umsy")
 
 dev.off()
 
-
-# -----------------------------------------
-# Use individual functions
+```
 
 
+
+### Use individual calculation functions
+
+```
+
+# data check
 data.chk <- checkSRData(SR_Sample[SR_Sample$Stock == "Stock1",])
 names(data.chk)
 print(data.chk$Summary)
@@ -204,10 +215,14 @@ ricker.revretro <- testDetRickerBM(SR_Sample[SR_Sample$Stock == "Stock1",],
 
 print(head(ricker.revretro))
 
+```
 
 
-# Plot examples
 
+### Use individual plotting functions
+
+
+```
 # add a new col, for easier plotting
 SR_Sample[["RpS"]] <- exp(SR_Sample$logRpS)
 
@@ -253,8 +268,23 @@ title(main = "Rec/Spn", outer = TRUE, line = -2,cex.main =2, col.main = "darkblu
 dev.off()
 
 
-
 ```
 
 
 
+### Use individual benchmark calculation functions
+
+
+```
+
+test.df <- data.frame(ln.alpha = log(seq(1.5,8.5,by=0.5)),beta = 10^(-05),sigma = 0.5 )
+test.df
+
+
+test.df <- calcRickerSmsy(test.df, method = "Scheuerell2016", sr.scale = 1, out.type = "Full")
+test.df
+
+test.df <- calcRickerSgen(test.df, method = "Connorsetal2022",sr.scale = 1, out.type = "Full",tracing = FALSE)
+test.df
+
+```
