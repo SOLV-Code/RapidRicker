@@ -118,8 +118,7 @@ for(stk in stk.list){
   
   fit.tmp <- calcDetModelFit(sr_obj = sr.sub,
   sr.scale = sr.scale, min.obs=min.obs,resids = FALSE, fn.use = "lm", ar1 = FALSE)
-  
-  bm.tmp <- calcDetRickerBM(fit_obj = fit.tmp,sr.scale = sr.scale)
+   bm.tmp <- calcDetRickerBM(fit_obj = fit.tmp,sr.scale = sr.scale)
   if(trace){print(bm.tmp)}
   
   bm.det.store[stk,] <- bm.tmp

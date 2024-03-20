@@ -17,10 +17,9 @@ calcDetModelFit <- function(sr_obj,sr.scale = 10^6, min.obs=15,resids = FALSE, f
 
 
 sr.use  <- sr_obj %>% dplyr::filter(!is.na(logRpS),!is.na(Spn)) %>%
-				mutate(Spn = Spn / sr.scale, Rec = Rec / sr.scale)
+				mutate(Spn = Spn / sr.scale)
 
-
-
+if("Rec" %in% names(sr.use)){sr.use <- sr.use %>% mutate(Rec = Rec / sr.scale) }
 
 if(dim(sr.use)[1] >= min.obs){
 
