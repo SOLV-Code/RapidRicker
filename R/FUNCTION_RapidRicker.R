@@ -110,7 +110,10 @@ for(stk in stk.list){
   sr.sub <- sr_obj_m %>% dplyr::filter(Stock == stk)
   if(trace){print(sr.sub)}
   
-  bm.tmp <- calcDetRickerBM(sr_obj = sr.sub,min.obs=min.obs)
+  fit.tmp <- calcDetModelFit(sr_obj = sr.sub,
+  sr.scale = 10^6, min.obs=min.obs,resids = FALSE, fn.use = "lm", ar1 = FALSE)
+  
+  bm.tmp <- calcDetRickerBM(fit_obj = fit.tmp,sr.scale = 10^6)
   bm.det.store[stk,] <- bm.tmp
 }
 
