@@ -96,8 +96,8 @@ if(bm.test){
 
 if(trace){print("starting simple Ricker BM")}
 
-bm.cols <- c("n_obs", "ln_a","ln_a_c","a","b","sd","Smax","Seq","Seq.c","Smsy_h","Umsy_h",
-             "Smsy_p","Umsy_p")
+bm.cols <- c("n_obs", "ln_a","ln_a_c","a","b","sd","Smax","Seq","Seq.c","Smsy","Smsy.c",
+             "Umsy","Umsy.c")
 
 bm.det.store <- as.data.frame(matrix(NA,nrow=length(stk.list),ncol= length(bm.cols),
                                      dimnames=list(stk.list,bm.cols)))
@@ -114,6 +114,8 @@ for(stk in stk.list){
   sr.scale = 10^6, min.obs=min.obs,resids = FALSE, fn.use = "lm", ar1 = FALSE)
   
   bm.tmp <- calcDetRickerBM(fit_obj = fit.tmp,sr.scale = 10^6)
+  if(trace){print(bm.tmp)}
+  
   bm.det.store[stk,] <- bm.tmp
 }
 
