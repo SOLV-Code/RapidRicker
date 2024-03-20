@@ -13,7 +13,7 @@
 #' rapid.ricker.out <- RapidRicker(SR_Sample,min.obs = 10,  trace=FALSE)
 
 
-RapidRicker <- function(sr_obj_m,min.obs = 10, trace = TRUE, flags = NULL, data.check = TRUE, bm.test = TRUE){
+RapidRicker <- function(sr_obj_m,min.obs = 10, trace = TRUE, flags = NULL, data.check = TRUE, bm.test = TRUE,sr.scale=10^6){
 
 # NEED TO FIX:
 # - how trace = TRUE is handled throughout the subroutine calls
@@ -117,9 +117,9 @@ for(stk in stk.list){
   if(trace){print(sr.sub)}
   
   fit.tmp <- calcDetModelFit(sr_obj = sr.sub,
-  sr.scale = 10^6, min.obs=min.obs,resids = FALSE, fn.use = "lm", ar1 = FALSE)
+  sr.scale = sr.scale, min.obs=min.obs,resids = FALSE, fn.use = "lm", ar1 = FALSE)
   
-  bm.tmp <- calcDetRickerBM(fit_obj = fit.tmp,sr.scale = 10^6)
+  bm.tmp <- calcDetRickerBM(fit_obj = fit.tmp,sr.scale = sr.scale)
   if(trace){print(bm.tmp)}
   
   bm.det.store[stk,] <- bm.tmp
@@ -144,7 +144,7 @@ for(stk in stk.list){
 
   if(sum(!is.na(sr.sub$Spn) & !is.na(sr.sub$logRpS) ) > min.obs){
 
-    jack.tmp <- testDetRickerBM(sr_obj = sr.sub,min.obs=min.obs,type="jack")
+    jack.tmp <- testDetRickerBM(sr_obj = sr.sub,sr.scale = sr.scale,min.obs=min.obs,type="jack")
     jack.tmp <- jack.tmp %>% mutate(Stock = stk) %>% select(Stock, DropYr,everything())
     jack.bm.det.store <- rbind(jack.bm.det.store,jack.tmp)
     }
@@ -169,7 +169,7 @@ for(stk in stk.list){
   
   if(sum(!is.na(sr.sub$Spn) & !is.na(sr.sub$logRpS) ) > min.obs){
 
-    retro.tmp <- testDetRickerBM(sr_obj = sr.sub,min.obs=min.obs,type="retro")
+    retro.tmp <- testDetRickerBM(sr_obj = sr.sub,sr.scale = sr.scale,min.obs=min.obs,type="retro")
     retro.tmp <- retro.tmp %>% mutate(Stock = stk) %>% select(Stock, UpToYr,everything())
     retro.bm.det.store <- rbind(retro.bm.det.store,retro.tmp)
   }
@@ -196,7 +196,7 @@ for(stk in stk.list){
   
   if(sum(!is.na(sr.sub$Spn) & !is.na(sr.sub$logRpS) ) > min.obs){
 
-    revretro.tmp <- testDetRickerBM(sr_obj = sr.sub,min.obs=min.obs,type="revretro",trace=FALSE)
+    revretro.tmp <- testDetRickerBM(sr_obj = sr.sub,sr.scale = sr.scale,min.obs=min.obs,type="revretro",trace=FALSE)
     revretro.tmp <- revretro.tmp %>% mutate(Stock = stk) %>% select(Stock, SinceYr,everything())
     revretro.bm.det.store <- rbind(revretro.bm.det.store,revretro.tmp)
   }
@@ -228,9 +228,12 @@ for(stk in stk.list){
     sr.sub <- sr.sub %>% dplyr::filter(Spn < drop.val)
 
 
-  #print(paste("n.obs =",sum(!is.na(sr.sub$Spn) & !is.na(sr.sub$logRpS) )))
-  bm.tmp <- calcDetRickerBM(sr_obj = sr.sub,min.obs=min.obs)
-  #print(bm.tmp)
+  fit.tmp <- calcDetModelFit(sr_obj = sr.sub,
+  sr.scale = sr.scale, min.obs=min.obs,resids = FALSE, fn.use = "lm", ar1 = FALSE)
+  
+  bm.tmp <- calcDetRickerBM(fit_obj = fit.tmp,sr.scale = sr.scale)
+  if(trace){print(bm.tmp)}
+
   drop2.bm.det.store[stk,] <- bm.tmp
 
 }

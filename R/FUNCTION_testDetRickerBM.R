@@ -1,6 +1,6 @@
 #' testDetRickerBM
 #'
-#' This function calculates standard biological benchmarks (Smsy, Seq, Smax, Umsy) for different subsets of the input data, using the function calcDetRickerBM(). See calculation details there.
+#' This function calculates standard biological benchmarks (Smsy, Seq, Smax, Umsy) for different subsets of the input data, using the functions calcDetModelFit() and calcDetRickerBM(). See calculation details there.
 #' @param sr_obj a data frame with Year and Spn, logRpS (Data for 1 Stock!). Other variables can be there but are not used (RpS, Qual, ExpF etc). 
 #' @param min.obs min number of S-R pairs needed to fit a model
 #' @param type one of "jack" (for a drop 1 jackknife test), "retro" (retrospective test starting with min.obs, then adding more years), or "revretro" (reverse retrospective, starting with all years and them dropping the earlier obs one at a time until only the most recent min.obs are left).
@@ -12,12 +12,18 @@
 
 
 
-testDetRickerBM <- function(sr_obj,min.obs=15, type="jack",trace = FALSE){
+testDetRickerBM <- function(sr_obj,sr.scale = 10^6,min.obs=15, type="jack",trace = FALSE){
 
 sr.use  <- sr_obj %>% dplyr::filter(!is.na(logRpS),!is.na(Spn))
 
-bm.cols <- c("n_obs", "ln_a","ln_a_c","a","b","sd","Smax","Seq","Seq.c","Smsy_h","Umsy_h",
-             "Smsy_p","Umsy_p")
+
+# OLD
+#bm.cols <- c("n_obs", "ln_a","ln_a_c","a","b","sd","Smax","Seq","Seq.c","Smsy","Smsy.c",
+#             "Umsy","Umsy.c")
+
+# NEW
+bm.cols <- c("n_obs","ln.alpha","ln.alpha.c","alpha","alpha.c","beta","sigma","Seq",
+"Smax","Seq.c","Smsy","Smsy.c","Umsy","Umsy.c","Sgen","Sgen.c","SgenRatio","SgenRatio.c")
 			 
 
 if(type == "jack"){
@@ -26,7 +32,9 @@ if(type == "jack"){
                                      dimnames=list(yrs.do,bm.cols)))
 	for(yr in yrs.do){
 			sr.in <- sr.use %>% dplyr::filter(Year != yr)
-			bm.i <- calcDetRickerBM(sr_obj = sr.in,min.obs=min.obs)
+			fit.i <- calcDetModelFit(sr_obj = sr.in,
+				sr.scale = sr.scale, min.obs=min.obs,resids = FALSE, fn.use = "lm", ar1 = FALSE)
+			bm.i<- calcDetRickerBM(fit_obj = fit.i,sr.scale = sr.scale)
 			bm.test.store[as.character(yr),] <- bm.i
 		}
 		
@@ -46,7 +54,9 @@ if(type == "retro"){
                                      dimnames=list(yrs.do,bm.cols)))
 	for(yr in yrs.do){
 			sr.in <- sr.use %>% dplyr::filter(Year <= yr)
-			bm.i <- calcDetRickerBM(sr_obj = sr.in,min.obs=min.obs)
+			fit.i <- calcDetModelFit(sr_obj = sr.in,
+				sr.scale = sr.scale, min.obs=min.obs,resids = FALSE, fn.use = "lm", ar1 = FALSE)
+			bm.i<- calcDetRickerBM(fit_obj = fit.i,sr.scale = sr.scale)
 			bm.test.store[as.character(yr),] <- bm.i
 		}
 		
@@ -66,8 +76,9 @@ if(type == "revretro"){
                                      dimnames=list(yrs.do,bm.cols)))
 	for(yr in yrs.do){
 			sr.in <- sr.use %>% dplyr::filter(Year >= yr)
-			if(trace){print(sr.in$Year)}
-			bm.i <- calcDetRickerBM(sr_obj = sr.in,min.obs=min.obs)
+			fit.i <- calcDetModelFit(sr_obj = sr.in,
+				sr.scale = sr.scale, min.obs=min.obs,resids = FALSE, fn.use = "lm", ar1 = FALSE)
+			bm.i<- calcDetRickerBM(fit_obj = fit.i,sr.scale = sr.scale)
 			bm.test.store[as.character(yr),] <- bm.i
 		}
 		
