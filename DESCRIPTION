@@ -9,7 +9,7 @@ License: GNU GENERAL PUBLIC LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: tidyverse, dplyr, coda, R2jags, rstan, rstanarm, MASS, nlme
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.3
 Suggests: 
     rmarkdown,
     knitr

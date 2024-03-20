@@ -94,7 +94,7 @@ if(bm.test){
 #-----------------------------------------------------------------------
 # Part 1: Simple Ricker BM
 
-
+if(trace){print("starting simple Ricker BM")}
 
 bm.cols <- c("n_obs", "ln_a","ln_a_c","a","b","sd","Smax","Seq","Seq.c","Smsy_h","Umsy_h",
              "Smsy_p","Umsy_p")
@@ -108,7 +108,9 @@ for(stk in stk.list){
   print("------------")
   print(stk)
   sr.sub <- sr_obj_m %>% dplyr::filter(Stock == stk)
-  bm.tmp <- calcDetRickerBM(sr_obj = sr.sub,min.obs=)
+  if(trace){print(sr.sub)}
+  
+  bm.tmp <- calcDetRickerBM(sr_obj = sr.sub,min.obs=min.obs)
   bm.det.store[stk,] <- bm.tmp
 }
 

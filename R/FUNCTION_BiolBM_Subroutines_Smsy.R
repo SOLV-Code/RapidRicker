@@ -97,7 +97,7 @@ if(out.type == "BMOnly"){return(bind_cols(Smsy = smsy.est, Umsy = umsy.est))  }
 
 
 # ----------------------------------------------------------------------------------
-# Rapid Ricker Brute Force BruteForceimation
+# Rapid Ricker Brute Force Approximation
 # ----------------------------------------------------------------------------------
 
 
