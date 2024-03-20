@@ -96,8 +96,14 @@ if(bm.test){
 
 if(trace){print("starting simple Ricker BM")}
 
-bm.cols <- c("n_obs", "ln_a","ln_a_c","a","b","sd","Smax","Seq","Seq.c","Smsy","Smsy.c",
-             "Umsy","Umsy.c")
+# OLD
+#bm.cols <- c("n_obs", "ln_a","ln_a_c","a","b","sd","Smax","Seq","Seq.c","Smsy","Smsy.c",
+#             "Umsy","Umsy.c")
+
+# NEW
+bm.cols <- c("n_obs","ln.alpha","ln.alpha.c","alpha","alpha.c","beta","sigma","Seq",
+"Smax","Seq.c","Smsy","Smsy.c","Umsy","Umsy.c","Sgen","Sgen.c","SgenRatio","SgenRatio.c")
+
 
 bm.det.store <- as.data.frame(matrix(NA,nrow=length(stk.list),ncol= length(bm.cols),
                                      dimnames=list(stk.list,bm.cols)))
