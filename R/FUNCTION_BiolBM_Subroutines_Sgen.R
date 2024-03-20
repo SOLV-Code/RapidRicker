@@ -12,8 +12,7 @@
 # https://waves-vagues.dfo-mpo.gc.ca/Library/351191.pdf
 
 
-#  Need proper samSim citation
-# https://github.com/Pacific-salmon-assess/samSim
+#  SamSim: https://github.com/Pacific-salmon-assess/samSim
 
 # Connors, B.M., Cunningham C., Bradley C.A., Hamazaki T., and Liller, Z.W. 2022.
 # Estimates of biological benchmarks for the Canadian-origin Yukon River mainstem Chinook salmon

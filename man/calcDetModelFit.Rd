@@ -4,7 +4,14 @@
 \alias{calcDetModelFit}
 \title{calcDetModelFit}
 \usage{
-calcDetModelFit(sr_obj, sr.scale = 10^6, min.obs = 15, resids = FALSE)
+calcDetModelFit(
+  sr_obj,
+  sr.scale = 10^6,
+  min.obs = 15,
+  resids = FALSE,
+  fn.use = "lm",
+  ar1 = FALSE
+)
 }
 \arguments{
 \item{sr_obj}{a data frame with Year and Spn, logRpS , and Rec (Data for 1 Stock!). Other variables can be there but are not used (RpS, Qual, ExpF etc)}
@@ -12,12 +19,16 @@ calcDetModelFit(sr_obj, sr.scale = 10^6, min.obs = 15, resids = FALSE)
 \item{min.obs}{min number of S-R pairs needed to fit a model}
 
 \item{resids}{if TRUE, add the residuals to the output}
+
+\item{fn.use}{default is "lm" to use lm() from Base R. Alternative is "gls" to use the gls() function from the {nlme} package.}
+
+\item{ar1}{if TRUE, *and* if data set has no missing years, then calculate the Ricker fit with lag-1 autoregression. Note: this uses gls(), regardless of what setting is provided for the gls argument}
 }
 \description{
-This function calculates Ricker Model parameters for spawner-recruit data using a simple linear regression of log(R/S) ~ S.  Note that these are simple deterministic model fits intended for rapid testing of input data!
+This function calculates Ricker Model parameters for spawner-recruit data using a simple linear regression of log(R/S) ~ S.  Note that these are simple deterministic model fits intended for rapid testing of input data! Use of gls() function from {nlme} and AR1 version of deterministic fit, using gls(), contributed by Hamachan Hamazaki (ADFG).
 }
 \examples{
-ricker.fit <- calcDetModelFitSR_Sample[SR_Sample$Stock == "Stock1",],min.obs = 10)
+ricker.fit <- calcDetModelFit(SR_Sample[SR_Sample$Stock == "Stock1",],min.obs = 10)
 print(ricker.fit)
 }
 \keyword{Ricker}
