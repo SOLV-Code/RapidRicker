@@ -82,6 +82,7 @@ out.vec <-  c(n_obs = dim(sr.use)[1],
 			ln.alpha = NA,
 			ln.alpha.c = NA,
 			alpha = NA,
+			alpha.c = NA,
 			beta = NA,
 			sigma = NA
 			)
