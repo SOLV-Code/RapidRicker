@@ -169,6 +169,10 @@ na.count <- colSums(is.na(mcmc.df)) %>% as.data.frame() %>% rownames_to_column("
 summary.df <- left_join(as.data.frame(summary.df),  
 				unique(det.df), by = "VarType") %>%
 				mutate(Diff = p50 - Det) %>% mutate(PercDiff = round(Diff/Det *100,1)) %>%
+				mutate(Diffp10 = p10 - Det) %>% mutate(PercDiffp10 = round(Diffp10/Det *100,1)) %>%
+				mutate(Diffp25 = p25 - Det) %>% mutate(PercDiffp25 = round(Diffp25/Det *100,1)) %>%
+				mutate(Diffp75 = p75 - Det) %>% mutate(PercDiffp75 = round(Diffp75/Det *100,1)) %>%
+				mutate(Diffp90 = p90 - Det) %>% mutate(PercDiffp90 = round(Diffp90/Det *100,1)) %>%
 				left_join(na.count, by="Variable") %>%
                       select(VarType,Variable,everything()) #YrIdx,Yr,
 
