@@ -35,7 +35,7 @@ prior.list[custom.match] <- custom.list[custom.match]
 
 
 
-if(!is.na(prior.list$p.alpha) ){prior.list$p.alpha <- as.numeric(prior.list$p.alpha)} # because it might be text of the spec file has "default" for some entries
+if(!is.na(prior.list$p.alpha) ){prior.list$p.alpha <- as.numeric(prior.list$p.alpha)} # because it might be text if the spec file has "default" for some entries
 if(is.na(prior.list$p.alpha) ){
   #default mean for the normal (log) alpha parameter is 0, as per previous implementations
   # for the Kalman filter model, this is the mean of the first alpha, alpha[2] to alpha[N] are based on the previous alpha plus a step w[i]

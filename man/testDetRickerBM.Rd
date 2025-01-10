@@ -4,7 +4,13 @@
 \alias{testDetRickerBM}
 \title{testDetRickerBM}
 \usage{
-testDetRickerBM(sr_obj, min.obs = 15, type = "jack", trace = FALSE)
+testDetRickerBM(
+  sr_obj,
+  sr.scale = 10^6,
+  min.obs = 15,
+  type = "jack",
+  trace = FALSE
+)
 }
 \arguments{
 \item{sr_obj}{a data frame with Year and Spn, logRpS (Data for 1 Stock!). Other variables can be there but are not used (RpS, Qual, ExpF etc).}
@@ -16,7 +22,7 @@ testDetRickerBM(sr_obj, min.obs = 15, type = "jack", trace = FALSE)
 \item{trace}{if TRUE, print various intermediate diagnostic output to the console}
 }
 \description{
-This function calculates standard biological benchmarks (Smsy, Seq, Smax, Umsy) for different subsets of the input data, using the function calcDetRickerBM(). See calculation details there.
+This function calculates standard biological benchmarks (Smsy, Seq, Smax, Umsy) for different subsets of the input data, using the functions calcDetModelFit() and calcDetRickerBM(). See calculation details there.
 }
 \examples{
 ricker.test <- testDetRickerBM(SR_Sample[SR_Sample$Stock == "Stock1",],min.obs = 10,  type="retro")
