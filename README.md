@@ -4,18 +4,18 @@ R Package to run spawner-recruit data quality checks and test the sensitivity of
 
 Development Team: Gottfried Pestal, Charmaine Carr-Harris, Steven Cox-Rogers
 
-**Important Notes:** 
+## Important Notes
+
+* **Ricker Parameters and Benchmark Estimates**: Ricker model fits and biological benchmarks are simple deterministic fits based on ```lm(logRpS ~ S)```. These are intended solely as a rapid check for the sensitivity to different ways of subsetting the data.  We envision this as a pre-screening step to plan out more formal model fitting and sensitivity testing (e.g. Bayesian models with time-varying productivity, hierarchical models with shared productivity estimates across stocks).
+
+* **Bayesian Ricker Fits**: This package includes functions that implement Bayesian Ricker fits via the R2jags package. These are now obsolete, because the [samEst package](https://github.com/Pacific-salmon-assess/samEst) does the same thing faster and more reliably using using STAN. However, we've kept the Bayesian functions in this package to ensure archived code for completed research documents keeps working.
 
 
-* **WARNING: This package is currently being fundamentally revised. For the next little while, analyses may not run,
-or worse, they may run with nonsense output! Stay tuned for the next working version! Check progress on the [To Do List](https://github.com/SOLV-Code/RapidRicker/issues/118)** 
 
-* This package is under development. Functions may change rapidly and substantially. Do not use these if you are not part of the development team!
-* WARNING: The age comp diagnostics in the data check were not behaving properly. See [this issue](https://github.com/SOLV-Code/RapidRicker/issues/61) for details, and [this wiki page] for context. Therefore, the
-corresponding steps have been commented out in the *checkSRData() fn, and the associated trigger values have been removed from the *flags_default* object.
-* SR model fits and biological benchmarks are simple deterministic fits based on ```lm(logRpS ~ S)```. These are intended solely as a rapid check for the sensitivity to different ways of subsetting the data.  We envision this as a pre-screening step to plan out more formal model fitting and sensitivity testing (e.g. Bayesian models with time-varying productivity, hierarchical models with shared productivity estimates across stocks).
+## Functions
 
-For now *RapidRicker* includes 3 functions that work on data for a single stock:
+
+*RapidRicker* includes 3 functions that work on data for a single stock:
 
 *  *checkSRData()*: calculates a set of diagnostics for the spawner-recruit data. Some apply to the whole series (e.g. the contrast in spawner estimates), while others flag individual observations (e.g. R/S above user-specified plausible upper bound, pointing to a potential data error in either R or S).
 * *calcDetRickerBM()*: fits a simple linear regression to ```log(R/S) ~ S``` and calculates standard biological
@@ -24,13 +24,7 @@ benchmarks (Smsy, Smax, Seq, Umsy)
 
 There is also a wrapper function *RapidRicker()* that applies all of these to a data set with multiple stocks and generates a compact output object with list elements for the data check (summary tables, details), BM estimates, and sensitivity tests (e.g. BM values for each step in the retrospective, and a summary of min/max % diff of the retrospective values compared to the base case with all values).
 
-
-*Update*: Basic Bayesian estimates are being added in the *calcMCMCRickerBM()* function, with the planned option of running them through the R2jags package, the Rstanarm package (with a syntax like R's lm function) or the Rstan package ("traditional" STAN). Depending on speed, these may be incorporated into the overall *RapidRicker()* function call, or stay as a standalone extension.
-
-
-
 To get up and running with some examples, follow the *Quick Start* steps below.
-
 
 
 ## Quick Start
@@ -75,8 +69,6 @@ head(SR_Sample) # shows the first few rows
 
 		
 ```
-
-
 
 
 ## Worked Examples

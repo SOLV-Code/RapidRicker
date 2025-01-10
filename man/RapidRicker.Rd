@@ -10,7 +10,8 @@ RapidRicker(
   trace = TRUE,
   flags = NULL,
   data.check = TRUE,
-  bm.test = TRUE
+  bm.test = TRUE,
+  sr.scale = 10^6
 )
 }
 \arguments{
