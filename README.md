@@ -4,6 +4,17 @@ R Package to run spawner-recruit data quality checks and test the sensitivity of
 
 Development Team: Gottfried Pestal, Charmaine Carr-Harris, Steven Cox-Rogers
 
+## Citation
+
+G. Pestal, C. Carr-Harris, and S. Cox-Rogers. 2025. SOLV-Code/RapidRicker (v1.1). Zenodo. https://doi.org/10.5281/zenodo.14635888
+
+
+[![DOI](https://zenodo.org/badge/308917272.svg)](https://doi.org/10.5281/zenodo.14635888)
+
+
+
+
+
 ## Important Notes
 
 * **Ricker Parameters and Benchmark Estimates**: Ricker model fits and biological benchmarks are simple deterministic fits based on ```lm(logRpS ~ S)```. These are intended solely as a rapid check for the sensitivity to different ways of subsetting the data.  We envision this as a pre-screening step to plan out more formal model fitting and sensitivity testing (e.g. Bayesian models with time-varying productivity, hierarchical models with shared productivity estimates across stocks).
