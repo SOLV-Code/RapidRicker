@@ -8,7 +8,7 @@ Development Team: Gottfried Pestal, Charmaine Carr-Harris, Steven Cox-Rogers
 
 * **Ricker Parameters and Benchmark Estimates**: Ricker model fits and biological benchmarks are simple deterministic fits based on ```lm(logRpS ~ S)```. These are intended solely as a rapid check for the sensitivity to different ways of subsetting the data.  We envision this as a pre-screening step to plan out more formal model fitting and sensitivity testing (e.g. Bayesian models with time-varying productivity, hierarchical models with shared productivity estimates across stocks).
 
-* **Bayesian Ricker Fits**: This package includes functions that implement Bayesian Ricker fits via the R2jags package. These are now obsolete, because the [samEst package](https://github.com/Pacific-salmon-assess/samEst) does the same thing faster and more reliably using using STAN. However, we've kept the Bayesian functions in this package to ensure archived code for completed research documents keeps working.
+* **Bayesian Ricker Fits**: This package includes functions that implement Bayesian Ricker fits via the R2jags package. These are now obsolete, because the [samEst package](https://github.com/Pacific-salmon-assess/samEst) does the same thing faster and more reliably using STAN. However, we've kept the Bayesian functions in this package to ensure archived code for completed research documents keeps working.
 
 
 
@@ -73,6 +73,7 @@ head(SR_Sample) # shows the first few rows
 
 ## Worked Examples
 
+**Below are some code examples. The [RapidRicker-Demo repository](https://github.com/SOLV-Code/RapidRicker-Demo) has a full demonstration of the full workflow using these functions using a sample data set.**
 
 ### Load the Package
 
